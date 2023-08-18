@@ -1,16 +1,13 @@
-/** https://github.com/i7/extensions/blob/master/Ron%20Newcomb/Problem-Solving%20Characters.i7x */
-
 type Button = any;
 
 interface Character {
+  name: string;
   buttons: Button[];
-  think: () => {};
+  think: () => void;
   //act: Act;
 
   goals: Attempt;
 }
-
-const characters: Character[] = [];
 
 interface WhyHowNode {
   parent?: WhyHowNode;
@@ -24,12 +21,13 @@ interface Action {
   actor?: Character;
 }
 
-const Waiting: Action = { verb: "wait" };
-
+/** An action which has failed.  Attempts record which Check rule prevented the action and whether the action could or should be re-attempted later.
+ *  For a re-attempt to be successful, certain pre-requisites need to be 'fulfilled' (a relation) by other actions, so the same Check rule doesn't
+ *  simply stop the action again. */
 interface Attempt {
   action: Action;
   status: "untried" | "failed" | "partly successful" | "successful";
-  meddlingCheckRule: Rule<any>;
+  meddlingCheckRule?: Rule<any>;
   fulfills?: Attempt; //  .parent
 }
 
@@ -42,14 +40,22 @@ interface Planner {
 
 interface Option extends Action {}
 
+const characters: Character[] = [];
+const globalAttemptList: Attempt[] = [];
+
+function attempts(): Attempt[] {
+  return globalAttemptList;
+}
+
 let reasonActionFailed: Rule<any> | undefined;
 let personAsked: Character;
 let currentAction: Action;
 let player: Character;
 
-function weCouldTry(actor: Character, suggestion: Action) {
+function weCouldTry(actor: Character, suggestion: Action): Attempt {
   let thisAttempt = whatTheyAreTryingToDoNow(actor); //  whatactortryingtoaccomplishnow;
   let circumvention = {} as Attempt;
+  globalAttemptList.push(circumvention);
   circumvention.action = suggestion;
   circumvention.action.actor = actor;
   circumvention.status = "untried";
@@ -61,36 +67,88 @@ function weCouldTry(actor: Character, suggestion: Action) {
     thisAttempt.fulfills = actor.goals;
     thisAttempt.meddlingCheckRule = reasonActionFailed!;
     actor.goals.status = "untried";
+    globalAttemptList.push(thisAttempt);
   }
   circumvention.fulfills = thisAttempt;
+  return circumvention;
 }
 
 const makeNoDecision: undefined = undefined;
 type RuleOutcome = "success" | "failed" | typeof makeNoDecision;
-type Rule<T> = ((x: T, noun: Noun, secondNoun: Noun) => RuleOutcome) & { name?: string };
+type Rule<T> = ((x: T, noun: Noun | undefined, secondNoun: Noun | undefined, actor?: Character) => RuleOutcome) & { name?: string };
+const pretendItWorked: RuleOutcome = "success";
 
 interface Rulebook<T> {
   rules: Rule<T>[];
 }
 
-function attempts(): Attempt[] {
-  return [];
+function getRulebookFor<T>(act: Action): Rulebook<T> {
+  switch (act.verb) {
+    case "wait":
+      return { rules: [] };
+    case "exit":
+      return { rules: [() => "failed"] };
+    default:
+      return { rules: [] };
+  }
 }
 
-const dontPlanForPlayer: Rule<Character> = () => {
-  // First when hindered by (this is don't plan for player rule): if person asked is player, do nothing instead.
-  if (personAsked == player) return "failed";
-};
+function executeRulebook<T>(
+  rulebook: Rulebook<T>,
+  on: T,
+  actor: Character,
+  noun: Noun | undefined,
+  secondNoun: Noun | undefined
+): RuleOutcome {
+  for (const rule of rulebook.rules) {
+    const outcome = rule(on, noun, secondNoun, actor);
+    if (!!outcome) {
+      reasonActionFailed = rule;
+      return outcome;
+    }
+  }
+  return makeNoDecision;
+}
 
-const updatePlansOnSuccess: Rule<Character> = (actor: Character, noun: Noun, secondNoun: Noun) => {
-  //First after an actor doing something (this is update plans on success rule):
+function doingThings(todo: Action, actor: Character, noun: Noun | undefined, secondNoun: Noun | undefined) {
+  personAsked = actor;
+  reasonActionFailed = undefined;
+  currentAction = todo;
+
+  // DO the currentAction and get status
+  const rb = getRulebookFor(currentAction);
+  const outcome: RuleOutcome = executeRulebook(rb, noun, actor, noun, secondNoun);
+
+  // update trees
+  if (outcome == "failed") updatePlansOnFailure(actor, noun, secondNoun);
+  else updatePlansOnSuccess(actor, noun, secondNoun);
+}
+
+function main() {
+  const Rose: Character = {
+    name: "Rose",
+    buttons: [],
+    think: () => {},
+    goals: { action: { verb: "wait" }, status: "untried", meddlingCheckRule: undefined },
+  };
+  characters.push(Rose);
+
+  console.log(JSON.stringify(characters, undefined, 4));
+
+  doingThings(Exiting, Rose, undefined, undefined);
+
+  console.log(JSON.stringify(characters, undefined, 4));
+}
+
+//First after an actor doing something (this is update plans on success rule):
+const updatePlansOnSuccess: Rule<Character> = (actor: Character, noun: Noun | undefined, secondNoun: Noun | undefined) => {
   let thisAttempt: Attempt = whatTheyWillDoNext(actor);
   if (currentAction == thisAttempt.action) thisAttempt.status = "successful";
   return makeNoDecision;
 };
 
-const updatePlansOnFailure: Rule<Character> = (actor: Character, noun: Noun, secondNoun: Noun) => {
-  //} First after not an actor doing something (this is update plans on failure rule):
+//} First after not an actor doing something (this is update plans on failure rule):
+const updatePlansOnFailure: Rule<Character> = (actor: Character, noun: Noun | undefined, secondNoun: Noun | undefined) => {
   let thisAttempt: Attempt | undefined = whatTheyWillDoNext(actor);
   // TODO what's the next line for?????
   // if ( currentAction != thisAttempt.action )		 thisAttempt = undefined  ;
@@ -125,14 +183,8 @@ const isTopLevel = (it: Attempt) => !it.fulfills; // someone plans the cause of 
 const busy = (actor: Character) => !quiescent(actor);
 const quiescent = (actor: Character) => attempts().every(at => at.fulfills == actor.goals && inThePast(at)); // all attempts which [could possibly] fulfill goals of actor are in past;
 
-// function executeRulebook<T>(rulebook:Rulebook<T >, on: T):RuleOutcome{
-//     for(const rule of rulebook.rules) {
-//         const outcome = rule(on);
-//         if (!!outcome)return outcome;
-//     }
-//     return makeNoDecision;
-// }
-
+const Waiting: Action = { verb: "wait" };
+const Exiting: Action = { verb: "exit" };
 const Taking = (noun: Noun): Action => ({ verb: "take", directObject: noun });
 const TakingOff = (noun: Noun): Action => ({ verb: "take off", directObject: noun });
 const Opening = (noun: Noun): Action => ({ verb: "open", directObject: noun });
@@ -141,64 +193,65 @@ const Dropping = (noun: Noun): Action => ({ verb: "drop", directObject: noun });
 const AskingFor = (noun: Noun, secondNoun: Noun): Action => ({ verb: "ask for", directObject: noun, indirectObject: secondNoun });
 const PuttingOn = (noun: Noun, secondNoun: Noun): Action => ({ verb: "put on", directObject: noun, indirectObject: secondNoun });
 
-const whenHinderedBy = (r: Rule<any>, actor: Character, noun: Noun, secondNoun: Noun): RuleOutcome => {
+const whenHinderedBy = (r: Rule<any>, actor: Character, noun: Noun | undefined, secondNoun: Noun | undefined): RuleOutcome => {
+  // First when hindered by (this is don't plan for player rule): if person asked is player, do nothing instead.
+  if (actor == player) return "failed";
+
   switch (r.name) {
     case "cant wear whats not held":
-      weCouldTry(actor, Taking(noun));
+      if (noun) weCouldTry(actor, Taking(noun));
       break;
     case "cant wave whats not held":
-      weCouldTry(actor, Taking(noun));
+      if (noun) weCouldTry(actor, Taking(noun));
       break;
     case "cant show what you havent got":
-      weCouldTry(actor, Taking(noun));
+      if (noun) weCouldTry(actor, Taking(noun));
       break;
     case "cant give what you havent got":
-      weCouldTry(actor, Taking(noun));
+      if (noun) weCouldTry(actor, Taking(noun));
       break;
     case "cant take what youre inside":
-      weCouldTry(actor, { verb: "exit" });
+      weCouldTry(actor, Exiting);
       break;
     case "cant enter closed containers":
-      weCouldTry(actor, Opening(noun));
+      if (noun) weCouldTry(actor, Opening(noun));
       break;
     //  case "cant exit closed containers": weCouldTry(actor,Opening (personAsked.holder));break;
     case "cant insert into closed containers":
-      weCouldTry(actor, Opening(secondNoun));
+      if (secondNoun) weCouldTry(actor, Opening(secondNoun));
       break;
     //  case "cant search closed opaque containers": if (    noun == a closed opaque container ) weCouldTry(actor,Opening(noun));break;
     case "cant lock whats open":
-      weCouldTry(actor, Closing(noun));
+      if (noun) weCouldTry(actor, Closing(noun));
       break;
     case "cant enter something carried":
-      weCouldTry(actor, Dropping(noun));
+      if (noun) weCouldTry(actor, Dropping(noun));
       break;
     case "cant put onto something being carried":
-      weCouldTry(actor, Dropping(secondNoun));
-      weCouldTry(actor, PuttingOn(noun, secondNoun));
+      if (secondNoun) weCouldTry(actor, Dropping(secondNoun));
+      if (noun && secondNoun) weCouldTry(actor, PuttingOn(noun, secondNoun));
       break;
     case "cant drop clothes being worn":
-      weCouldTry(actor, TakingOff(noun));
+      if (noun) weCouldTry(actor, TakingOff(noun));
       break;
     case "cant put clothes being worn":
-      weCouldTry(actor, TakingOff(noun));
+      if (noun) weCouldTry(actor, TakingOff(noun));
       break;
     //  case "cant take peoples possessions": weCouldTry(actor,AskingFor(  noun.holder,  noun));break;
     case "cant insert clothes being worn":
-      weCouldTry(actor, TakingOff(noun));
+      if (noun) weCouldTry(actor, TakingOff(noun));
       break;
     case "cant give clothes being worn":
-      weCouldTry(actor, TakingOff(noun));
+      if (noun) weCouldTry(actor, TakingOff(noun));
       break;
-
     case "carrying requirements":
-      weCouldTry(actor, Taking(noun));
+      if (noun) weCouldTry(actor, Taking(noun));
       break;
     default:
       return pretendItWorked;
   }
+  return makeNoDecision;
 };
-
-const pretendItWorked = "success";
 
 let confusedAboutTiming: boolean;
 

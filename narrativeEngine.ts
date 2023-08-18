@@ -93,31 +93,25 @@ function getRulebookFor<T>(act: Action): Rulebook<T> {
   }
 }
 
-function executeRulebook<T>(
-  rulebook: Rulebook<T>,
-  on: T,
-  actor: Character,
-  noun: Noun | undefined,
-  secondNoun: Noun | undefined
-): RuleOutcome {
+function executeRulebook<T>(rulebook: Rulebook<T>, on: T, actor: Character, noun?: Noun, secondNoun?: Noun): RuleOutcome {
   for (const rule of rulebook.rules) {
     const outcome = rule(on, noun, secondNoun, actor);
-    if (!!outcome) {
-      reasonActionFailed = rule;
-      return outcome;
-    }
+    if (outcome == "failed") reasonActionFailed = rule;
+    if (!!outcome) return outcome;
   }
   return makeNoDecision;
 }
 
-function doingThings(todo: Action, actor: Character, noun: Noun | undefined, secondNoun: Noun | undefined) {
+function doThing(todo: Action, actor: Character, noun?: Noun, secondNoun?: Noun) {
   personAsked = actor;
   reasonActionFailed = undefined;
   currentAction = todo;
+  if (!todo) throw "no TODO";
 
   // DO the currentAction and get status
   const rb = getRulebookFor(currentAction);
   const outcome: RuleOutcome = executeRulebook(rb, noun, actor, noun, secondNoun);
+  console.log(todo.verb, outcome);
 
   // update trees
   if (outcome == "failed") updatePlansOnFailure(actor, noun, secondNoun);
@@ -129,13 +123,21 @@ function main() {
     name: "Rose",
     buttons: [],
     think: () => {},
-    goals: { action: { verb: "wait" }, status: "untried", meddlingCheckRule: undefined },
+    goals: { action: { verb: "wait" }, status: "untried" },
   };
   characters.push(Rose);
+  console.log(JSON.stringify(characters, undefined, 4));
+
+  // go
+  doThing(Exiting, Rose, undefined, undefined);
 
   console.log(JSON.stringify(characters, undefined, 4));
 
-  doingThings(Exiting, Rose, undefined, undefined);
+  doThing(Exiting, Rose, undefined, undefined);
+
+  console.log(JSON.stringify(characters, undefined, 4));
+
+  doThing(Exiting, Rose, undefined, undefined);
 
   console.log(JSON.stringify(characters, undefined, 4));
 }
@@ -184,7 +186,7 @@ const busy = (actor: Character) => !quiescent(actor);
 const quiescent = (actor: Character) => attempts().every(at => at.fulfills == actor.goals && inThePast(at)); // all attempts which [could possibly] fulfill goals of actor are in past;
 
 const Waiting: Action = { verb: "wait" };
-const Exiting: Action = { verb: "exit" };
+const Exiting: Action = { verb: "exit" } as const;
 const Taking = (noun: Noun): Action => ({ verb: "take", directObject: noun });
 const TakingOff = (noun: Noun): Action => ({ verb: "take off", directObject: noun });
 const Opening = (noun: Noun): Action => ({ verb: "open", directObject: noun });
@@ -292,9 +294,11 @@ const howTheyWill = (actor: Character, act: Attempt): Attempt => {
 
 const howTheyCan = (actor: Character, act: Attempt): Attempt[] => {
   //[	return list of not in past attempts which fulfill act.]
+  console.log("  How can", actor.name, stringifyAttempt(act));
   let choices = [] as Attempt[];
   const list = attempts().filter(at => !inThePast(at) && at.fulfills == act); // not in past attempts which fulfill act
   for (const item of list) choices.push(item);
+  console.log("  choices are", choices.map(stringifyAttempt));
   return choices;
 };
 
@@ -315,6 +319,7 @@ const howTheyCouldHave = (actor: Character, act: Attempt): Attempt[] => {
 };
 
 const whatTheyAreTryingToDoNow = (actor: Character): Attempt => {
+  console.log("  What is", actor.name, "trying to do now?");
   let thisAct = actor.goals;
   let details = attempts().find(at => hindered(at) && at.fulfills == thisAct);
   while (details) {
@@ -322,13 +327,28 @@ const whatTheyAreTryingToDoNow = (actor: Character): Attempt => {
     thisAct = details;
     details = attempts().find(at => hindered(at) && at.fulfills == thisAct);
   }
+  printAttempt(thisAct);
   return thisAct; // [the most finely detailed, and hindered,]
 };
 
+function stringifyAction(act: Action): string {
+  return (act.actor?.name || "") + " " + act.verb + " " + (act.indirectObject || "") + " " + (act.directObject || "");
+}
+
+function stringifyAttempt(attempt: Attempt): string {
+  return stringifyAction(attempt.action) + " (" + attempt.status + ")";
+}
+
+function printAttempt(attempt: Attempt) {
+  console.log("  '" + stringifyAttempt(attempt) + '"');
+}
+
 const whatTheyWillDoNext = (actor: Character): Attempt => {
+  console.log("  What will", actor.name, "do next?");
   let choices = howTheyCan(actor, whatTheyAreTryingToDoNow(actor));
   for (const item of choices) if (item.status == "untried") return item;
   actor.goals.action = Waiting;
+  printAttempt(actor.goals);
   return actor.goals; // of actor. ["I don't know"]
 };
 
@@ -338,3 +358,5 @@ const whichActionFromTheAgendaOf = (act: Action, performer: Character): Attempt 
   for (const item of attempts()) if (act == item.action) mostRecentAnswer = item;
   return mostRecentAnswer;
 };
+
+main();

@@ -1,14 +1,95 @@
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var makeNoDecision = undefined;
 var pretendItWorked = "success";
 ///////////////
 var characters = [];
 var reasonActionFailed;
 var personAsked;
-var currentAction;
 var player;
-///////////
+var Waiting = {
+    verb: "wait",
+    createAction: function (actor) { return ({ verb: Waiting.verb, actor: actor, definition: Waiting }); },
+    rulebook: { rules: [] }
+};
+var Exiting = {
+    verb: "exit",
+    createAction: function (actor) { return ({ verb: Exiting.verb, actor: actor, definition: Exiting }); },
+    rulebook: {
+        rules: [
+            function cantlockwhatsopen() {
+                return "failed";
+            },
+        ]
+    }
+};
+var Taking = {
+    verb: "take",
+    createAction: function (actor, noun) { return ({ verb: Taking.verb, directObject: noun, actor: actor, definition: Taking }); },
+    rulebook: { rules: [] }
+};
+var TakingOff = {
+    verb: "take off",
+    createAction: function (actor, noun) { return ({ verb: TakingOff.verb, directObject: noun, actor: actor, definition: TakingOff }); },
+    rulebook: { rules: [] }
+};
+var Opening = {
+    verb: "open",
+    createAction: function (actor, noun) { return ({ verb: Opening.verb, directObject: noun, actor: actor, definition: Opening }); },
+    rulebook: { rules: [] }
+};
+var Closing = {
+    verb: "close",
+    createAction: function (actor, noun) { return ({ verb: Closing.verb, directObject: noun, actor: actor, definition: Closing }); },
+    rulebook: { rules: [] }
+};
+var Dropping = {
+    verb: "wait",
+    createAction: function (actor, noun) { return ({ verb: Dropping.verb, directObject: noun, actor: actor, definition: Dropping }); },
+    rulebook: { rules: [] }
+};
+var AskingFor = {
+    verb: "asking _ for",
+    createAction: function (actor, noun, secondNoun) { return ({
+        verb: AskingFor.verb,
+        actor: actor,
+        directObject: noun,
+        indirectObject: secondNoun,
+        definition: AskingFor
+    }); },
+    rulebook: { rules: [] }
+};
+var PuttingOn = {
+    verb: "putting _ on",
+    createAction: function (actor, noun, secondNoun) { return ({
+        verb: PuttingOn.verb,
+        actor: actor,
+        directObject: noun,
+        indirectObject: secondNoun,
+        definition: PuttingOn
+    }); },
+    rulebook: { rules: [] }
+};
+/////////// debug
 function stringify(obj) {
-    return JSON.stringify(obj, function (key, value) { return (key == "actor" && !!value ? "\\\\".concat(value.name) : key == "fulfills" && !!value ? "\\\\<backlink>" : value); }, 4);
+    return JSON.stringify(obj, function (key, value) {
+        return key == "actor" && !!value
+            ? "\\\\".concat(value.name)
+            : key == "fulfills" && !!value
+                ? "\\\\<backlink>"
+                : key == "definition"
+                    ? undefined
+                    : value;
+    }, 4);
 }
 function stringifyAction(act) {
     var _a;
@@ -20,55 +101,12 @@ function stringifyAttempt(attempt) {
 function printAttempt(attempt) {
     console.log("  '" + stringifyAttempt(attempt) + '"');
 }
-////////////
-function weCouldTry(actor, suggestion) {
-    var thisAttempt = whatTheyAreTryingToDoNow(actor);
-    console.log(actor.name, "could try", stringifyAction(suggestion), "before", stringifyAttempt(thisAttempt));
-    var circumvention = {
-        action: suggestion,
-        status: "untried",
-        fulfills: undefined,
-        fullfilledBy: []
-    };
-    circumvention.action.actor = actor;
-    if (thisAttempt == actor.goals[0]) {
-        console.log("replacing toplevel goal");
-        var newAttempt = {
-            action: currentAction,
-            status: "untried",
-            fulfills: actor.goals[0],
-            fullfilledBy: [],
-            meddlingCheckRule: reasonActionFailed
-        };
-        newAttempt.action.actor = actor;
-        thisAttempt = newAttempt;
-        actor.goals[0].fullfilledBy.push(newAttempt);
-        actor.goals[0].status = "untried";
-    }
-    thisAttempt.fullfilledBy.push(circumvention);
-    circumvention.fulfills = thisAttempt;
-    return circumvention;
-}
-function getRulebookFor(act) {
-    switch (act.verb) {
-        case "wait":
-            return { rules: [] };
-        case "exit":
-            return {
-                rules: [
-                    function cantlockwhatsopen() {
-                        return "failed";
-                    },
-                ]
-            };
-        default:
-            return { rules: [] };
-    }
-}
-function executeRulebook(rulebook, on, actor, noun, secondNoun) {
+//////////// action machinery
+function executeRulebook(act) {
+    var rulebook = act.definition.rulebook;
     for (var _i = 0, _a = rulebook.rules; _i < _a.length; _i++) {
         var rule = _a[_i];
-        var outcome = rule(on, noun, secondNoun, actor);
+        var outcome = rule(act.directObject, act.indirectObject, act.actor);
         if (outcome == "failed")
             reasonActionFailed = rule;
         if (!!outcome)
@@ -76,87 +114,61 @@ function executeRulebook(rulebook, on, actor, noun, secondNoun) {
     }
     return makeNoDecision;
 }
-function doThing(todo, actor) {
-    if (!todo)
+/** performs the action */
+function doThing(thisAttempt, actor) {
+    if (!thisAttempt)
         throw "no TODO";
+    if (!actor)
+        throw "no ACTOR";
     personAsked = actor;
     reasonActionFailed = undefined;
-    currentAction = todo.action;
-    var verb = currentAction.verb;
-    var noun = currentAction.directObject;
-    var secondNoun = currentAction.indirectObject;
     // DO the currentAction and get status
-    var rb = getRulebookFor(currentAction);
-    var outcome = executeRulebook(rb, noun, actor, noun, secondNoun);
-    console.log(verb, "is done:", outcome);
-    // update trees
-    if (outcome == "failed")
-        updatePlansOnFailure(todo);
-    else
-        updatePlansOnSuccess(actor, noun, secondNoun);
-}
-function main() {
-    var Rose = {
-        name: "Rose",
-        buttons: [],
-        think: function () { },
-        goals: []
-    };
-    Rose.goals.push({ action: Exiting(Rose), status: "untried", fullfilledBy: [], fulfills: undefined });
-    characters.push(Rose);
-    console.log(stringify(characters));
-    /// init end
-    var next = whatTheyAreTryingToDoNow(Rose);
-    console.log("Her next is", stringifyAttempt(next));
-    // go
-    doThing(next, Rose);
-    console.log(stringify(characters));
-    // doThing(Exiting, Rose, undefined, undefined);
-    // console.log(JSON.stringify(characters, undefined, 4));
-    // doThing(Exiting, Rose, undefined, undefined);
-    // console.log(JSON.stringify(characters, undefined, 4));
-}
-//First after an actor doing something (this is update plans on success rule):
-var updatePlansOnSuccess = function (actor, noun, secondNoun) {
-    var thisAttempt = whatTheyWillDoNext(actor);
-    if (!thisAttempt)
-        return makeNoDecision; // nothing to do, always succeeds
-    if (currentAction == thisAttempt.action)
+    var outcome = executeRulebook(thisAttempt.action);
+    console.log(thisAttempt.action.verb, "is done:", outcome);
+    // update trees to record result
+    if (outcome != "failed") {
         thisAttempt.status = "successful";
-    return makeNoDecision;
-};
-//} First after not an actor doing something (this is update plans on failure rule):
-var updatePlansOnFailure = function (thisAttempt) {
-    //console.log("updatePlansOnFailure");
-    // let thisAttempt = whatTheyWillDoNext(actor);
-    // if (!thisAttempt) {
-    //   console.log("Update plans on failure -- nothing to do");
-    //   return;
-    // }
-    console.log("Update plans on failure", stringifyAttempt(thisAttempt));
-    var actor = thisAttempt.action.actor;
-    var noun = thisAttempt.action.directObject;
-    var secondNoun = thisAttempt.action.indirectObject;
-    // TODO what's the next line for?????
-    // if (currentAction != thisAttempt.action) thisAttempt = undefined as any;
-    //const solution = attempts().filter(attempt => attempt.status == "successful" && attempt.fulfills == thisAttempt);
-    var solution = thisAttempt.fullfilledBy.filter(function (a) { return a.status == "successful"; });
-    //if (a successful attempt (called solution) fulfills thisAttempt) {
-    if (solution.length > 0) {
-        if (reasonActionFailed != thisAttempt.meddlingCheckRule)
-            thisAttempt.status = "partly successful";
     }
-    console.log(solution.length, "partial solutions found");
-    var outcome = whenHinderedBy(reasonActionFailed, actor, noun, secondNoun); //	follow when hindered by rules for reason action failed;
-    console.log("circumventions", outcome, thisAttempt.fullfilledBy);
-    if (outcome == pretendItWorked)
-        thisAttempt.status = "successful";
-    else if (thisAttempt.fullfilledBy.length == 0)
-        thisAttempt.status = "failed";
-    else if (thisAttempt.fullfilledBy.length > 0)
-        thisAttempt.status = "partly successful";
+    else {
+        console.log("Update plans on failure", stringifyAttempt(thisAttempt));
+        var solution = thisAttempt.fullfilledBy.filter(function (a) { return a.status == "successful"; });
+        if (solution.length > 0) {
+            if (reasonActionFailed != thisAttempt.meddlingCheckRule)
+                thisAttempt.status = "partly successful";
+        }
+        console.log(solution.length, "partial solutions found");
+        var outcome_1 = whenHinderedBy(thisAttempt, reasonActionFailed); //	follow when hindered by rules for reason action failed;
+        console.log("circumventions outcome:", outcome_1, ".  Could be fulfilled by:", thisAttempt.fullfilledBy.map(stringifyAttempt));
+        thisAttempt.status = outcome_1 == pretendItWorked ? "successful" : thisAttempt.fullfilledBy.length > 0 ? "partly successful" : "failed";
+    }
     return makeNoDecision;
-};
+}
+/////////// Planner AI
+// //First after an actor doing something (this is update plans on success rule):
+// const updatePlansOnSuccess = (thisAttempt: Attempt) => {
+//   if (!thisAttempt) return makeNoDecision; // nothing to do, always succeeds
+//   if (currentAction == thisAttempt.action) thisAttempt.status = "successful";
+//   return makeNoDecision;
+// };
+// //} First after not an actor doing something (this is update plans on failure rule):
+// const updatePlansOnFailure = (thisAttempt: Attempt) => {
+//   //console.log("updatePlansOnFailure");
+//   // let thisAttempt = whatTheyWillDoNext(actor);
+//   // if (!thisAttempt) {
+//   //   console.log("Update plans on failure -- nothing to do");
+//   //   return;
+//   // }
+//   console.log("Update plans on failure", stringifyAttempt(thisAttempt));
+//   const solution = thisAttempt.fullfilledBy.filter(a => a.status == "successful");
+//   if (solution.length > 0) {
+//     if (reasonActionFailed != thisAttempt.meddlingCheckRule) thisAttempt.status = "partly successful";
+//   }
+//   console.log(solution.length, "partial solutions found");
+//   const outcome = whenHinderedBy(thisAttempt, reasonActionFailed!); //	follow when hindered by rules for reason action failed;
+//   console.log("circumventions", outcome, thisAttempt.fullfilledBy);
+//   thisAttempt.status = outcome == pretendItWorked ? "successful" : thisAttempt.fullfilledBy.length > 0 ? "partly successful" : "failed";
+//   return makeNoDecision;
+// };
 var hindered = function (it) {
     return (it.status == "failed" || it.status == "untried") &&
         !!it.fullfilledBy.filter(function (at) { return at.status == "untried"; }).length &&
@@ -265,94 +277,105 @@ var whatTheyWillDoNext = function (actor) {
 //   for (const item of attempts()) if (act == item.action) mostRecentAnswer = item;
 //   return mostRecentAnswer;
 // };
-//////////
-var Waiting = function (actor) { return ({ verb: "wait", actor: actor }); };
-var Exiting = function (actor) { return ({ verb: "exit", actor: actor }); };
-var Taking = function (actor, noun) { return ({ verb: "take", directObject: noun, actor: actor }); };
-var TakingOff = function (actor, noun) { return ({ verb: "take off", directObject: noun, actor: actor }); };
-var Opening = function (actor, noun) { return ({ verb: "open", directObject: noun, actor: actor }); };
-var Closing = function (actor, noun) { return ({ verb: "close", directObject: noun, actor: actor }); };
-var Dropping = function (actor, noun) { return ({ verb: "drop", directObject: noun, actor: actor }); };
-var AskingFor = function (actor, noun, secondNoun) { return ({
-    verb: "ask for",
-    actor: actor,
-    directObject: noun,
-    indirectObject: secondNoun
-}); };
-var PuttingOn = function (actor, noun, secondNoun) { return ({
-    verb: "put on",
-    actor: actor,
-    directObject: noun,
-    indirectObject: secondNoun
-}); };
-var whenHinderedBy = function (r, actor, noun, secondNoun) {
+/** attaches a suggestion to the tree */
+function weCouldTry(actor, suggestion, thisAttempt) {
+    console.log(actor.name, "could try", stringifyAction(suggestion), "before", stringifyAttempt(thisAttempt));
+    var circumvention = {
+        action: __assign(__assign({}, suggestion), { actor: actor }),
+        status: "untried",
+        fulfills: thisAttempt,
+        fullfilledBy: []
+    };
+    //circumvention.action.actor = actor;
+    // if (thisAttempt == actor.goals[0]) {
+    //   console.log("replacing toplevel goal");
+    //   const newAttempt: Attempt = {
+    //     action: currentAction,
+    //     status: "untried",
+    //     fulfills: actor.goals[0],
+    //     fullfilledBy: [],
+    //     meddlingCheckRule: reasonActionFailed!,
+    //   };
+    //   newAttempt.action.actor = actor;
+    //   thisAttempt = newAttempt;
+    //   actor.goals[0].fullfilledBy.push(newAttempt);
+    //   actor.goals[0].status = "untried";
+    // }
+    thisAttempt.fullfilledBy.push(circumvention);
+    //circumvention.fulfills = thisAttempt;
+    return circumvention;
+}
+var whenHinderedBy = function (attempt, checkRuleThatFailedIt) {
+    var actor = attempt.action.actor;
+    var noun = attempt.action.directObject;
+    var secondNoun = attempt.action.indirectObject;
     // First when hindered by (this is don't plan for player rule): if person asked is player, do nothing instead.
     if (actor == player)
         return "failed";
-    console.log("RULE NAME", r.name);
-    switch (r.name) {
-        case "cant wear whats not held":
+    console.log("RULE NAME", checkRuleThatFailedIt.name);
+    switch (checkRuleThatFailedIt.name) {
+        case "cantwearwhatsnotheld":
             if (noun)
-                weCouldTry(actor, Taking(actor, noun));
+                weCouldTry(actor, Taking.createAction(actor, noun), attempt);
             break;
-        case "cant wave whats not held":
+        case "cantwavewhatsnotheld":
             if (noun)
-                weCouldTry(actor, Taking(actor, noun));
+                weCouldTry(actor, Taking.createAction(actor, noun), attempt);
             break;
-        case "cant show what you havent got":
+        case "cantshowwhatyouhaventgot":
             if (noun)
-                weCouldTry(actor, Taking(actor, noun));
+                weCouldTry(actor, Taking.createAction(actor, noun), attempt);
             break;
-        case "cant give what you havent got":
+        case "cantgivewhatyouhaventgot":
             if (noun)
-                weCouldTry(actor, Taking(actor, noun));
+                weCouldTry(actor, Taking.createAction(actor, noun), attempt);
             break;
-        case "cant take what youre inside":
-            weCouldTry(actor, Exiting(actor));
+        case "canttakewhatyoureinside":
+            weCouldTry(actor, Exiting.createAction(actor), attempt);
             break;
-        case "cant enter closed containers":
+        case "cantenterclosedcontainers":
             if (noun)
-                weCouldTry(actor, Opening(actor, noun));
+                weCouldTry(actor, Opening.createAction(actor, noun), attempt);
             break;
-        //  case "cant exit closed containers": weCouldTry(actor,Opening (personAsked.holder));break;
-        case "cant insert into closed containers":
+        //  case "cantexitclosedcontainers": weCouldTry(actor,Opening (personAsked.holder));break;
+        case "cantinsertintoclosedcontainers":
             if (secondNoun)
-                weCouldTry(actor, Opening(actor, secondNoun));
+                weCouldTry(actor, Opening.createAction(actor, secondNoun), attempt);
             break;
-        //  case "cant search closed opaque containers": if (    noun == a closed opaque container ) weCouldTry(actor,Opening(noun));break;
+        //  case "cantsearchclosedopaquecontainers": if (    noun == a closed opaque container ) weCouldTry(actor,Opening(noun));break;
         case "cantlockwhatsopen":
-            weCouldTry(actor, Closing(actor, "whatever"));
+            weCouldTry(actor, Closing.createAction(actor, "whatever"), attempt);
             break;
-        case "cant enter something carried":
+        case "cantentersomethingcarried":
             if (noun)
-                weCouldTry(actor, Dropping(actor, noun));
+                weCouldTry(actor, Dropping.createAction(actor, noun), attempt);
             break;
-        case "cant put onto something being carried":
+        case "cantputontosomethingbeingcarried":
             if (secondNoun)
-                weCouldTry(actor, Dropping(actor, secondNoun));
+                weCouldTry(actor, Dropping.createAction(actor, secondNoun), attempt);
             if (noun && secondNoun)
-                weCouldTry(actor, PuttingOn(actor, noun, secondNoun));
+                weCouldTry(actor, PuttingOn.createAction(actor, noun, secondNoun), attempt);
             break;
-        case "cant drop clothes being worn":
+        case "cantdropclothesbeingworn":
             if (noun)
-                weCouldTry(actor, TakingOff(actor, noun));
+                weCouldTry(actor, TakingOff.createAction(actor, noun), attempt);
             break;
-        case "cant put clothes being worn":
+        case "cantputclothesbeingworn":
             if (noun)
-                weCouldTry(actor, TakingOff(actor, noun));
+                weCouldTry(actor, TakingOff.createAction(actor, noun), attempt);
             break;
-        //  case "cant take peoples possessions": weCouldTry(actor,AskingFor(  noun.holder,  noun));break;
-        case "cant insert clothes being worn":
+        //  case "canttakepeoplespossessions": weCouldTry(actor,AskingFor(  noun.holder,  noun));break;
+        case "cantinsertclothesbeingworn":
             if (noun)
-                weCouldTry(actor, TakingOff(actor, noun));
+                weCouldTry(actor, TakingOff.createAction(actor, noun), attempt);
             break;
-        case "cant give clothes being worn":
+        case "cantgiveclothesbeingworn":
             if (noun)
-                weCouldTry(actor, TakingOff(actor, noun));
+                weCouldTry(actor, TakingOff.createAction(actor, noun), attempt);
             break;
-        case "carrying requirements":
+        case "carryingrequirements":
             if (noun)
-                weCouldTry(actor, Taking(actor, noun));
+                weCouldTry(actor, Taking.createAction(actor, noun), attempt);
             break;
         default:
             return pretendItWorked;
@@ -360,4 +383,21 @@ var whenHinderedBy = function (r, actor, noun, secondNoun) {
     return makeNoDecision;
 };
 /////////////////
+function main() {
+    var Rose = {
+        name: "Rose",
+        buttons: [],
+        think: function () { },
+        goals: []
+    };
+    Rose.goals.push({ action: Exiting.createAction(Rose), status: "untried", fullfilledBy: [], fulfills: undefined });
+    characters.push(Rose);
+    console.log(stringify(characters));
+    /// init end
+    var next = whatTheyAreTryingToDoNow(Rose);
+    console.log("Her next is", stringifyAttempt(next));
+    // go
+    doThing(next, Rose);
+    console.log(stringify(characters));
+}
 main();

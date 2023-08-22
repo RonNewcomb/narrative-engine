@@ -27,7 +27,8 @@ interface Attempt {
 type Verb = string;
 type Noun = Desireable;
 
-type Rule = ((attempt: Attempt) => RuleOutcome) & { name?: string };
+type RuleWithOutcome = ((attempt: Attempt) => RuleOutcome) & { name?: string };
+type Rule = ((attempt: Attempt) => void) & { name?: string };
 
 type RuleOutcome = "success" | "failed" | undefined;
 const makeNoDecision: RuleOutcome = undefined;
@@ -36,20 +37,19 @@ const pretendItWorked: RuleOutcome = "success";
 interface Rulebook {
   rules: Rule[];
 }
-
-///////////////
-
-const characters: Character[] = [];
+interface RulebookWithOutcome {
+  rules: RuleWithOutcome[];
+}
 
 /////////// Buttons
 
 interface ActionDefinition {
   verb: Verb;
-  create: (...rest: any[]) => Attempt;
-  rulebooks: {
-    check: Rulebook;
-    moveDesireables: Rulebook;
-    news: Rulebook;
+  // create: (...rest: any[]) => Attempt;
+  rulebooks?: {
+    check?: RulebookWithOutcome;
+    moveDesireables?: Rulebook;
+    news?: Rulebook;
   };
 }
 
@@ -86,23 +86,27 @@ function printAttempt(attempt: Attempt) {
 
 function executeRulebook(attempt: Attempt): RuleOutcome {
   const rulebooks = attempt.definition.rulebooks;
-  for (const rule of rulebooks.check.rules) {
-    const outcome = rule(attempt);
-    if (outcome == "failed") {
-      attempt.meddlingCheckRule = rule;
-      return outcome;
+  if (!rulebooks) return makeNoDecision;
+  if (rulebooks.check)
+    for (const rule of rulebooks.check.rules || []) {
+      const outcome = rule(attempt);
+      if (outcome == "failed") {
+        attempt.meddlingCheckRule = rule;
+        return outcome;
+      }
     }
-  }
-  for (const rule of rulebooks.moveDesireables.rules) {
-    const outcome = rule(attempt);
-    // if (outcome == "failed") attempt.meddlingCheckRule = rule;
-    // if (!!outcome) return outcome;
-  }
-  for (const rule of rulebooks.news.rules) {
-    const outcome = rule(attempt);
-    // if (outcome == "failed") reasonActionFailed = rule;
-    // if (!!outcome) return outcome;
-  }
+  if (rulebooks.moveDesireables)
+    for (const rule of rulebooks.moveDesireables.rules || []) {
+      const outcome = rule(attempt);
+      // if (outcome == "failed") attempt.meddlingCheckRule = rule;
+      // if (!!outcome) return outcome;
+    }
+  if (rulebooks.news)
+    for (const rule of rulebooks.news.rules || []) {
+      const outcome = rule(attempt);
+      // if (outcome == "failed") reasonActionFailed = rule;
+      // if (!!outcome) return outcome;
+    }
   return makeNoDecision;
 }
 
@@ -260,16 +264,53 @@ const whatTheyWillDoNext = (actor: Character): Attempt | undefined => {
 // };
 
 /** attaches a suggestion to the tree */
-function weCouldTry(actor: Character, suggestion: Attempt, thisAttempt: Attempt): RuleOutcome {
-  console.log(actor.name, "could try", stringifyAction(suggestion), "before", stringifyAttempt(thisAttempt));
+function weCouldTry(
+  actor: Character,
+  definition: ActionDefinition,
+  noun: Noun | undefined,
+  secondNoun: Noun | undefined,
+  failingAction: Attempt
+): RuleOutcome {
+  console.log(actor.name, "could try", definition.verb, "before", stringifyAttempt(failingAction));
   const circumvention: Attempt = {
-    ...suggestion,
+    verb: definition.verb,
     actor,
+    definition,
+    noun,
+    secondNoun,
     status: "untried",
-    fulfills: thisAttempt,
+    meddlingCheckRule: undefined,
+    fulfills: failingAction,
     fullfilledBy: [],
   };
-  thisAttempt.fullfilledBy.push(circumvention);
-  // thisAttempt.meddlingCheckRule = reasonActionFailed;
+  failingAction.fullfilledBy.push(circumvention);
   return "failed";
+}
+
+function createGoal(actor: Character, definition: ActionDefinition, noun?: Noun, secondNoun?: Noun): Attempt {
+  const circumvention: Attempt = {
+    verb: definition.verb,
+    actor,
+    definition,
+    noun,
+    secondNoun,
+    status: "untried",
+    meddlingCheckRule: undefined,
+    fulfills: undefined,
+    fullfilledBy: [],
+  };
+  return circumvention;
+}
+
+function main(...characters: Character[]) {
+  for (let turn = 1; turn < 4; turn++) {
+    produceParagraphs(characters);
+    console.log("TURN", turn);
+    for (let character of characters) {
+      const next = whatTheyAreTryingToDoNow(character);
+      console.log("Their next action is", next ? stringifyAttempt(next) : "Nothing");
+      if (next) doThing(next, character);
+    }
+  }
+  produceParagraphs(characters);
 }

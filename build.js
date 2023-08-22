@@ -11,21 +11,8 @@ function createCCC(choice, consequence, closure) {
 function getCCC(searchParameters) {
     return tracking.filter(function (ccc) { return ccc.choice == searchParameters.choice; });
 }
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
 var makeNoDecision = undefined;
 var pretendItWorked = "success";
-///////////////
-var characters = [];
 /////////// debug
 function stringify(obj) {
     return JSON.stringify(obj, function (key, value) {
@@ -51,26 +38,31 @@ function printAttempt(attempt) {
 //////////// action machinery
 function executeRulebook(attempt) {
     var rulebooks = attempt.definition.rulebooks;
-    for (var _i = 0, _a = rulebooks.check.rules; _i < _a.length; _i++) {
-        var rule = _a[_i];
-        var outcome = rule(attempt);
-        if (outcome == "failed") {
-            attempt.meddlingCheckRule = rule;
-            return outcome;
+    if (!rulebooks)
+        return makeNoDecision;
+    if (rulebooks.check)
+        for (var _i = 0, _a = rulebooks.check.rules || []; _i < _a.length; _i++) {
+            var rule = _a[_i];
+            var outcome = rule(attempt);
+            if (outcome == "failed") {
+                attempt.meddlingCheckRule = rule;
+                return outcome;
+            }
         }
-    }
-    for (var _b = 0, _c = rulebooks.moveDesireables.rules; _b < _c.length; _b++) {
-        var rule = _c[_b];
-        var outcome = rule(attempt);
-        // if (outcome == "failed") attempt.meddlingCheckRule = rule;
-        // if (!!outcome) return outcome;
-    }
-    for (var _d = 0, _e = rulebooks.news.rules; _d < _e.length; _d++) {
-        var rule = _e[_d];
-        var outcome = rule(attempt);
-        // if (outcome == "failed") reasonActionFailed = rule;
-        // if (!!outcome) return outcome;
-    }
+    if (rulebooks.moveDesireables)
+        for (var _b = 0, _c = rulebooks.moveDesireables.rules || []; _b < _c.length; _b++) {
+            var rule = _c[_b];
+            var outcome = rule(attempt);
+            // if (outcome == "failed") attempt.meddlingCheckRule = rule;
+            // if (!!outcome) return outcome;
+        }
+    if (rulebooks.news)
+        for (var _d = 0, _e = rulebooks.news.rules || []; _d < _e.length; _d++) {
+            var rule = _e[_d];
+            var outcome = rule(attempt);
+            // if (outcome == "failed") reasonActionFailed = rule;
+            // if (!!outcome) return outcome;
+        }
     return makeNoDecision;
 }
 /** performs the action */
@@ -217,12 +209,53 @@ var whatTheyWillDoNext = function (actor) {
 //   return mostRecentAnswer;
 // };
 /** attaches a suggestion to the tree */
-function weCouldTry(actor, suggestion, thisAttempt) {
-    console.log(actor.name, "could try", stringifyAction(suggestion), "before", stringifyAttempt(thisAttempt));
-    var circumvention = __assign(__assign({}, suggestion), { actor: actor, status: "untried", fulfills: thisAttempt, fullfilledBy: [] });
-    thisAttempt.fullfilledBy.push(circumvention);
-    // thisAttempt.meddlingCheckRule = reasonActionFailed;
+function weCouldTry(actor, definition, noun, secondNoun, failingAction) {
+    console.log(actor.name, "could try", definition.verb, "before", stringifyAttempt(failingAction));
+    var circumvention = {
+        verb: definition.verb,
+        actor: actor,
+        definition: definition,
+        noun: noun,
+        secondNoun: secondNoun,
+        status: "untried",
+        meddlingCheckRule: undefined,
+        fulfills: failingAction,
+        fullfilledBy: []
+    };
+    failingAction.fullfilledBy.push(circumvention);
     return "failed";
+}
+function createGoal(actor, definition, noun, secondNoun) {
+    var circumvention = {
+        verb: definition.verb,
+        actor: actor,
+        definition: definition,
+        noun: noun,
+        secondNoun: secondNoun,
+        status: "untried",
+        meddlingCheckRule: undefined,
+        fulfills: undefined,
+        fullfilledBy: []
+    };
+    return circumvention;
+}
+function main() {
+    var characters = [];
+    for (var _i = 0; _i < arguments.length; _i++) {
+        characters[_i] = arguments[_i];
+    }
+    for (var turn = 1; turn < 4; turn++) {
+        produceParagraphs(characters);
+        console.log("TURN", turn);
+        for (var _a = 0, characters_1 = characters; _a < characters_1.length; _a++) {
+            var character = characters_1[_a];
+            var next = whatTheyAreTryingToDoNow(character);
+            console.log("Their next action is", next ? stringifyAttempt(next) : "Nothing");
+            if (next)
+                doThing(next, character);
+        }
+    }
+    produceParagraphs(characters);
 }
 /// <reference path="./narrativeEngine.ts"/>
 function disagrees(character, state, recentActionLearned, desireablesAffected) {
@@ -249,28 +282,14 @@ var desireables = [
     { name: "door", isLocked: true },
 ];
 ////////////////
-function ActionFactory(def, actor, noun, secondNoun) {
-    var action = {
-        verb: def.verb,
-        definition: def,
-        noun: noun,
-        secondNoun: secondNoun,
-        actor: actor,
-        status: "untried",
-        meddlingCheckRule: undefined,
-        fulfills: undefined,
-        fullfilledBy: []
-    };
-    return action;
-}
 var Waiting = {
     verb: "wait",
-    create: function (actor) { return ActionFactory(Waiting, actor); },
+    //  create: (actor: Character) => makeAttemptObject(Waiting, actor),
     rulebooks: { check: { rules: [] }, moveDesireables: { rules: [] }, news: { rules: [] } }
 };
 var Exiting = {
     verb: "exit",
-    create: function (actor) { return ActionFactory(Exiting, actor); },
+    //  create: (actor: Character) => makeAttemptObject(Exiting, actor),
     rulebooks: {
         check: {
             rules: [
@@ -280,7 +299,7 @@ var Exiting = {
                         throw "door??";
                     if (!door.isLocked)
                         return "success";
-                    weCouldTry(attempt.actor, Unlocking.create(attempt.actor, door), attempt);
+                    weCouldTry(attempt.actor, Unlocking, door, undefined, attempt);
                     return "failed";
                 },
             ]
@@ -291,27 +310,27 @@ var Exiting = {
 };
 var Taking = {
     verb: "take",
-    create: function (actor, noun) { return ActionFactory(Taking, actor, noun); },
+    //  create: (actor: Character, noun: Noun) => makeAttemptObject(Taking, actor, noun),
     rulebooks: { check: { rules: [] }, moveDesireables: { rules: [] }, news: { rules: [] } }
 };
 var TakingOff = {
     verb: "take off",
-    create: function (actor, noun) { return ActionFactory(TakingOff, actor, noun); },
+    //  create: (actor: Character, noun: Noun) => makeAttemptObject(TakingOff, actor, noun),
     rulebooks: { check: { rules: [] }, moveDesireables: { rules: [] }, news: { rules: [] } }
 };
 var Opening = {
     verb: "open",
-    create: function (actor, noun) { return ActionFactory(Opening, actor, noun); },
+    //  create: (actor: Character, noun: Noun) => makeAttemptObject(Opening, actor, noun),
     rulebooks: {
         check: {
             rules: [
                 // attempt => {
                 //   if (!attempt.directObject) {
-                //     return weCouldTry(attempt.actor, Unlocking.create(attempt.actor, attempt.directObject), attempt);
+                //     return weCouldTry(attempt.actor,  Unlocking, attempt.noun,undefined, attempt);
                 //   }
                 //   return "success";
                 // },
-                function (attempt) { var _a; return (((_a = attempt.noun) === null || _a === void 0 ? void 0 : _a.isLocked) ? weCouldTry(attempt.actor, Unlocking.create(attempt.actor, attempt.noun), attempt) : "success"); },
+                function (attempt) { var _a; return (((_a = attempt.noun) === null || _a === void 0 ? void 0 : _a.isLocked) ? weCouldTry(attempt.actor, Unlocking, attempt.noun, undefined, attempt) : "success"); },
             ]
         },
         moveDesireables: { rules: [] },
@@ -320,12 +339,12 @@ var Opening = {
 };
 var Closing = {
     verb: "close",
-    create: function (actor, noun) { return ActionFactory(Closing, actor, noun); },
+    //  create: (actor: Character, noun: Noun) => makeAttemptObject(Closing, actor, noun),
     rulebooks: { check: { rules: [] }, moveDesireables: { rules: [] }, news: { rules: [] } }
 };
 var Unlocking = {
     verb: "unlock _ with",
-    create: function (actor, door, key) { return ActionFactory(Unlocking, actor, door, key); },
+    //  create: (actor: Character, door: Noun, key: Noun) => makeAttemptObject(Unlocking, actor, door, key),
     rulebooks: {
         check: {
             rules: [
@@ -336,7 +355,6 @@ var Unlocking = {
             rules: [
                 function (attempt) {
                     attempt.noun.isLocked = false;
-                    return "success";
                 },
             ]
         },
@@ -345,7 +363,6 @@ var Unlocking = {
                 function (a) {
                     var door = desireables.find(function (d) { return d.name == "door"; });
                     console.log("door is", door);
-                    return "success";
                 },
             ]
         }
@@ -353,22 +370,22 @@ var Unlocking = {
 };
 var Locking = {
     verb: "lock",
-    create: function (actor, noun) { return ActionFactory(Locking, actor, noun); },
+    //  create: (actor: Character, noun: Noun) => makeAttemptObject(Locking, actor, noun),
     rulebooks: { check: { rules: [] }, moveDesireables: { rules: [] }, news: { rules: [] } }
 };
 var Dropping = {
     verb: "wait",
-    create: function (actor, noun) { return ActionFactory(Dropping, actor, noun); },
+    //  create: (actor: Character, noun: Noun) => makeAttemptObject(Dropping, actor, noun),
     rulebooks: { check: { rules: [] }, moveDesireables: { rules: [] }, news: { rules: [] } }
 };
 var AskingFor = {
     verb: "asking _ for",
-    create: function (actor, otherPerson, thing) { return ActionFactory(AskingFor, actor, otherPerson, thing); },
+    //  create: (actor: Character, otherPerson: Noun, thing: Noun) => makeAttemptObject(AskingFor, actor, otherPerson, thing),
     rulebooks: { check: { rules: [] }, moveDesireables: { rules: [] }, news: { rules: [] } }
 };
 var PuttingOn = {
     verb: "putting _ on",
-    create: function (actor, noun, secondNoun) { return ActionFactory(PuttingOn, actor, noun, secondNoun); },
+    //  create: (actor: Character, noun: Noun, secondNoun: Noun) => makeAttemptObject(PuttingOn, actor, noun, secondNoun),
     rulebooks: { check: { rules: [] }, moveDesireables: { rules: [] }, news: { rules: [] } }
 };
 /////////////////
@@ -378,23 +395,6 @@ var Rose = {
     think: function () { },
     goals: []
 };
+Rose.goals.push(createGoal(Rose, Exiting));
 ////////////
-function main() {
-    Rose.goals.push(Exiting.create(Rose));
-    characters.push(Rose);
-    /// init end
-    // go
-    for (var turn = 1; turn < 4; turn++) {
-        produceParagraphs(characters);
-        console.log("TURN", turn);
-        for (var _i = 0, characters_1 = characters; _i < characters_1.length; _i++) {
-            var character = characters_1[_i];
-            var next = whatTheyAreTryingToDoNow(character);
-            console.log("Their next action is", next ? stringifyAttempt(next) : "Nothing");
-            if (next)
-                doThing(next, character);
-        }
-    }
-    produceParagraphs(characters);
-}
-main();
+main(Rose);

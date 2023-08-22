@@ -14,30 +14,15 @@ const desireables: Desireable[] = [
 
 ////////////////
 
-function ActionFactory(def: ActionDefinition, actor: Character, noun?: Noun, secondNoun?: Noun): Attempt {
-  const action: Attempt = {
-    verb: def.verb,
-    definition: def,
-    noun: noun,
-    secondNoun: secondNoun,
-    actor: actor,
-    status: "untried",
-    meddlingCheckRule: undefined,
-    fulfills: undefined,
-    fullfilledBy: [],
-  };
-  return action;
-}
-
 const Waiting: ActionDefinition = {
   verb: "wait",
-  create: (actor: Character) => ActionFactory(Waiting, actor),
+  //  create: (actor: Character) => makeAttemptObject(Waiting, actor),
   rulebooks: { check: { rules: [] }, moveDesireables: { rules: [] }, news: { rules: [] } },
 };
 
 const Exiting: ActionDefinition = {
   verb: "exit",
-  create: (actor: Character) => ActionFactory(Exiting, actor),
+  //  create: (actor: Character) => makeAttemptObject(Exiting, actor),
   rulebooks: {
     check: {
       rules: [
@@ -45,7 +30,7 @@ const Exiting: ActionDefinition = {
           const door = desireables.find(d => d.name == "door");
           if (!door) throw "door??";
           if (!door.isLocked) return "success";
-          weCouldTry(attempt.actor, Unlocking.create(attempt.actor, door), attempt);
+          weCouldTry(attempt.actor, Unlocking, door, undefined, attempt);
           return "failed";
         },
       ],
@@ -57,29 +42,29 @@ const Exiting: ActionDefinition = {
 
 const Taking: ActionDefinition = {
   verb: "take",
-  create: (actor: Character, noun: Noun) => ActionFactory(Taking, actor, noun),
+  //  create: (actor: Character, noun: Noun) => makeAttemptObject(Taking, actor, noun),
   rulebooks: { check: { rules: [] }, moveDesireables: { rules: [] }, news: { rules: [] } },
 };
 
 const TakingOff: ActionDefinition = {
   verb: "take off",
-  create: (actor: Character, noun: Noun) => ActionFactory(TakingOff, actor, noun),
+  //  create: (actor: Character, noun: Noun) => makeAttemptObject(TakingOff, actor, noun),
   rulebooks: { check: { rules: [] }, moveDesireables: { rules: [] }, news: { rules: [] } },
 };
 
 const Opening: ActionDefinition = {
   verb: "open",
-  create: (actor: Character, noun: Noun) => ActionFactory(Opening, actor, noun),
+  //  create: (actor: Character, noun: Noun) => makeAttemptObject(Opening, actor, noun),
   rulebooks: {
     check: {
       rules: [
         // attempt => {
         //   if (!attempt.directObject) {
-        //     return weCouldTry(attempt.actor, Unlocking.create(attempt.actor, attempt.directObject), attempt);
+        //     return weCouldTry(attempt.actor,  Unlocking, attempt.noun,undefined, attempt);
         //   }
         //   return "success";
         // },
-        attempt => (attempt.noun?.isLocked ? weCouldTry(attempt.actor, Unlocking.create(attempt.actor, attempt.noun), attempt) : "success"),
+        attempt => (attempt.noun?.isLocked ? weCouldTry(attempt.actor, Unlocking, attempt.noun, undefined, attempt) : "success"),
       ],
     },
     moveDesireables: { rules: [] },
@@ -89,13 +74,13 @@ const Opening: ActionDefinition = {
 
 const Closing: ActionDefinition = {
   verb: "close",
-  create: (actor: Character, noun: Noun) => ActionFactory(Closing, actor, noun),
+  //  create: (actor: Character, noun: Noun) => makeAttemptObject(Closing, actor, noun),
   rulebooks: { check: { rules: [] }, moveDesireables: { rules: [] }, news: { rules: [] } },
 };
 
 const Unlocking: ActionDefinition = {
   verb: "unlock _ with",
-  create: (actor: Character, door: Noun, key: Noun) => ActionFactory(Unlocking, actor, door, key),
+  //  create: (actor: Character, door: Noun, key: Noun) => makeAttemptObject(Unlocking, actor, door, key),
   rulebooks: {
     check: {
       rules: [
@@ -106,7 +91,6 @@ const Unlocking: ActionDefinition = {
       rules: [
         attempt => {
           attempt.noun!.isLocked = false;
-          return "success";
         },
       ],
     },
@@ -115,7 +99,6 @@ const Unlocking: ActionDefinition = {
         a => {
           const door = desireables.find(d => d.name == "door");
           console.log("door is", door);
-          return "success";
         },
       ],
     },
@@ -124,25 +107,25 @@ const Unlocking: ActionDefinition = {
 
 const Locking: ActionDefinition = {
   verb: "lock",
-  create: (actor: Character, noun: Noun) => ActionFactory(Locking, actor, noun),
+  //  create: (actor: Character, noun: Noun) => makeAttemptObject(Locking, actor, noun),
   rulebooks: { check: { rules: [] }, moveDesireables: { rules: [] }, news: { rules: [] } },
 };
 
 const Dropping: ActionDefinition = {
   verb: "wait",
-  create: (actor: Character, noun: Noun) => ActionFactory(Dropping, actor, noun),
+  //  create: (actor: Character, noun: Noun) => makeAttemptObject(Dropping, actor, noun),
   rulebooks: { check: { rules: [] }, moveDesireables: { rules: [] }, news: { rules: [] } },
 };
 
 const AskingFor: ActionDefinition = {
   verb: "asking _ for",
-  create: (actor: Character, otherPerson: Noun, thing: Noun) => ActionFactory(AskingFor, actor, otherPerson, thing),
+  //  create: (actor: Character, otherPerson: Noun, thing: Noun) => makeAttemptObject(AskingFor, actor, otherPerson, thing),
   rulebooks: { check: { rules: [] }, moveDesireables: { rules: [] }, news: { rules: [] } },
 };
 
 const PuttingOn: ActionDefinition = {
   verb: "putting _ on",
-  create: (actor: Character, noun: Noun, secondNoun: Noun) => ActionFactory(PuttingOn, actor, noun, secondNoun),
+  //  create: (actor: Character, noun: Noun, secondNoun: Noun) => makeAttemptObject(PuttingOn, actor, noun, secondNoun),
   rulebooks: { check: { rules: [] }, moveDesireables: { rules: [] }, news: { rules: [] } },
 };
 
@@ -154,26 +137,8 @@ const Rose: Character = {
   think: () => {},
   goals: [],
 };
+Rose.goals.push(createGoal(Rose, Exiting));
 
 ////////////
 
-function main() {
-  Rose.goals.push(Exiting.create(Rose));
-  characters.push(Rose);
-  /// init end
-
-  // go
-  for (let turn = 1; turn < 4; turn++) {
-    produceParagraphs(characters);
-    console.log("TURN", turn);
-    for (let character of characters) {
-      const next = whatTheyAreTryingToDoNow(character);
-      console.log("Their next action is", next ? stringifyAttempt(next) : "Nothing");
-      if (next) doThing(next, character);
-    }
-  }
-
-  produceParagraphs(characters);
-}
-
-main();
+main(Rose);

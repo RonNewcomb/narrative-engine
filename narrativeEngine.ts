@@ -1,6 +1,6 @@
 type Button = any;
 
-export interface Character {
+interface Character {
   name: string;
   shoulds: Button[];
   think: () => void;
@@ -9,7 +9,7 @@ export interface Character {
   goals: Attempt[];
 }
 
-export interface Action {
+interface Action {
   verb: Verb;
   directObject?: Noun;
   indirectObject?: Noun;
@@ -20,7 +20,7 @@ export interface Action {
 /** An action which has failed.  Attempts record which Check rule prevented the action and whether the action could or should be re-attempted later.
  *  For a re-attempt to be successful, certain pre-requisites need to be 'fulfilled' (a relation) by other actions, so the same Check rule doesn't
  *  simply stop the action again. */
-export interface Attempt {
+interface Attempt {
   action: Action;
   status: "untried" | "failed" | "partly successful" | "successful";
   meddlingCheckRule?: Rule;
@@ -28,20 +28,14 @@ export interface Attempt {
   fullfilledBy: Attempt[]; // .children
 }
 
-export type Verb = string;
-export type Noun = string;
+type Verb = string;
+type Noun = string;
 
-interface Planner {
-  database: Option[];
-}
+type Rule = ((act: Action, attempt: Attempt) => RuleOutcome) & { name?: string };
 
-interface Option extends Action {}
-
-export type Rule = ((act: Action, attempt: Attempt) => RuleOutcome) & { name?: string };
-
-export type RuleOutcome = "success" | "failed" | undefined;
-export const makeNoDecision: RuleOutcome = undefined;
-export const pretendItWorked: RuleOutcome = "success";
+type RuleOutcome = "success" | "failed" | undefined;
+const makeNoDecision: RuleOutcome = undefined;
+const pretendItWorked: RuleOutcome = "success";
 
 interface Rulebook {
   rules: Rule[];
@@ -49,14 +43,11 @@ interface Rulebook {
 
 ///////////////
 
-export const characters: Character[] = [];
-let reasonActionFailed: Rule | undefined;
-let personAsked: Character;
-let player: Character;
+const characters: Character[] = [];
 
 /////////// Buttons
 
-export interface ActionDefinition {
+interface ActionDefinition {
   verb: Verb;
   createAction: (...rest: any[]) => Action;
   rulebooks: {
@@ -68,7 +59,7 @@ export interface ActionDefinition {
 
 /////////// debug
 
-export function stringify(obj: any): string {
+function stringify(obj: any): string {
   return JSON.stringify(
     obj,
     (key, value) =>
@@ -83,15 +74,15 @@ export function stringify(obj: any): string {
   );
 }
 
-export function stringifyAction(act: Action): string {
+function stringifyAction(act: Action): string {
   return (act.actor?.name || "") + " " + act.verb + " " + (act.indirectObject || "") + " " + (act.directObject || "");
 }
 
-export function stringifyAttempt(attempt: Attempt): string {
+function stringifyAttempt(attempt: Attempt): string {
   return stringifyAction(attempt.action) + " (" + attempt.status + ")";
 }
 
-export function printAttempt(attempt: Attempt) {
+function printAttempt(attempt: Attempt) {
   console.log("  '" + stringifyAttempt(attempt) + '"');
 }
 
@@ -101,12 +92,12 @@ function executeRulebook(act: Action, attempt: Attempt): RuleOutcome {
   const rulebooks = act.definition.rulebooks;
   for (const rule of rulebooks.check.rules) {
     const outcome = rule(act, attempt);
-    if (outcome == "failed") reasonActionFailed = rule;
+    if (outcome == "failed") attempt.meddlingCheckRule = rule;
     if (!!outcome) return outcome;
   }
   for (const rule of rulebooks.moveDesireables.rules) {
     const outcome = rule(act, attempt);
-    if (outcome == "failed") reasonActionFailed = rule;
+    if (outcome == "failed") attempt.meddlingCheckRule = rule;
     if (!!outcome) return outcome;
   }
   for (const rule of rulebooks.news.rules) {
@@ -118,14 +109,12 @@ function executeRulebook(act: Action, attempt: Attempt): RuleOutcome {
 }
 
 /** performs the action */
-export function doThing(thisAttempt: Attempt, actor: Character) {
+function doThing(thisAttempt: Attempt, actor: Character) {
   if (!thisAttempt) throw "no TODO";
   if (!actor) throw "no ACTOR";
-  personAsked = actor;
-  reasonActionFailed = undefined;
 
   // DO the currentAction and get status
-  const outcome: RuleOutcome = executeRulebook(thisAttempt.action, thisAttempt);
+  const outcome = executeRulebook(thisAttempt.action, thisAttempt);
   console.log(thisAttempt.action.verb, "is done:", outcome);
 
   // update trees to record result
@@ -133,12 +122,12 @@ export function doThing(thisAttempt: Attempt, actor: Character) {
     thisAttempt.status = "successful";
   } else {
     console.log("Update plans on failure", stringifyAttempt(thisAttempt));
-    const solution = thisAttempt.fullfilledBy.filter(a => a.status == "successful");
-    if (solution.length > 0) {
-      if (reasonActionFailed != thisAttempt.meddlingCheckRule) thisAttempt.status = "partly successful";
-    }
-    console.log(solution.length, "partial solutions found");
-    const outcome = whenHinderedBy(thisAttempt, reasonActionFailed!); //	follow when hindered by rules for reason action failed;
+    // const solution = thisAttempt.fullfilledBy.filter(a => a.status == "successful");
+    // if (solution.length > 0) {
+    //   if (reasonActionFailed != thisAttempt.meddlingCheckRule) thisAttempt.status = "partly successful";
+    // }
+    // console.log(solution.length, "partial solutions found");
+    // const outcome = whenHinderedBy(thisAttempt, reasonActionFailed!); //	follow when hindered by rules for reason action failed;
     console.log("circumventions outcome:", outcome, ".  Could be fulfilled by:", thisAttempt.fullfilledBy.map(stringifyAttempt));
     thisAttempt.status = outcome == pretendItWorked ? "successful" : thisAttempt.fullfilledBy.length > 0 ? "partly successful" : "failed";
   }
@@ -207,7 +196,7 @@ let confusedAboutTiming: boolean;
 //   return actor.goals;
 // };
 
-export const howTheyCan = (actor: Character, act: Attempt): Attempt[] => {
+const howTheyCan = (actor: Character, act: Attempt): Attempt[] => {
   //[	return list of not in past attempts which fulfill act.]
   const options = act.fullfilledBy.filter(a => !inThePast(a));
   console.log("  Q: How can", actor.name, stringifyAttempt(act));
@@ -236,7 +225,7 @@ export const howTheyCan = (actor: Character, act: Attempt): Attempt[] => {
 //   return choices;
 // };
 
-export const whatTheyAreTryingToDoNow = (actor: Character): Attempt => {
+const whatTheyAreTryingToDoNow = (actor: Character): Attempt => {
   let thisAct = actor.goals[0];
   // let details:Attempt|undefined = thisAct;// thisAct.fullfilledBy.find(at => inThePresent(at));
   let details: Attempt | undefined = actor.goals[0];
@@ -250,7 +239,7 @@ export const whatTheyAreTryingToDoNow = (actor: Character): Attempt => {
   return thisAct; // [the most finely detailed, and hindered,]
 };
 
-export const whatTheyWillDoNext = (actor: Character): Attempt | undefined => {
+const whatTheyWillDoNext = (actor: Character): Attempt | undefined => {
   let choices = howTheyCan(actor, whatTheyAreTryingToDoNow(actor));
   const untried = choices.find(item => item.status == "untried");
   //actor.goals.action = Waiting;
@@ -267,7 +256,7 @@ export const whatTheyWillDoNext = (actor: Character): Attempt | undefined => {
 // };
 
 /** attaches a suggestion to the tree */
-export function weCouldTry(actor: Character, suggestion: Action, thisAttempt: Attempt): Attempt {
+function weCouldTry(actor: Character, suggestion: Action, thisAttempt: Attempt): Attempt {
   console.log(actor.name, "could try", stringifyAction(suggestion), "before", stringifyAttempt(thisAttempt));
   const circumvention: Attempt = {
     action: { ...suggestion, actor },
@@ -276,25 +265,26 @@ export function weCouldTry(actor: Character, suggestion: Action, thisAttempt: At
     fullfilledBy: [],
   };
   thisAttempt.fullfilledBy.push(circumvention);
+  // thisAttempt.meddlingCheckRule = reasonActionFailed;
   return circumvention;
 }
 
-export type WhenHinderedByRule = (attempt: Attempt, checkRuleThatFailedIt: Rule) => RuleOutcome;
+// type WhenHinderedByRule = (attempt: Attempt, checkRuleThatFailedIt: Rule) => RuleOutcome;
 
-export const WhenHinderedByRules: WhenHinderedByRule[] = [];
+// const WhenHinderedByRules: WhenHinderedByRule[] = [];
 
-const whenHinderedBy: WhenHinderedByRule = (attempt: Attempt, checkRuleThatFailedIt: Rule): RuleOutcome => {
-  const actor: Character = attempt.action.actor;
+// const whenHinderedBy: WhenHinderedByRule = (attempt: Attempt, checkRuleThatFailedIt: Rule): RuleOutcome => {
+//   const actor: Character = attempt.action.actor;
 
-  // First when hindered by (this is don't plan for player rule): if person asked is player, do nothing instead.
-  if (actor == player) return "failed";
+//   // First when hindered by (this is don't plan for player rule): if person asked is player, do nothing instead.
+//   if (actor == player) return "failed";
 
-  console.log("RULE NAME", checkRuleThatFailedIt.name);
+//   console.log("RULE NAME", checkRuleThatFailedIt.name);
 
-  for (const rules of WhenHinderedByRules) {
-    const outcome = rules(attempt, checkRuleThatFailedIt);
-    if (!!outcome) return outcome;
-  }
+//   for (const rules of WhenHinderedByRules) {
+//     const outcome = rules(attempt, checkRuleThatFailedIt);
+//     if (!!outcome) return outcome;
+//   }
 
-  return makeNoDecision;
-};
+//   return makeNoDecision;
+// };

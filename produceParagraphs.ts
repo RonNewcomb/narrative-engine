@@ -1,5 +1,5 @@
-export interface Information {}
+interface Information {}
 
-export function produceParagraphs(information: Information): string {
+function produceParagraphs(information: Information): string {
   return JSON.stringify(information);
 }

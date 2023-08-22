@@ -1,15 +1,15 @@
-export interface IForeshadow {}
+interface IForeshadow {}
 
-export interface Choi6eWithForeshadowing {
+interface Choi6eWithForeshadowing {
   choice: "ally" | "support" | "defuse" | "escalate" | "ignore" | "prolong";
   foreshadow: IForeshadow;
 }
-export interface ForeshadowedNewsProvesAgency {
+interface ForeshadowedNewsProvesAgency {
   foreshadow: IForeshadow;
 }
-export interface ClosureFromInteriorReflection {}
+interface ClosureFromInteriorReflection {}
 
-export interface ChoiceConsequenceClosure {
+interface ChoiceConsequenceClosure {
   choice: Choi6eWithForeshadowing;
   consequence: ForeshadowedNewsProvesAgency;
   closure: ClosureFromInteriorReflection;
@@ -17,7 +17,7 @@ export interface ChoiceConsequenceClosure {
 
 const tracking: ChoiceConsequenceClosure[] = [];
 
-export function createCCC(
+function createCCC(
   choice: Choi6eWithForeshadowing,
   consequence?: ForeshadowedNewsProvesAgency,
   closure?: ClosureFromInteriorReflection
@@ -31,6 +31,6 @@ export function createCCC(
   return ccc;
 }
 
-export function getCCC(searchParameters: any): ChoiceConsequenceClosure[] {
+function getCCC(searchParameters: any): ChoiceConsequenceClosure[] {
   return tracking.filter(ccc => ccc.choice == searchParameters.choice);
 }

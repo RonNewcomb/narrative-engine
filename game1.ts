@@ -1,24 +1,3 @@
-import { Desireable } from "./iPlot";
-import {
-  Action,
-  ActionDefinition,
-  Attempt,
-  Character,
-  Noun,
-  Rule,
-  RuleOutcome,
-  WhenHinderedByRules,
-  characters,
-  doThing,
-  makeNoDecision,
-  pretendItWorked,
-  stringify,
-  stringifyAttempt,
-  weCouldTry,
-  whatTheyAreTryingToDoNow,
-} from "./narrativeEngine";
-import { produceParagraphs } from "./produceParagraphs";
-
 ///////////////
 
 const desireables: Desireable[] = [
@@ -109,66 +88,66 @@ const PuttingOn: ActionDefinition = {
 
 ////////////////
 
-WhenHinderedByRules.push((attempt: Attempt, checkRuleThatFailedIt: Rule): RuleOutcome => {
-  const actor: Character = attempt.action.actor;
-  const noun: Noun | undefined = attempt.action.directObject;
-  const secondNoun: Noun | undefined = attempt.action.indirectObject;
+// WhenHinderedByRules.push((attempt: Attempt, checkRuleThatFailedIt: Rule): RuleOutcome => {
+//   const actor: Character = attempt.action.actor;
+//   const noun: Noun | undefined = attempt.action.directObject;
+//   const secondNoun: Noun | undefined = attempt.action.indirectObject;
 
-  switch (checkRuleThatFailedIt.name) {
-    case "cantwearwhatsnotheld":
-      if (noun) weCouldTry(actor, Taking.createAction(actor, noun), attempt);
-      break;
-    case "cantwavewhatsnotheld":
-      if (noun) weCouldTry(actor, Taking.createAction(actor, noun), attempt);
-      break;
-    case "cantshowwhatyouhaventgot":
-      if (noun) weCouldTry(actor, Taking.createAction(actor, noun), attempt);
-      break;
-    case "cantgivewhatyouhaventgot":
-      if (noun) weCouldTry(actor, Taking.createAction(actor, noun), attempt);
-      break;
-    case "canttakewhatyoureinside":
-      weCouldTry(actor, Exiting.createAction(actor), attempt);
-      break;
-    case "cantenterclosedcontainers":
-      if (noun) weCouldTry(actor, Opening.createAction(actor, noun), attempt);
-      break;
-    //  case "cantexitclosedcontainers": weCouldTry(actor,Opening.createAction(personAsked.holder));break;
-    case "cantinsertintoclosedcontainers":
-      if (secondNoun) weCouldTry(actor, Opening.createAction(actor, secondNoun), attempt);
-      break;
-    //  case "cantsearchclosedopaquecontainers": if (    noun == a closed opaque container ) weCouldTry(actor,Opening.createAction(noun));break;
-    case "cantlockwhatsopen":
-      weCouldTry(actor, Closing.createAction(actor, "whatever"), attempt);
-      break;
-    case "cantentersomethingcarried":
-      if (noun) weCouldTry(actor, Dropping.createAction(actor, noun), attempt);
-      break;
-    case "cantputontosomethingbeingcarried":
-      if (secondNoun) weCouldTry(actor, Dropping.createAction(actor, secondNoun), attempt);
-      if (noun && secondNoun) weCouldTry(actor, PuttingOn.createAction(actor, noun, secondNoun), attempt);
-      break;
-    case "cantdropclothesbeingworn":
-      if (noun) weCouldTry(actor, TakingOff.createAction(actor, noun), attempt);
-      break;
-    case "cantputclothesbeingworn":
-      if (noun) weCouldTry(actor, TakingOff.createAction(actor, noun), attempt);
-      break;
-    //  case "canttakepeoplespossessions": weCouldTry(actor,AskingFor.createAction(  noun.holder,  noun));break;
-    case "cantinsertclothesbeingworn":
-      if (noun) weCouldTry(actor, TakingOff.createAction(actor, noun), attempt);
-      break;
-    case "cantgiveclothesbeingworn":
-      if (noun) weCouldTry(actor, TakingOff.createAction(actor, noun), attempt);
-      break;
-    case "carryingrequirements":
-      if (noun) weCouldTry(actor, Taking.createAction(actor, noun), attempt);
-      break;
-    default:
-      return pretendItWorked;
-  }
-  return makeNoDecision;
-});
+//   switch (checkRuleThatFailedIt.name) {
+//     case "cantwearwhatsnotheld":
+//       if (noun) weCouldTry(actor, Taking.createAction(actor, noun), attempt,checkRuleThatFailedIt);
+//       break;
+//     case "cantwavewhatsnotheld":
+//       if (noun) weCouldTry(actor, Taking.createAction(actor, noun), attempt,checkRuleThatFailedIt);
+//       break;
+//     case "cantshowwhatyouhaventgot":
+//       if (noun) weCouldTry(actor, Taking.createAction(actor, noun), attempt,checkRuleThatFailedIt);
+//       break;
+//     case "cantgivewhatyouhaventgot":
+//       if (noun) weCouldTry(actor, Taking.createAction(actor, noun), attempt,checkRuleThatFailedIt);
+//       break;
+//     case "canttakewhatyoureinside":
+//       weCouldTry(actor, Exiting.createAction(actor), attempt,checkRuleThatFailedIt);
+//       break;
+//     case "cantenterclosedcontainers":
+//       if (noun) weCouldTry(actor, Opening.createAction(actor, noun), attempt,checkRuleThatFailedIt);
+//       break;
+//     //  case "cantexitclosedcontainers": weCouldTry(actor,Opening.createAction(personAsked.holder));break;
+//     case "cantinsertintoclosedcontainers":
+//       if (secondNoun) weCouldTry(actor, Opening.createAction(actor, secondNoun), attempt);
+//       break;
+//     //  case "cantsearchclosedopaquecontainers": if (    noun == a closed opaque container ) weCouldTry(actor,Opening.createAction(noun));break;
+//     case "cantlockwhatsopen":
+//       weCouldTry(actor, Closing.createAction(actor, "whatever"), attempt);
+//       break;
+//     case "cantentersomethingcarried":
+//       if (noun) weCouldTry(actor, Dropping.createAction(actor, noun), attempt);
+//       break;
+//     case "cantputontosomethingbeingcarried":
+//       if (secondNoun) weCouldTry(actor, Dropping.createAction(actor, secondNoun), attempt);
+//       if (noun && secondNoun) weCouldTry(actor, PuttingOn.createAction(actor, noun, secondNoun), attempt);
+//       break;
+//     case "cantdropclothesbeingworn":
+//       if (noun) weCouldTry(actor, TakingOff.createAction(actor, noun), attempt);
+//       break;
+//     case "cantputclothesbeingworn":
+//       if (noun) weCouldTry(actor, TakingOff.createAction(actor, noun), attempt);
+//       break;
+//     //  case "canttakepeoplespossessions": weCouldTry(actor,AskingFor.createAction(  noun.holder,  noun));break;
+//     case "cantinsertclothesbeingworn":
+//       if (noun) weCouldTry(actor, TakingOff.createAction(actor, noun), attempt);
+//       break;
+//     case "cantgiveclothesbeingworn":
+//       if (noun) weCouldTry(actor, TakingOff.createAction(actor, noun), attempt);
+//       break;
+//     case "carryingrequirements":
+//       if (noun) weCouldTry(actor, Taking.createAction(actor, noun), attempt);
+//       break;
+//     default:
+//       return pretendItWorked;
+//   }
+//   return makeNoDecision;
+// });
 
 /////////////////
 
@@ -201,4 +180,5 @@ function main() {
   produceParagraphs(characters);
 }
 
+console.log("running main");
 main();

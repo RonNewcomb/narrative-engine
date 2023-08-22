@@ -203,37 +203,10 @@ function doThing(thisAttempt: Attempt, actor: Character) {
 
 /////////// Planner AI
 
-// //First after an actor doing something (this is update plans on success rule):
-// const updatePlansOnSuccess = (thisAttempt: Attempt) => {
-//   if (!thisAttempt) return makeNoDecision; // nothing to do, always succeeds
-//   if (currentAction == thisAttempt.action) thisAttempt.status = "successful";
-//   return makeNoDecision;
-// };
-
-// //} First after not an actor doing something (this is update plans on failure rule):
-// const updatePlansOnFailure = (thisAttempt: Attempt) => {
-//   //console.log("updatePlansOnFailure");
-//   // let thisAttempt = whatTheyWillDoNext(actor);
-//   // if (!thisAttempt) {
-//   //   console.log("Update plans on failure -- nothing to do");
-//   //   return;
-//   // }
-//   console.log("Update plans on failure", stringifyAttempt(thisAttempt));
-//   const solution = thisAttempt.fullfilledBy.filter(a => a.status == "successful");
-//   if (solution.length > 0) {
-//     if (reasonActionFailed != thisAttempt.meddlingCheckRule) thisAttempt.status = "partly successful";
-//   }
-//   console.log(solution.length, "partial solutions found");
-//   const outcome = whenHinderedBy(thisAttempt, reasonActionFailed!); //	follow when hindered by rules for reason action failed;
-//   console.log("circumventions", outcome, thisAttempt.fullfilledBy);
-//   thisAttempt.status = outcome == pretendItWorked ? "successful" : thisAttempt.fullfilledBy.length > 0 ? "partly successful" : "failed";
-//   return makeNoDecision;
-// };
-
 const hindered = (it: Attempt) =>
-  (it.status == "failed" || it.status == "untried") &&
-  !!it.fullfilledBy.filter(at => at.status == "untried").length &&
-  !it.fullfilledBy.filter(at => at.status == "successful").length;
+  (it.status == "failed" || it.status == "partly successful") &&
+  it.fullfilledBy.filter(at => at.status == "untried").length > 0 &&
+  it.fullfilledBy.filter(at => at.status == "successful").length == 0;
 // attempts().some(at => at.fulfills == it && at.status == "untried") &&
 // !attempts().some(at => at.fulfills == it && at.status == "successful");
 // there are untried attempts which fulfill it && there are no successful attempts which fulfill it;
@@ -321,8 +294,8 @@ const howTheyCan = (actor: Character, act: Attempt): Attempt[] => {
 
 const whatTheyAreTryingToDoNow = (actor: Character): Attempt => {
   let thisAct = actor.goals[0];
-  let details = thisAct.fullfilledBy.find(at => inThePresent(at));
-  //let details = attempts().find(at => inThePresent(at) && at.fulfills == thisAct);
+  // let details:Attempt|undefined = thisAct;// thisAct.fullfilledBy.find(at => inThePresent(at));
+  let details: Attempt | undefined = actor.goals[0];
   while (details) {
     //	while a hindered attempt (called details) fulfills thisAct:
     thisAct = details;
@@ -358,23 +331,7 @@ function weCouldTry(actor: Character, suggestion: Action, thisAttempt: Attempt):
     fulfills: thisAttempt,
     fullfilledBy: [],
   };
-  //circumvention.action.actor = actor;
-  // if (thisAttempt == actor.goals[0]) {
-  //   console.log("replacing toplevel goal");
-  //   const newAttempt: Attempt = {
-  //     action: currentAction,
-  //     status: "untried",
-  //     fulfills: actor.goals[0],
-  //     fullfilledBy: [],
-  //     meddlingCheckRule: reasonActionFailed!,
-  //   };
-  //   newAttempt.action.actor = actor;
-  //   thisAttempt = newAttempt;
-  //   actor.goals[0].fullfilledBy.push(newAttempt);
-  //   actor.goals[0].status = "untried";
-  // }
   thisAttempt.fullfilledBy.push(circumvention);
-  //circumvention.fulfills = thisAttempt;
   return circumvention;
 }
 
@@ -407,11 +364,11 @@ const whenHinderedBy = (attempt: Attempt, checkRuleThatFailedIt: Rule): RuleOutc
     case "cantenterclosedcontainers":
       if (noun) weCouldTry(actor, Opening.createAction(actor, noun), attempt);
       break;
-    //  case "cantexitclosedcontainers": weCouldTry(actor,Opening (personAsked.holder));break;
+    //  case "cantexitclosedcontainers": weCouldTry(actor,Opening.createAction(personAsked.holder));break;
     case "cantinsertintoclosedcontainers":
       if (secondNoun) weCouldTry(actor, Opening.createAction(actor, secondNoun), attempt);
       break;
-    //  case "cantsearchclosedopaquecontainers": if (    noun == a closed opaque container ) weCouldTry(actor,Opening(noun));break;
+    //  case "cantsearchclosedopaquecontainers": if (    noun == a closed opaque container ) weCouldTry(actor,Opening.createAction(noun));break;
     case "cantlockwhatsopen":
       weCouldTry(actor, Closing.createAction(actor, "whatever"), attempt);
       break;
@@ -428,7 +385,7 @@ const whenHinderedBy = (attempt: Attempt, checkRuleThatFailedIt: Rule): RuleOutc
     case "cantputclothesbeingworn":
       if (noun) weCouldTry(actor, TakingOff.createAction(actor, noun), attempt);
       break;
-    //  case "canttakepeoplespossessions": weCouldTry(actor,AskingFor(  noun.holder,  noun));break;
+    //  case "canttakepeoplespossessions": weCouldTry(actor,AskingFor.createAction(  noun.holder,  noun));break;
     case "cantinsertclothesbeingworn":
       if (noun) weCouldTry(actor, TakingOff.createAction(actor, noun), attempt);
       break;
@@ -458,11 +415,15 @@ function main() {
   console.log(stringify(characters));
   /// init end
 
-  const next = whatTheyAreTryingToDoNow(Rose);
-  console.log("Her next is", stringifyAttempt(next));
-
   // go
-  doThing(next, Rose);
+  for (let turn = 1; turn < 3; turn++) {
+    console.log("TURN", turn);
+    for (let character of characters) {
+      const next = whatTheyAreTryingToDoNow(character);
+      console.log("Their next action is", stringifyAttempt(next));
+      doThing(next, character);
+    }
+  }
 
   console.log(stringify(characters));
 }

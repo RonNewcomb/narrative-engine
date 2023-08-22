@@ -20,8 +20,8 @@ interface Action {
 /** An action which has failed.  Attempts record which Check rule prevented the action and whether the action could or should be re-attempted later.
  *  For a re-attempt to be successful, certain pre-requisites need to be 'fulfilled' (a relation) by other actions, so the same Check rule doesn't
  *  simply stop the action again. */
-interface Attempt {
-  action: Action;
+interface Attempt extends Action {
+  //action: Action;
   status: "untried" | "failed" | "partly successful" | "successful";
   meddlingCheckRule?: Rule;
   fulfills: Attempt | undefined; // .parent
@@ -49,7 +49,7 @@ const characters: Character[] = [];
 
 interface ActionDefinition {
   verb: Verb;
-  createAction: (...rest: any[]) => Action;
+  create: (...rest: any[]) => Attempt;
   rulebooks: {
     check: Rulebook;
     moveDesireables: Rulebook;
@@ -79,7 +79,7 @@ function stringifyAction(act: Action): string {
 }
 
 function stringifyAttempt(attempt: Attempt): string {
-  return stringifyAction(attempt.action) + " (" + attempt.status + ")";
+  return stringifyAction(attempt) + " (" + attempt.status + ")";
 }
 
 function printAttempt(attempt: Attempt) {
@@ -114,8 +114,8 @@ function doThing(thisAttempt: Attempt, actor: Character) {
   if (!actor) throw "no ACTOR";
 
   // DO the currentAction and get status
-  const outcome = executeRulebook(thisAttempt.action, thisAttempt);
-  console.log(thisAttempt.action.verb, "is done:", outcome);
+  const outcome = executeRulebook(thisAttempt, thisAttempt);
+  console.log(thisAttempt.verb, "is done:", outcome);
 
   // update trees to record result
   if (outcome != "failed") {
@@ -265,7 +265,8 @@ const whatTheyWillDoNext = (actor: Character): Attempt | undefined => {
 function weCouldTry(actor: Character, suggestion: Action, thisAttempt: Attempt): Attempt {
   console.log(actor.name, "could try", stringifyAction(suggestion), "before", stringifyAttempt(thisAttempt));
   const circumvention: Attempt = {
-    action: { ...suggestion, actor },
+    ...suggestion,
+    actor,
     status: "untried",
     fulfills: thisAttempt,
     fullfilledBy: [],

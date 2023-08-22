@@ -12,21 +12,36 @@ const desireables: Desireable[] = [
 
 ////////////////
 
+function ActionFactory(def: ActionDefinition, actor: Character, noun?: Noun, secondNoun?: Noun): Attempt {
+  const action: Attempt = {
+    verb: def.verb,
+    definition: def,
+    directObject: noun,
+    indirectObject: secondNoun,
+    actor: actor,
+    status: "untried",
+    meddlingCheckRule: undefined,
+    fulfills: undefined,
+    fullfilledBy: [],
+  };
+  return action;
+}
+
 const Waiting: ActionDefinition = {
   verb: "wait",
-  createAction: (actor: Character): Action => ({ verb: Waiting.verb, actor, definition: Waiting }),
+  create: (actor: Character) => ActionFactory(Waiting, actor),
   rulebooks: { check: { rules: [] }, moveDesireables: { rules: [] }, news: { rules: [] } },
 };
 
 const Exiting: ActionDefinition = {
   verb: "exit",
-  createAction: (actor: Character): Action => ({ verb: Exiting.verb, actor, definition: Exiting }),
+  create: (actor: Character) => ActionFactory(Exiting, actor),
   rulebooks: {
     check: {
       rules: [
         function cantlockwhatsopen(action: Action, attempt: Attempt) {
           if (false) return "success";
-          weCouldTry(action.actor, Closing.createAction(action.actor, "whatever"), attempt);
+          weCouldTry(action.actor, Closing.create(action.actor, "whatever"), attempt);
           return "failed";
         },
       ],
@@ -38,55 +53,43 @@ const Exiting: ActionDefinition = {
 
 const Taking: ActionDefinition = {
   verb: "take",
-  createAction: (actor: Character, noun: Noun): Action => ({ verb: Taking.verb, directObject: noun, actor, definition: Taking }),
+  create: (actor: Character, noun: Noun) => ActionFactory(Taking, actor, noun),
   rulebooks: { check: { rules: [] }, moveDesireables: { rules: [] }, news: { rules: [] } },
 };
 
 const TakingOff: ActionDefinition = {
   verb: "take off",
-  createAction: (actor: Character, noun: Noun): Action => ({ verb: TakingOff.verb, directObject: noun, actor, definition: TakingOff }),
+  create: (actor: Character, noun: Noun) => ActionFactory(TakingOff, actor, noun),
   rulebooks: { check: { rules: [] }, moveDesireables: { rules: [] }, news: { rules: [] } },
 };
 
 const Opening: ActionDefinition = {
   verb: "open",
-  createAction: (actor: Character, noun: Noun): Action => ({ verb: Opening.verb, directObject: noun, actor, definition: Opening }),
+  create: (actor: Character, noun: Noun) => ActionFactory(Opening, actor, noun),
   rulebooks: { check: { rules: [] }, moveDesireables: { rules: [] }, news: { rules: [] } },
 };
 
 const Closing: ActionDefinition = {
   verb: "close",
-  createAction: (actor: Character, noun: Noun): Action => ({ verb: Closing.verb, directObject: noun, actor, definition: Closing }),
+  create: (actor: Character, noun: Noun) => ActionFactory(Closing, actor, noun),
   rulebooks: { check: { rules: [] }, moveDesireables: { rules: [] }, news: { rules: [] } },
 };
 
 const Dropping: ActionDefinition = {
   verb: "wait",
-  createAction: (actor: Character, noun: Noun): Action => ({ verb: Dropping.verb, directObject: noun, actor, definition: Dropping }),
+  create: (actor: Character, noun: Noun) => ActionFactory(Dropping, actor, noun),
   rulebooks: { check: { rules: [] }, moveDesireables: { rules: [] }, news: { rules: [] } },
 };
 
 const AskingFor: ActionDefinition = {
   verb: "asking _ for",
-  createAction: (actor: Character, noun: Noun, secondNoun: Noun): Action => ({
-    verb: AskingFor.verb,
-    actor,
-    directObject: noun,
-    indirectObject: secondNoun,
-    definition: AskingFor,
-  }),
+  create: (actor: Character, noun: Noun, secondNoun: Noun) => ActionFactory(AskingFor, actor, noun, secondNoun),
   rulebooks: { check: { rules: [] }, moveDesireables: { rules: [] }, news: { rules: [] } },
 };
 
 const PuttingOn: ActionDefinition = {
   verb: "putting _ on",
-  createAction: (actor: Character, noun: Noun, secondNoun: Noun): Action => ({
-    verb: PuttingOn.verb,
-    actor,
-    directObject: noun,
-    indirectObject: secondNoun,
-    definition: PuttingOn,
-  }),
+  create: (actor: Character, noun: Noun, secondNoun: Noun) => ActionFactory(PuttingOn, actor, noun, secondNoun),
   rulebooks: { check: { rules: [] }, moveDesireables: { rules: [] }, news: { rules: [] } },
 };
 
@@ -102,7 +105,7 @@ const Rose: Character = {
 ////////////
 
 function main() {
-  Rose.goals.push({ action: Exiting.createAction(Rose), status: "untried", fullfilledBy: [], fulfills: undefined });
+  Rose.goals.push(Exiting.create(Rose));
   characters.push(Rose);
   /// init end
 

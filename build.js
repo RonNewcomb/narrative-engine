@@ -54,7 +54,7 @@ function stringifyAction(act) {
     return (((_a = act.actor) === null || _a === void 0 ? void 0 : _a.name) || "") + " " + act.verb + " " + (act.indirectObject || "") + " " + (act.directObject || "");
 }
 function stringifyAttempt(attempt) {
-    return stringifyAction(attempt.action) + " (" + attempt.status + ")";
+    return stringifyAction(attempt) + " (" + attempt.status + ")";
 }
 function printAttempt(attempt) {
     console.log("  '" + stringifyAttempt(attempt) + '"');
@@ -93,8 +93,8 @@ function doThing(thisAttempt, actor) {
     if (!actor)
         throw "no ACTOR";
     // DO the currentAction and get status
-    var outcome = executeRulebook(thisAttempt.action, thisAttempt);
-    console.log(thisAttempt.action.verb, "is done:", outcome);
+    var outcome = executeRulebook(thisAttempt, thisAttempt);
+    console.log(thisAttempt.verb, "is done:", outcome);
     // update trees to record result
     if (outcome != "failed") {
         thisAttempt.status = "successful";
@@ -232,12 +232,7 @@ var whatTheyWillDoNext = function (actor) {
 /** attaches a suggestion to the tree */
 function weCouldTry(actor, suggestion, thisAttempt) {
     console.log(actor.name, "could try", stringifyAction(suggestion), "before", stringifyAttempt(thisAttempt));
-    var circumvention = {
-        action: __assign(__assign({}, suggestion), { actor: actor }),
-        status: "untried",
-        fulfills: thisAttempt,
-        fullfilledBy: []
-    };
+    var circumvention = __assign(__assign({}, suggestion), { actor: actor, status: "untried", fulfills: thisAttempt, fullfilledBy: [] });
     thisAttempt.fullfilledBy.push(circumvention);
     // thisAttempt.meddlingCheckRule = reasonActionFailed;
     return circumvention;
@@ -252,21 +247,35 @@ var desireables = [
     { name: "to be at Harrenfall before the 12th" },
 ];
 ////////////////
+function ActionFactory(def, actor, noun, secondNoun) {
+    var action = {
+        verb: def.verb,
+        definition: def,
+        directObject: noun,
+        indirectObject: secondNoun,
+        actor: actor,
+        status: "untried",
+        meddlingCheckRule: undefined,
+        fulfills: undefined,
+        fullfilledBy: []
+    };
+    return action;
+}
 var Waiting = {
     verb: "wait",
-    createAction: function (actor) { return ({ verb: Waiting.verb, actor: actor, definition: Waiting }); },
+    create: function (actor) { return ActionFactory(Waiting, actor); },
     rulebooks: { check: { rules: [] }, moveDesireables: { rules: [] }, news: { rules: [] } }
 };
 var Exiting = {
     verb: "exit",
-    createAction: function (actor) { return ({ verb: Exiting.verb, actor: actor, definition: Exiting }); },
+    create: function (actor) { return ActionFactory(Exiting, actor); },
     rulebooks: {
         check: {
             rules: [
                 function cantlockwhatsopen(action, attempt) {
                     if (false)
                         return "success";
-                    weCouldTry(action.actor, Closing.createAction(action.actor, "whatever"), attempt);
+                    weCouldTry(action.actor, Closing.create(action.actor, "whatever"), attempt);
                     return "failed";
                 },
             ]
@@ -277,49 +286,37 @@ var Exiting = {
 };
 var Taking = {
     verb: "take",
-    createAction: function (actor, noun) { return ({ verb: Taking.verb, directObject: noun, actor: actor, definition: Taking }); },
+    create: function (actor, noun) { return ActionFactory(Taking, actor, noun); },
     rulebooks: { check: { rules: [] }, moveDesireables: { rules: [] }, news: { rules: [] } }
 };
 var TakingOff = {
     verb: "take off",
-    createAction: function (actor, noun) { return ({ verb: TakingOff.verb, directObject: noun, actor: actor, definition: TakingOff }); },
+    create: function (actor, noun) { return ActionFactory(TakingOff, actor, noun); },
     rulebooks: { check: { rules: [] }, moveDesireables: { rules: [] }, news: { rules: [] } }
 };
 var Opening = {
     verb: "open",
-    createAction: function (actor, noun) { return ({ verb: Opening.verb, directObject: noun, actor: actor, definition: Opening }); },
+    create: function (actor, noun) { return ActionFactory(Opening, actor, noun); },
     rulebooks: { check: { rules: [] }, moveDesireables: { rules: [] }, news: { rules: [] } }
 };
 var Closing = {
     verb: "close",
-    createAction: function (actor, noun) { return ({ verb: Closing.verb, directObject: noun, actor: actor, definition: Closing }); },
+    create: function (actor, noun) { return ActionFactory(Closing, actor, noun); },
     rulebooks: { check: { rules: [] }, moveDesireables: { rules: [] }, news: { rules: [] } }
 };
 var Dropping = {
     verb: "wait",
-    createAction: function (actor, noun) { return ({ verb: Dropping.verb, directObject: noun, actor: actor, definition: Dropping }); },
+    create: function (actor, noun) { return ActionFactory(Dropping, actor, noun); },
     rulebooks: { check: { rules: [] }, moveDesireables: { rules: [] }, news: { rules: [] } }
 };
 var AskingFor = {
     verb: "asking _ for",
-    createAction: function (actor, noun, secondNoun) { return ({
-        verb: AskingFor.verb,
-        actor: actor,
-        directObject: noun,
-        indirectObject: secondNoun,
-        definition: AskingFor
-    }); },
+    create: function (actor, noun, secondNoun) { return ActionFactory(AskingFor, actor, noun, secondNoun); },
     rulebooks: { check: { rules: [] }, moveDesireables: { rules: [] }, news: { rules: [] } }
 };
 var PuttingOn = {
     verb: "putting _ on",
-    createAction: function (actor, noun, secondNoun) { return ({
-        verb: PuttingOn.verb,
-        actor: actor,
-        directObject: noun,
-        indirectObject: secondNoun,
-        definition: PuttingOn
-    }); },
+    create: function (actor, noun, secondNoun) { return ActionFactory(PuttingOn, actor, noun, secondNoun); },
     rulebooks: { check: { rules: [] }, moveDesireables: { rules: [] }, news: { rules: [] } }
 };
 /////////////////
@@ -331,7 +328,7 @@ var Rose = {
 };
 ////////////
 function main() {
-    Rose.goals.push({ action: Exiting.createAction(Rose), status: "untried", fullfilledBy: [], fulfills: undefined });
+    Rose.goals.push(Exiting.create(Rose));
     characters.push(Rose);
     /// init end
     // go

@@ -1,3 +1,5 @@
+/// <reference path="./narrativeEngine.ts"/>
+
 interface Information {}
 
 function produceParagraphs(information: Information): string {

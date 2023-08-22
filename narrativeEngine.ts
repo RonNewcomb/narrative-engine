@@ -9,19 +9,15 @@ interface Character {
   goals: Attempt[];
 }
 
-interface Action {
-  verb: Verb;
-  directObject?: Noun;
-  indirectObject?: Noun;
-  actor: Character;
-  definition: ActionDefinition;
-}
-
 /** An action which has failed.  Attempts record which Check rule prevented the action and whether the action could or should be re-attempted later.
  *  For a re-attempt to be successful, certain pre-requisites need to be 'fulfilled' (a relation) by other actions, so the same Check rule doesn't
  *  simply stop the action again. */
-interface Attempt extends Action {
-  //action: Action;
+interface Attempt {
+  verb: Verb;
+  noun?: Noun;
+  secondNoun?: Noun;
+  actor: Character;
+  definition: ActionDefinition;
   status: "untried" | "failed" | "partly successful" | "successful";
   meddlingCheckRule?: Rule;
   fulfills: Attempt | undefined; // .parent
@@ -29,9 +25,9 @@ interface Attempt extends Action {
 }
 
 type Verb = string;
-type Noun = string;
+type Noun = Desireable;
 
-type Rule = ((act: Action, attempt: Attempt) => RuleOutcome) & { name?: string };
+type Rule = ((attempt: Attempt) => RuleOutcome) & { name?: string };
 
 type RuleOutcome = "success" | "failed" | undefined;
 const makeNoDecision: RuleOutcome = undefined;
@@ -74,8 +70,8 @@ function stringify(obj: any): string {
   );
 }
 
-function stringifyAction(act: Action): string {
-  return (act.actor?.name || "") + " " + act.verb + " " + (act.indirectObject || "") + " " + (act.directObject || "");
+function stringifyAction(act: Attempt): string {
+  return (act.actor?.name || "") + " " + act.verb + " " + (act.secondNoun || "") + " " + (act.noun || "");
 }
 
 function stringifyAttempt(attempt: Attempt): string {
@@ -88,20 +84,22 @@ function printAttempt(attempt: Attempt) {
 
 //////////// action machinery
 
-function executeRulebook(act: Action, attempt: Attempt): RuleOutcome {
-  const rulebooks = act.definition.rulebooks;
+function executeRulebook(attempt: Attempt): RuleOutcome {
+  const rulebooks = attempt.definition.rulebooks;
   for (const rule of rulebooks.check.rules) {
-    const outcome = rule(act, attempt);
-    if (outcome == "failed") attempt.meddlingCheckRule = rule;
-    if (!!outcome) return outcome;
+    const outcome = rule(attempt);
+    if (outcome == "failed") {
+      attempt.meddlingCheckRule = rule;
+      return outcome;
+    }
   }
   for (const rule of rulebooks.moveDesireables.rules) {
-    const outcome = rule(act, attempt);
-    if (outcome == "failed") attempt.meddlingCheckRule = rule;
-    if (!!outcome) return outcome;
+    const outcome = rule(attempt);
+    // if (outcome == "failed") attempt.meddlingCheckRule = rule;
+    // if (!!outcome) return outcome;
   }
   for (const rule of rulebooks.news.rules) {
-    const outcome = rule(act, attempt);
+    const outcome = rule(attempt);
     // if (outcome == "failed") reasonActionFailed = rule;
     // if (!!outcome) return outcome;
   }
@@ -114,7 +112,7 @@ function doThing(thisAttempt: Attempt, actor: Character) {
   if (!actor) throw "no ACTOR";
 
   // DO the currentAction and get status
-  const outcome = executeRulebook(thisAttempt, thisAttempt);
+  const outcome = executeRulebook(thisAttempt);
   console.log(thisAttempt.verb, "is done:", outcome);
 
   // update trees to record result
@@ -262,7 +260,7 @@ const whatTheyWillDoNext = (actor: Character): Attempt | undefined => {
 // };
 
 /** attaches a suggestion to the tree */
-function weCouldTry(actor: Character, suggestion: Action, thisAttempt: Attempt): Attempt {
+function weCouldTry(actor: Character, suggestion: Attempt, thisAttempt: Attempt): RuleOutcome {
   console.log(actor.name, "could try", stringifyAction(suggestion), "before", stringifyAttempt(thisAttempt));
   const circumvention: Attempt = {
     ...suggestion,
@@ -273,5 +271,5 @@ function weCouldTry(actor: Character, suggestion: Action, thisAttempt: Attempt):
   };
   thisAttempt.fullfilledBy.push(circumvention);
   // thisAttempt.meddlingCheckRule = reasonActionFailed;
-  return circumvention;
+  return "failed";
 }

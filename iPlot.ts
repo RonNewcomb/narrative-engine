@@ -1,4 +1,6 @@
-interface Desireable {
+/// <reference path="./narrativeEngine.ts"/>
+
+interface Desireable extends Record<string, any> {
   name: string;
   number?: number;
   owner?: Character;

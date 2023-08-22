@@ -11,17 +11,6 @@ function createCCC(choice, consequence, closure) {
 function getCCC(searchParameters) {
     return tracking.filter(function (ccc) { return ccc.choice == searchParameters.choice; });
 }
-function disagrees(character, state, recentActionLearned, desireablesAffected) {
-    return character.shoulds.filter(function (should) { });
-}
-function isButtonsPushed(character, state, recentActionLearned, desireablesAffected) {
-    return character.shoulds.filter(function (should) { }).length > 0;
-}
-function produceParagraphs(information) {
-    var paragraph = stringify(information);
-    console.log(paragraph);
-    return paragraph;
-}
 var __assign = (this && this.__assign) || function () {
     __assign = Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -51,7 +40,7 @@ function stringify(obj) {
 }
 function stringifyAction(act) {
     var _a;
-    return (((_a = act.actor) === null || _a === void 0 ? void 0 : _a.name) || "") + " " + act.verb + " " + (act.indirectObject || "") + " " + (act.directObject || "");
+    return (((_a = act.actor) === null || _a === void 0 ? void 0 : _a.name) || "") + " " + act.verb + " " + (act.secondNoun || "") + " " + (act.noun || "");
 }
 function stringifyAttempt(attempt) {
     return stringifyAction(attempt) + " (" + attempt.status + ")";
@@ -60,27 +49,25 @@ function printAttempt(attempt) {
     console.log("  '" + stringifyAttempt(attempt) + '"');
 }
 //////////// action machinery
-function executeRulebook(act, attempt) {
-    var rulebooks = act.definition.rulebooks;
+function executeRulebook(attempt) {
+    var rulebooks = attempt.definition.rulebooks;
     for (var _i = 0, _a = rulebooks.check.rules; _i < _a.length; _i++) {
         var rule = _a[_i];
-        var outcome = rule(act, attempt);
-        if (outcome == "failed")
+        var outcome = rule(attempt);
+        if (outcome == "failed") {
             attempt.meddlingCheckRule = rule;
-        if (!!outcome)
             return outcome;
+        }
     }
     for (var _b = 0, _c = rulebooks.moveDesireables.rules; _b < _c.length; _b++) {
         var rule = _c[_b];
-        var outcome = rule(act, attempt);
-        if (outcome == "failed")
-            attempt.meddlingCheckRule = rule;
-        if (!!outcome)
-            return outcome;
+        var outcome = rule(attempt);
+        // if (outcome == "failed") attempt.meddlingCheckRule = rule;
+        // if (!!outcome) return outcome;
     }
     for (var _d = 0, _e = rulebooks.news.rules; _d < _e.length; _d++) {
         var rule = _e[_d];
-        var outcome = rule(act, attempt);
+        var outcome = rule(attempt);
         // if (outcome == "failed") reasonActionFailed = rule;
         // if (!!outcome) return outcome;
     }
@@ -93,7 +80,7 @@ function doThing(thisAttempt, actor) {
     if (!actor)
         throw "no ACTOR";
     // DO the currentAction and get status
-    var outcome = executeRulebook(thisAttempt, thisAttempt);
+    var outcome = executeRulebook(thisAttempt);
     console.log(thisAttempt.verb, "is done:", outcome);
     // update trees to record result
     if (outcome != "failed") {
@@ -235,7 +222,20 @@ function weCouldTry(actor, suggestion, thisAttempt) {
     var circumvention = __assign(__assign({}, suggestion), { actor: actor, status: "untried", fulfills: thisAttempt, fullfilledBy: [] });
     thisAttempt.fullfilledBy.push(circumvention);
     // thisAttempt.meddlingCheckRule = reasonActionFailed;
-    return circumvention;
+    return "failed";
+}
+/// <reference path="./narrativeEngine.ts"/>
+function disagrees(character, state, recentActionLearned, desireablesAffected) {
+    return character.shoulds.filter(function (should) { });
+}
+function isButtonsPushed(character, state, recentActionLearned, desireablesAffected) {
+    return character.shoulds.filter(function (should) { }).length > 0;
+}
+/// <reference path="./narrativeEngine.ts"/>
+function produceParagraphs(information) {
+    var paragraph = stringify(information);
+    console.log(paragraph);
+    return paragraph;
 }
 /// <reference path="./iPlot.ts" />
 /// <reference path="./produceParagraphs.ts" />
@@ -245,14 +245,16 @@ var desireables = [
     { name: "Rose's inheritance" },
     { name: "Legitamacy in the eyes of the court" },
     { name: "to be at Harrenfall before the 12th" },
+    { name: "door key", isKey: true },
+    { name: "door", isLocked: true },
 ];
 ////////////////
 function ActionFactory(def, actor, noun, secondNoun) {
     var action = {
         verb: def.verb,
         definition: def,
-        directObject: noun,
-        indirectObject: secondNoun,
+        noun: noun,
+        secondNoun: secondNoun,
         actor: actor,
         status: "untried",
         meddlingCheckRule: undefined,
@@ -272,10 +274,13 @@ var Exiting = {
     rulebooks: {
         check: {
             rules: [
-                function cantlockwhatsopen(action, attempt) {
-                    if (false)
+                function (attempt) {
+                    var door = desireables.find(function (d) { return d.name == "door"; });
+                    if (!door)
+                        throw "door??";
+                    if (!door.isLocked)
                         return "success";
-                    weCouldTry(action.actor, Closing.create(action.actor, "whatever"), attempt);
+                    weCouldTry(attempt.actor, Unlocking.create(attempt.actor, door), attempt);
                     return "failed";
                 },
             ]
@@ -297,11 +302,58 @@ var TakingOff = {
 var Opening = {
     verb: "open",
     create: function (actor, noun) { return ActionFactory(Opening, actor, noun); },
-    rulebooks: { check: { rules: [] }, moveDesireables: { rules: [] }, news: { rules: [] } }
+    rulebooks: {
+        check: {
+            rules: [
+                // attempt => {
+                //   if (!attempt.directObject) {
+                //     return weCouldTry(attempt.actor, Unlocking.create(attempt.actor, attempt.directObject), attempt);
+                //   }
+                //   return "success";
+                // },
+                function (attempt) { var _a; return (((_a = attempt.noun) === null || _a === void 0 ? void 0 : _a.isLocked) ? weCouldTry(attempt.actor, Unlocking.create(attempt.actor, attempt.noun), attempt) : "success"); },
+            ]
+        },
+        moveDesireables: { rules: [] },
+        news: { rules: [] }
+    }
 };
 var Closing = {
     verb: "close",
     create: function (actor, noun) { return ActionFactory(Closing, actor, noun); },
+    rulebooks: { check: { rules: [] }, moveDesireables: { rules: [] }, news: { rules: [] } }
+};
+var Unlocking = {
+    verb: "unlock _ with",
+    create: function (actor, door, key) { return ActionFactory(Unlocking, actor, door, key); },
+    rulebooks: {
+        check: {
+            rules: [
+            //        attempt=> !attempt.secondNoun?.isKey ? weCouldTry() : "success",
+            ]
+        },
+        moveDesireables: {
+            rules: [
+                function (attempt) {
+                    attempt.noun.isLocked = false;
+                    return "success";
+                },
+            ]
+        },
+        news: {
+            rules: [
+                function (a) {
+                    var door = desireables.find(function (d) { return d.name == "door"; });
+                    console.log("door is", door);
+                    return "success";
+                },
+            ]
+        }
+    }
+};
+var Locking = {
+    verb: "lock",
+    create: function (actor, noun) { return ActionFactory(Locking, actor, noun); },
     rulebooks: { check: { rules: [] }, moveDesireables: { rules: [] }, news: { rules: [] } }
 };
 var Dropping = {
@@ -311,7 +363,7 @@ var Dropping = {
 };
 var AskingFor = {
     verb: "asking _ for",
-    create: function (actor, noun, secondNoun) { return ActionFactory(AskingFor, actor, noun, secondNoun); },
+    create: function (actor, otherPerson, thing) { return ActionFactory(AskingFor, actor, otherPerson, thing); },
     rulebooks: { check: { rules: [] }, moveDesireables: { rules: [] }, news: { rules: [] } }
 };
 var PuttingOn = {

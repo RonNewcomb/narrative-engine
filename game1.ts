@@ -8,6 +8,8 @@ const desireables: Desireable[] = [
   { name: "Rose's inheritance" },
   { name: "Legitamacy in the eyes of the court" },
   { name: "to be at Harrenfall before the 12th" },
+  { name: "door key", isKey: true },
+  { name: "door", isLocked: true },
 ];
 
 ////////////////
@@ -16,8 +18,8 @@ function ActionFactory(def: ActionDefinition, actor: Character, noun?: Noun, sec
   const action: Attempt = {
     verb: def.verb,
     definition: def,
-    directObject: noun,
-    indirectObject: secondNoun,
+    noun: noun,
+    secondNoun: secondNoun,
     actor: actor,
     status: "untried",
     meddlingCheckRule: undefined,
@@ -39,9 +41,11 @@ const Exiting: ActionDefinition = {
   rulebooks: {
     check: {
       rules: [
-        function cantlockwhatsopen(action: Action, attempt: Attempt) {
-          if (false) return "success";
-          weCouldTry(action.actor, Closing.create(action.actor, "whatever"), attempt);
+        attempt => {
+          const door = desireables.find(d => d.name == "door");
+          if (!door) throw "door??";
+          if (!door.isLocked) return "success";
+          weCouldTry(attempt.actor, Unlocking.create(attempt.actor, door), attempt);
           return "failed";
         },
       ],
@@ -66,12 +70,61 @@ const TakingOff: ActionDefinition = {
 const Opening: ActionDefinition = {
   verb: "open",
   create: (actor: Character, noun: Noun) => ActionFactory(Opening, actor, noun),
-  rulebooks: { check: { rules: [] }, moveDesireables: { rules: [] }, news: { rules: [] } },
+  rulebooks: {
+    check: {
+      rules: [
+        // attempt => {
+        //   if (!attempt.directObject) {
+        //     return weCouldTry(attempt.actor, Unlocking.create(attempt.actor, attempt.directObject), attempt);
+        //   }
+        //   return "success";
+        // },
+        attempt => (attempt.noun?.isLocked ? weCouldTry(attempt.actor, Unlocking.create(attempt.actor, attempt.noun), attempt) : "success"),
+      ],
+    },
+    moveDesireables: { rules: [] },
+    news: { rules: [] },
+  },
 };
 
 const Closing: ActionDefinition = {
   verb: "close",
   create: (actor: Character, noun: Noun) => ActionFactory(Closing, actor, noun),
+  rulebooks: { check: { rules: [] }, moveDesireables: { rules: [] }, news: { rules: [] } },
+};
+
+const Unlocking: ActionDefinition = {
+  verb: "unlock _ with",
+  create: (actor: Character, door: Noun, key: Noun) => ActionFactory(Unlocking, actor, door, key),
+  rulebooks: {
+    check: {
+      rules: [
+        //        attempt=> !attempt.secondNoun?.isKey ? weCouldTry() : "success",
+      ],
+    },
+    moveDesireables: {
+      rules: [
+        attempt => {
+          attempt.noun!.isLocked = false;
+          return "success";
+        },
+      ],
+    },
+    news: {
+      rules: [
+        a => {
+          const door = desireables.find(d => d.name == "door");
+          console.log("door is", door);
+          return "success";
+        },
+      ],
+    },
+  },
+};
+
+const Locking: ActionDefinition = {
+  verb: "lock",
+  create: (actor: Character, noun: Noun) => ActionFactory(Locking, actor, noun),
   rulebooks: { check: { rules: [] }, moveDesireables: { rules: [] }, news: { rules: [] } },
 };
 
@@ -83,7 +136,7 @@ const Dropping: ActionDefinition = {
 
 const AskingFor: ActionDefinition = {
   verb: "asking _ for",
-  create: (actor: Character, noun: Noun, secondNoun: Noun) => ActionFactory(AskingFor, actor, noun, secondNoun),
+  create: (actor: Character, otherPerson: Noun, thing: Noun) => ActionFactory(AskingFor, actor, otherPerson, thing),
   rulebooks: { check: { rules: [] }, moveDesireables: { rules: [] }, news: { rules: [] } },
 };
 

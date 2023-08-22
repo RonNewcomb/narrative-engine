@@ -1,5 +1,7 @@
 interface Information {}
 
 function produceParagraphs(information: Information): string {
-  return JSON.stringify(information);
+  const paragraph = stringify(information);
+  console.log(paragraph);
+  return paragraph;
 }

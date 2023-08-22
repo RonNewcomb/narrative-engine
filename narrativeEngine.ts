@@ -225,23 +225,29 @@ const howTheyCan = (actor: Character, act: Attempt): Attempt[] => {
 //   return choices;
 // };
 
-const whatTheyAreTryingToDoNow = (actor: Character): Attempt => {
-  let thisAct = actor.goals[0];
+const whatTheyAreTryingToDoNow = (actor: Character): Attempt | undefined => {
+  let thisAct = actor.goals.find(g => g.status == "partly successful") || actor.goals.find(g => g.status == "untried");
+  if (!thisAct) return undefined;
+  if (thisAct.status == "untried") return thisAct;
   // let details:Attempt|undefined = thisAct;// thisAct.fullfilledBy.find(at => inThePresent(at));
-  let details: Attempt | undefined = actor.goals[0];
-  while (details) {
+  let previous: Attempt | undefined = thisAct;
+  while (thisAct) {
     //	while a hindered attempt (called details) fulfills thisAct:
-    thisAct = details;
-    details = thisAct.fullfilledBy.find(at => inThePresent(at));
+    previous = thisAct;
+    thisAct = previous.fullfilledBy.find(g => g.status == "partly successful");
+    //if (!thisAct) thisAct = previous.fullfilledBy.find(g => g.status == "untried");
   }
+  thisAct = previous.fullfilledBy.find(at => at.status == "successful")
+    ? previous
+    : previous.fullfilledBy.find(at => at.status == "untried");
   console.log("  Q: What is", actor.name, "trying to do now?");
-  console.log("  A: " + stringifyAttempt(thisAct));
+  console.log("  A: " + (thisAct ? stringifyAttempt(thisAct) : "nothing"));
   return thisAct; // [the most finely detailed, and hindered,]
 };
 
 const whatTheyWillDoNext = (actor: Character): Attempt | undefined => {
-  let choices = howTheyCan(actor, whatTheyAreTryingToDoNow(actor));
-  const untried = choices.find(item => item.status == "untried");
+  const current = whatTheyAreTryingToDoNow(actor);
+  const untried = !current ? undefined : howTheyCan(actor, current).find(item => item.status == "untried");
   //actor.goals.action = Waiting;
   console.log("  Q: What will", actor.name, "do next?");
   console.log("  A: ", untried ? stringifyAttempt(untried) : "No options.");
@@ -268,23 +274,3 @@ function weCouldTry(actor: Character, suggestion: Action, thisAttempt: Attempt):
   // thisAttempt.meddlingCheckRule = reasonActionFailed;
   return circumvention;
 }
-
-// type WhenHinderedByRule = (attempt: Attempt, checkRuleThatFailedIt: Rule) => RuleOutcome;
-
-// const WhenHinderedByRules: WhenHinderedByRule[] = [];
-
-// const whenHinderedBy: WhenHinderedByRule = (attempt: Attempt, checkRuleThatFailedIt: Rule): RuleOutcome => {
-//   const actor: Character = attempt.action.actor;
-
-//   // First when hindered by (this is don't plan for player rule): if person asked is player, do nothing instead.
-//   if (actor == player) return "failed";
-
-//   console.log("RULE NAME", checkRuleThatFailedIt.name);
-
-//   for (const rules of WhenHinderedByRules) {
-//     const outcome = rules(attempt, checkRuleThatFailedIt);
-//     if (!!outcome) return outcome;
-//   }
-
-//   return makeNoDecision;
-// };

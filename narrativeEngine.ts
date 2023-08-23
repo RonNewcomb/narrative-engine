@@ -1,6 +1,6 @@
 interface ShouldBe {
-  resource: Desireable;
   property: string;
+  ofDesireable: Desireable;
   shouldBe: "=" | "!=";
   toValue: any | any[];
   /** default to Success */
@@ -8,8 +8,8 @@ interface ShouldBe {
 }
 
 type ShouldBeStatement = [
-  resource: ShouldBe["resource"],
   property: ShouldBe["property"],
+  ofDesireable: ShouldBe["ofDesireable"],
   shouldBe: ShouldBe["shouldBe"],
   toValue: ShouldBe["toValue"]
 ];
@@ -17,9 +17,6 @@ type ShouldBeStatement = [
 interface Character {
   name: string;
   beliefs: ShouldBe[];
-  think: () => void;
-  //act: Act;
-
   goals: Attempt[];
 }
 
@@ -85,7 +82,9 @@ function stringify(obj: any): string {
 }
 
 function stringifyAction(act: Attempt): string {
-  return (act.actor?.name || "") + " " + act.verb + " " + (act.secondNoun || "") + " " + (act.noun || "");
+  const rearrange = act.verb.includes("_");
+  const predicate = rearrange ? act.verb.replace("_", act.noun?.name || "") : act.verb;
+  return (act.actor?.name || "") + " " + predicate + " " + (act.secondNoun?.name || "") + (rearrange ? "" : " " + (act.noun?.name || ""));
 }
 
 function stringifyAttempt(attempt: Attempt): string {
@@ -281,7 +280,7 @@ function weCouldTry(
   noun: Noun | undefined,
   secondNoun: Noun | undefined,
   failingAction: Attempt
-): RuleOutcome {
+): "failed" {
   console.log(actor.name, "could try", definition.verb, "before", stringifyAttempt(failingAction));
   const circumvention: Attempt = {
     verb: definition.verb,
@@ -298,10 +297,16 @@ function weCouldTry(
   return "failed";
 }
 
-function createGoal(actor: Character, definition: ActionDefinition, noun?: Noun, secondNoun?: Noun): Attempt {
+const me: Character = {
+  name: "myself",
+  beliefs: [],
+  goals: [],
+};
+
+function createMyGoal(definition: ActionDefinition, noun?: Noun, secondNoun?: Noun): Attempt {
   const circumvention: Attempt = {
     verb: definition.verb,
-    actor,
+    actor: me,
     definition,
     noun,
     secondNoun,
@@ -313,17 +318,28 @@ function createGoal(actor: Character, definition: ActionDefinition, noun?: Noun,
   return circumvention;
 }
 
+function createMyBelief(
+  property: ShouldBe["property"],
+  ofDesireable: ShouldBe["ofDesireable"],
+  shouldBe: ShouldBe["shouldBe"],
+  toValue: ShouldBe["toValue"],
+  sensitivity?: ShouldBe["sensitivity"]
+): ShouldBe {
+  const belief: ShouldBe = { property, ofDesireable, shouldBe, toValue, sensitivity };
+  return belief;
+}
+
 //////////
 
 function moveDesireable(
-  resource: ShouldBe["resource"],
   property: ShouldBe["property"],
+  ofDesireable: ShouldBe["ofDesireable"],
   shouldBe: ShouldBe["shouldBe"],
   toValue: ShouldBe["toValue"]
 ) {
   switch (shouldBe) {
     case "=":
-      resource[property] = toValue;
+      ofDesireable[property] = toValue;
       return;
     default:
       throw "Unknown operation on desireable resource " + shouldBe;
@@ -333,6 +349,10 @@ function moveDesireable(
 ///////////
 
 function main(...characters: Character[]) {
+  // clean up init
+  for (let character of characters) for (let goal of character.goals) if (goal.actor == me) goal.actor = character;
+
+  // GO
   for (let turn = 1; turn < 5; turn++) {
     produceParagraphs(characters);
     console.log("TURN", turn);
@@ -346,21 +366,33 @@ function main(...characters: Character[]) {
 
     // react to news
     for (let news of currentTurnsNews)
-      for (let character of characters) {
-        for (let should of character.beliefs) if (isButtonPushed(news, should)) createScene(character, news);
-      }
+      for (let character of characters)
+        for (let should of character.beliefs) if (isButtonPushed(news, should)) scheduleScene(createScene(character, news, "reaction"));
 
     // reset news
-    if (currentTurnsNews.length) {
-      oldNews.push(...currentTurnsNews);
-      currentTurnsNews = [];
-    }
+    oldNews.push(...currentTurnsNews);
+    currentTurnsNews = [];
   }
   produceParagraphs(characters);
 }
 
 /////////
 
-function createScene(character: Character, news: News) {
-  console.log("SCHEDULED SCENE for", character.name, "about", stringifyAction(news));
+interface Scene {
+  type: "reaction" /* to news */ | /* external */ "conflict" | "internal conflict" | "action";
+  actor: Character;
+  news: News;
+}
+
+const scenesTodo: Scene[] = [];
+
+function createScene(reactor: Character, news: News, type: Scene["type"]): Scene {
+  const scene: Scene = { type, news, actor: reactor };
+  return scene;
+}
+
+function scheduleScene(scene: Scene): void {
+  const character: Character = scene.actor;
+  console.log("SCHEDULED SCENE for", character.name, "about", stringifyAction(scene.news));
+  scenesTodo.push(scene);
 }

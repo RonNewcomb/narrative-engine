@@ -9,7 +9,7 @@ const door: Desireable = { name: "door", isLocked: true };
 
 const desireables: Desireable[] = [
   { name: "Rose's inheritance" },
-  { name: "Legitamacy in the eyes of the court" },
+  { name: "Legitimacy in the eyes of the court" },
   { name: "to be at Harrenfall before the 12th" },
   doorkey,
   door,
@@ -17,97 +17,66 @@ const desireables: Desireable[] = [
 
 ////////////////
 
-const Waiting: ActionDefinition = {
-  verb: "wait",
-};
+const Waiting: ActionDefinition = { verb: "wait" };
 
 const Exiting: ActionDefinition = {
   verb: "exit",
   rulebooks: {
     check: {
-      rules: [
-        attempt => {
-          if (!door.isLocked) return "success";
-          weCouldTry(attempt.actor, Unlocking, door, undefined, attempt);
-          return "failed";
-        },
-      ],
+      rules: [attempt => (!door.isLocked ? "success" : weCouldTry(attempt.actor, Unlocking, door, undefined, attempt))],
     },
-    //  moveDesireables: { rules: [] },
   },
 };
 
-const Taking: ActionDefinition = {
-  verb: "take",
-};
+const Taking: ActionDefinition = { verb: "take" };
 
-const TakingOff: ActionDefinition = {
-  verb: "take off",
-};
+const TakingOff: ActionDefinition = { verb: "take off" };
 
 const Opening: ActionDefinition = {
   verb: "open",
   rulebooks: {
     check: {
       rules: [
-        // attempt => {
-        //   if (!attempt.directObject) {
-        //     return weCouldTry(attempt.actor,  Unlocking, attempt.noun,undefined, attempt);
-        //   }
-        //   return "success";
-        // },
+        // attempt => (attempt.noun ? "successful" : weCouldTry(attempt.actor, Unlocking, attempt.noun, undefined, attempt)),
         attempt => (attempt.noun?.isLocked ? weCouldTry(attempt.actor, Unlocking, attempt.noun, undefined, attempt) : "success"),
       ],
     },
   },
 };
 
-const Closing: ActionDefinition = {
-  verb: "close",
-};
+const Closing: ActionDefinition = { verb: "close" };
 
 const Unlocking: ActionDefinition = {
   verb: "unlock _ with",
   rulebooks: {
     check: {
       rules: [
-        //        attempt=> !attempt.secondNoun?.isKey ? weCouldTry() : "success",
+        // attempt => (attempt.secondNoun?.isKey ? "success" : weCouldTry(attempt.actor, Taking, attempt.secondNoun, undefined, attempt)),
       ],
     },
-    moveDesireables: attempt => [[attempt.noun!, "isLocked", "=", false]],
+    moveDesireables: attempt => [["isLocked", attempt.noun!, "=", false]],
   },
 };
 
-const Locking: ActionDefinition = {
-  verb: "lock",
-};
+const Locking: ActionDefinition = { verb: "lock" };
 
-const Dropping: ActionDefinition = {
-  verb: "wait",
-};
+const Dropping: ActionDefinition = { verb: "wait" };
 
-const AskingFor: ActionDefinition = {
-  verb: "asking _ for",
-};
+const AskingFor: ActionDefinition = { verb: "asking _ for" };
 
-const PuttingOn: ActionDefinition = {
-  verb: "putting _ on",
-};
+const PuttingOn: ActionDefinition = { verb: "putting _ on" };
 
 /////////////////
 
 const Rose: Character = {
   name: "Rose",
   beliefs: [],
-  think: () => {},
-  goals: [],
+  goals: [createMyGoal(Exiting)],
 };
-Rose.goals.push(createGoal(Rose, Exiting));
 
 const Zafra: Character = {
   name: "Zafra",
-  beliefs: [{ resource: door, property: "isLocked", shouldBe: "=", toValue: true }],
-  think: () => {},
+  beliefs: [createMyBelief("isLocked", door, "=", true)],
   goals: [],
 };
 

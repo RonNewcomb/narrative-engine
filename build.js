@@ -2,14 +2,14 @@ var tracking = [];
 function createCCC(choice, consequence, closure) {
     var ccc = {
         choice: choice,
-        consequence: consequence || { foreshadow: choice.foreshadow },
-        closure: closure || {}
+        consequence: consequence || { foreshadow: choice.foreshadow, scene: null },
+        closure: closure || { scene: null }
     };
     tracking.push(ccc);
     return ccc;
 }
-function getCCC(searchParameters) {
-    return tracking.filter(function (ccc) { return ccc.choice == searchParameters.choice; });
+function getCCC(searchFn) {
+    return tracking.filter(searchFn);
 }
 var makeNoDecision = undefined;
 var pretendItWorked = "success";
@@ -26,8 +26,10 @@ function stringify(obj) {
     }, 4);
 }
 function stringifyAction(act) {
-    var _a;
-    return (((_a = act.actor) === null || _a === void 0 ? void 0 : _a.name) || "") + " " + act.verb + " " + (act.secondNoun || "") + " " + (act.noun || "");
+    var _a, _b, _c, _d;
+    var rearrange = act.verb.includes("_");
+    var predicate = rearrange ? act.verb.replace("_", ((_a = act.noun) === null || _a === void 0 ? void 0 : _a.name) || "") : act.verb;
+    return (((_b = act.actor) === null || _b === void 0 ? void 0 : _b.name) || "") + " " + predicate + " " + (((_c = act.secondNoun) === null || _c === void 0 ? void 0 : _c.name) || "") + (rearrange ? "" : " " + (((_d = act.noun) === null || _d === void 0 ? void 0 : _d.name) || ""));
 }
 function stringifyAttempt(attempt) {
     return stringifyAction(attempt) + " (" + attempt.status + ")";
@@ -225,10 +227,15 @@ function weCouldTry(actor, definition, noun, secondNoun, failingAction) {
     failingAction.fullfilledBy.push(circumvention);
     return "failed";
 }
-function createGoal(actor, definition, noun, secondNoun) {
+var me = {
+    name: "myself",
+    beliefs: [],
+    goals: []
+};
+function createMyGoal(definition, noun, secondNoun) {
     var circumvention = {
         verb: definition.verb,
-        actor: actor,
+        actor: me,
         definition: definition,
         noun: noun,
         secondNoun: secondNoun,
@@ -239,11 +246,15 @@ function createGoal(actor, definition, noun, secondNoun) {
     };
     return circumvention;
 }
+function createMyBelief(property, ofDesireable, shouldBe, toValue, sensitivity) {
+    var belief = { property: property, ofDesireable: ofDesireable, shouldBe: shouldBe, toValue: toValue, sensitivity: sensitivity };
+    return belief;
+}
 //////////
-function moveDesireable(resource, property, shouldBe, toValue) {
+function moveDesireable(property, ofDesireable, shouldBe, toValue) {
     switch (shouldBe) {
         case "=":
-            resource[property] = toValue;
+            ofDesireable[property] = toValue;
             return;
         default:
             throw "Unknown operation on desireable resource " + shouldBe;
@@ -255,40 +266,54 @@ function main() {
     for (var _i = 0; _i < arguments.length; _i++) {
         characters[_i] = arguments[_i];
     }
+    // clean up init
+    for (var _a = 0, characters_1 = characters; _a < characters_1.length; _a++) {
+        var character = characters_1[_a];
+        for (var _b = 0, _c = character.goals; _b < _c.length; _b++) {
+            var goal = _c[_b];
+            if (goal.actor == me)
+                goal.actor = character;
+        }
+    }
+    // GO
     for (var turn = 1; turn < 5; turn++) {
         produceParagraphs(characters);
         console.log("TURN", turn);
         // characters act
-        for (var _a = 0, characters_1 = characters; _a < characters_1.length; _a++) {
-            var character = characters_1[_a];
+        for (var _d = 0, characters_2 = characters; _d < characters_2.length; _d++) {
+            var character = characters_2[_d];
             var next = whatTheyAreTryingToDoNow(character);
             console.log(character.name, "next action is", next ? stringifyAttempt(next) : "Nothing");
             if (next)
                 doThing(next, character);
         }
         // react to news
-        for (var _b = 0, currentTurnsNews_1 = currentTurnsNews; _b < currentTurnsNews_1.length; _b++) {
-            var news = currentTurnsNews_1[_b];
-            for (var _c = 0, characters_2 = characters; _c < characters_2.length; _c++) {
-                var character = characters_2[_c];
-                for (var _d = 0, _e = character.beliefs; _d < _e.length; _d++) {
-                    var should = _e[_d];
+        for (var _e = 0, currentTurnsNews_1 = currentTurnsNews; _e < currentTurnsNews_1.length; _e++) {
+            var news = currentTurnsNews_1[_e];
+            for (var _f = 0, characters_3 = characters; _f < characters_3.length; _f++) {
+                var character = characters_3[_f];
+                for (var _g = 0, _h = character.beliefs; _g < _h.length; _g++) {
+                    var should = _h[_g];
                     if (isButtonPushed(news, should))
-                        createScene(character, news);
+                        scheduleScene(createScene(character, news, "reaction"));
                 }
             }
         }
         // reset news
-        if (currentTurnsNews.length) {
-            oldNews.push.apply(oldNews, currentTurnsNews);
-            currentTurnsNews = [];
-        }
+        oldNews.push.apply(oldNews, currentTurnsNews);
+        currentTurnsNews = [];
     }
     produceParagraphs(characters);
 }
-/////////
-function createScene(character, news) {
-    console.log("SCHEDULED SCENE for", character.name, "about", stringifyAction(news));
+var scenesTodo = [];
+function createScene(reactor, news, type) {
+    var scene = { type: type, news: news, actor: reactor };
+    return scene;
+}
+function scheduleScene(scene) {
+    var character = scene.actor;
+    console.log("SCHEDULED SCENE for", character.name, "about", stringifyAction(scene.news));
+    scenesTodo.push(scene);
 }
 /// <reference path="./narrativeEngine.ts"/>
 var __assign = (this && this.__assign) || function () {
@@ -305,7 +330,7 @@ var __assign = (this && this.__assign) || function () {
 function createNewsItem(attempt) {
     var newsItem = __assign(__assign({}, attempt), { level: attempt.status == "untried" ? "suggested" : attempt.status });
     currentTurnsNews.push(newsItem);
-    console.log("NEWS", newsItem);
+    //console.log("NEWS", newsItem);
     return newsItem;
 }
 var oldNews = [];
@@ -317,9 +342,9 @@ function isButtonPushed(news, belief) {
         return false;
     for (var _i = 0, changeStatements_1 = changeStatements; _i < changeStatements_1.length; _i++) {
         var statement = changeStatements_1[_i];
-        if (statement[0] != belief.resource)
-            continue;
-        if (statement[1] != belief.property)
+        if (statement[0] != belief.property && (statement[0] || belief.property))
+            continue; // they differ and either/both are a truthy value
+        if (statement[1] != belief.ofDesireable)
             continue;
         // if (statement[2] != belief.toValue) return true;
         // if (statement[3] != belief.toValue) return true;
@@ -341,90 +366,59 @@ var doorkey = { name: "door key", isKey: true };
 var door = { name: "door", isLocked: true };
 var desireables = [
     { name: "Rose's inheritance" },
-    { name: "Legitamacy in the eyes of the court" },
+    { name: "Legitimacy in the eyes of the court" },
     { name: "to be at Harrenfall before the 12th" },
     doorkey,
     door,
 ];
 ////////////////
-var Waiting = {
-    verb: "wait"
-};
+var Waiting = { verb: "wait" };
 var Exiting = {
     verb: "exit",
     rulebooks: {
         check: {
-            rules: [
-                function (attempt) {
-                    if (!door.isLocked)
-                        return "success";
-                    weCouldTry(attempt.actor, Unlocking, door, undefined, attempt);
-                    return "failed";
-                },
-            ]
+            rules: [function (attempt) { return (!door.isLocked ? "success" : weCouldTry(attempt.actor, Unlocking, door, undefined, attempt)); }]
         }
     }
 };
-var Taking = {
-    verb: "take"
-};
-var TakingOff = {
-    verb: "take off"
-};
+var Taking = { verb: "take" };
+var TakingOff = { verb: "take off" };
 var Opening = {
     verb: "open",
     rulebooks: {
         check: {
             rules: [
-                // attempt => {
-                //   if (!attempt.directObject) {
-                //     return weCouldTry(attempt.actor,  Unlocking, attempt.noun,undefined, attempt);
-                //   }
-                //   return "success";
-                // },
+                // attempt => (attempt.noun ? "successful" : weCouldTry(attempt.actor, Unlocking, attempt.noun, undefined, attempt)),
                 function (attempt) { var _a; return (((_a = attempt.noun) === null || _a === void 0 ? void 0 : _a.isLocked) ? weCouldTry(attempt.actor, Unlocking, attempt.noun, undefined, attempt) : "success"); },
             ]
         }
     }
 };
-var Closing = {
-    verb: "close"
-};
+var Closing = { verb: "close" };
 var Unlocking = {
     verb: "unlock _ with",
     rulebooks: {
         check: {
             rules: [
-            //        attempt=> !attempt.secondNoun?.isKey ? weCouldTry() : "success",
+            // attempt => (attempt.secondNoun?.isKey ? "success" : weCouldTry(attempt.actor, Taking, attempt.secondNoun, undefined, attempt)),
             ]
         },
-        moveDesireables: function (attempt) { return [[attempt.noun, "isLocked", "=", false]]; }
+        moveDesireables: function (attempt) { return [["isLocked", attempt.noun, "=", false]]; }
     }
 };
-var Locking = {
-    verb: "lock"
-};
-var Dropping = {
-    verb: "wait"
-};
-var AskingFor = {
-    verb: "asking _ for"
-};
-var PuttingOn = {
-    verb: "putting _ on"
-};
+var Locking = { verb: "lock" };
+var Dropping = { verb: "wait" };
+var AskingFor = { verb: "asking _ for" };
+var PuttingOn = { verb: "putting _ on" };
 /////////////////
 var Rose = {
     name: "Rose",
     beliefs: [],
-    think: function () { },
-    goals: []
+    goals: [createMyGoal(Exiting)]
 };
-Rose.goals.push(createGoal(Rose, Exiting));
 var Zafra = {
     name: "Zafra",
-    beliefs: [{ resource: door, property: "isLocked", shouldBe: "=", toValue: true }],
-    think: function () { },
+    beliefs: [createMyBelief("isLocked", door, "=", true)],
     goals: []
 };
 ////////////

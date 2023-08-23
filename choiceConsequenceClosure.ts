@@ -3,11 +3,15 @@ interface IForeshadow {}
 interface Choi6eWithForeshadowing {
   choice: "ally" | "support" | "defuse" | "escalate" | "ignore" | "prolong";
   foreshadow: IForeshadow;
+  scene: Scene;
 }
 interface ForeshadowedNewsProvesAgency {
   foreshadow: IForeshadow;
+  scene: Scene;
 }
-interface ClosureFromInteriorReflection {}
+interface ClosureFromInteriorReflection {
+  scene: Scene;
+}
 
 interface ChoiceConsequenceClosure {
   choice: Choi6eWithForeshadowing;
@@ -24,13 +28,13 @@ function createCCC(
 ): ChoiceConsequenceClosure {
   const ccc: ChoiceConsequenceClosure = {
     choice,
-    consequence: consequence || { foreshadow: choice.foreshadow },
-    closure: closure || {},
+    consequence: consequence || { foreshadow: choice.foreshadow, scene: null as any },
+    closure: closure || { scene: null as any },
   };
   tracking.push(ccc);
   return ccc;
 }
 
-function getCCC(searchParameters: any): ChoiceConsequenceClosure[] {
-  return tracking.filter(ccc => ccc.choice == searchParameters.choice);
+function getCCC(searchFn: (ccc: ChoiceConsequenceClosure) => boolean): ChoiceConsequenceClosure[] {
+  return tracking.filter(searchFn);
 }

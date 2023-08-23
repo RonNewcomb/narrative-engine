@@ -1,10 +1,20 @@
+var scenesTodo = [];
+function createScene(type, actor, news) {
+    var scene = type == "reaction" ? { type: type, news: news, actor: actor } : { type: type, actor: actor };
+    return scene;
+}
+function scheduleScene(scene) {
+    var character = scene.actor;
+    console.log("SCHEDULED", scene.type, "SCENE for", character.name, "about", scene.type == "reaction" && stringifyAction(scene.news));
+    scenesTodo.push(scene);
+}
 var tracking = [];
 function createSceneSet(choice, consequence, closure) {
     var news = {};
     var ccc = {
         choice: choice,
         consequence: consequence || { foreshadow: choice.foreshadow, scene: createScene("reaction", choice.scene.actor, news) },
-        closure: closure || { scene: createScene("reflective", choice.scene.actor, news) }
+        closure: closure || { scene: createScene("reflective", choice.scene.actor) }
     };
     tracking.push(ccc);
     return ccc;
@@ -77,21 +87,10 @@ function doThing(thisAttempt, actor) {
     // DO the currentAction and get status
     var outcome = executeRulebook(thisAttempt);
     console.log(thisAttempt.verb, "is done:", outcome);
+    thisAttempt.status = outcome != "failed" ? "successful" : thisAttempt.fullfilledBy.length > 0 ? "partly successful" : "failed";
     // update trees to record result
-    if (outcome != "failed") {
-        thisAttempt.status = "successful";
-    }
-    else {
-        console.log("Update plans on failure", stringifyAttempt(thisAttempt));
-        // const solution = thisAttempt.fullfilledBy.filter(a => a.status == "successful");
-        // if (solution.length > 0) {
-        //   if (reasonActionFailed != thisAttempt.meddlingCheckRule) thisAttempt.status = "partly successful";
-        // }
-        // console.log(solution.length, "partial solutions found");
-        // const outcome = whenHinderedBy(thisAttempt, reasonActionFailed!); //	follow when hindered by rules for reason action failed;
+    if (thisAttempt.status == "partly successful")
         console.log("circumventions outcome:", outcome, ".  Could be fulfilled by:", thisAttempt.fullfilledBy.map(stringifyAttempt));
-        thisAttempt.status = outcome == pretendItWorked ? "successful" : thisAttempt.fullfilledBy.length > 0 ? "partly successful" : "failed";
-    }
     return makeNoDecision;
 }
 /////////// Planner AI
@@ -295,7 +294,7 @@ function main() {
     for (var turn = 1; turn < 5; turn++) {
         produceParagraphs(characters);
         console.log("TURN", turn);
-        // characters act
+        // characters act // creates scene types of Action
         for (var _e = 0, characters_3 = characters; _e < characters_3.length; _e++) {
             var character = characters_3[_e];
             var next = whatTheyAreTryingToDoNow(character);
@@ -303,7 +302,7 @@ function main() {
             if (next)
                 doThing(next, character);
         }
-        // react to news
+        // react to news // creates scene types of Reaction
         for (var _f = 0, currentTurnsNews_1 = currentTurnsNews; _f < currentTurnsNews_1.length; _f++) {
             var news = currentTurnsNews_1[_f];
             for (var _g = 0, characters_4 = characters; _g < characters_4.length; _g++) {
@@ -324,16 +323,7 @@ function main() {
     }
     produceParagraphs(characters);
 }
-var scenesTodo = [];
-function createScene(type, actor, news) {
-    var scene = { type: type, news: news, actor: actor };
-    return scene;
-}
-function scheduleScene(scene) {
-    var character = scene.actor;
-    console.log("SCHEDULED SCENE for", character.name, "about", stringifyAction(scene.news));
-    scenesTodo.push(scene);
-}
+/////////
 /// <reference path="./narrativeEngine.ts"/>
 var __assign = (this && this.__assign) || function () {
     __assign = Object.assign || function(t) {

@@ -1,7 +1,7 @@
 interface ShouldBe {
   property: string;
   ofDesireable: Desireable;
-  shouldBe: "=" | "!=";
+  shouldBe: "=" | "in";
   toValue: any | any[];
   /** default to Success */
   sensitivity?: NewsSensitivity;
@@ -52,11 +52,8 @@ interface RulebookWithOutcome {
   rules: RuleWithOutcome[];
 }
 
-/////////// Buttons
-
 interface ActionDefinition {
   verb: Verb;
-  // create: (...rest: any[]) => Attempt;
   rulebooks?: {
     check?: RulebookWithOutcome;
     moveDesireables?: (attempt: Attempt) => ShouldBeStatement[];
@@ -129,20 +126,12 @@ function doThing(thisAttempt: Attempt, actor: Character) {
   const outcome = executeRulebook(thisAttempt);
   console.log(thisAttempt.verb, "is done:", outcome);
 
+  thisAttempt.status = outcome != "failed" ? "successful" : thisAttempt.fullfilledBy.length > 0 ? "partly successful" : "failed";
+
   // update trees to record result
-  if (outcome != "failed") {
-    thisAttempt.status = "successful";
-  } else {
-    console.log("Update plans on failure", stringifyAttempt(thisAttempt));
-    // const solution = thisAttempt.fullfilledBy.filter(a => a.status == "successful");
-    // if (solution.length > 0) {
-    //   if (reasonActionFailed != thisAttempt.meddlingCheckRule) thisAttempt.status = "partly successful";
-    // }
-    // console.log(solution.length, "partial solutions found");
-    // const outcome = whenHinderedBy(thisAttempt, reasonActionFailed!); //	follow when hindered by rules for reason action failed;
+  if (thisAttempt.status == "partly successful")
     console.log("circumventions outcome:", outcome, ".  Could be fulfilled by:", thisAttempt.fullfilledBy.map(stringifyAttempt));
-    thisAttempt.status = outcome == pretendItWorked ? "successful" : thisAttempt.fullfilledBy.length > 0 ? "partly successful" : "failed";
-  }
+
   return makeNoDecision;
 }
 
@@ -372,14 +361,14 @@ function main(...characters: Character[]) {
     produceParagraphs(characters);
     console.log("TURN", turn);
 
-    // characters act
+    // characters act // creates scene types of Action
     for (let character of characters) {
       const next = whatTheyAreTryingToDoNow(character);
       console.log(character.name, "next action is", next ? stringifyAttempt(next) : "Nothing");
       if (next) doThing(next, character);
     }
 
-    // react to news
+    // react to news // creates scene types of Reaction
     for (let news of currentTurnsNews)
       for (let character of characters)
         for (let belief of character.beliefs)
@@ -397,28 +386,3 @@ function main(...characters: Character[]) {
 }
 
 /////////
-
-interface Scene {
-  type:
-    | "introduction" /* of a character, possibly the whole story */
-    | "action" /* including heavy dialogue */
-    | "reaction" /* to news */
-    | /* external */ "conflict"
-    | "internal conflict"
-    | "reflective";
-  actor: Character;
-  news: News;
-}
-
-const scenesTodo: Scene[] = [];
-
-function createScene(type: Scene["type"], actor: Character, news: News): Scene {
-  const scene: Scene = { type, news, actor };
-  return scene;
-}
-
-function scheduleScene(scene: Scene): void {
-  const character: Character = scene.actor;
-  console.log("SCHEDULED SCENE for", character.name, "about", stringifyAction(scene.news));
-  scenesTodo.push(scene);
-}

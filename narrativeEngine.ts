@@ -297,7 +297,7 @@ function weCouldTry(
   return "failed";
 }
 
-const me: Character = {
+const author: Character = {
   name: "myself",
   beliefs: [],
   goals: [],
@@ -306,7 +306,7 @@ const me: Character = {
 function createMyGoal(definition: ActionDefinition, noun?: Noun, secondNoun?: Noun): Attempt {
   const circumvention: Attempt = {
     verb: definition.verb,
-    actor: me,
+    actor: author,
     definition,
     noun,
     secondNoun,
@@ -349,8 +349,23 @@ function moveDesireable(
 ///////////
 
 function main(...characters: Character[]) {
-  // clean up init
-  for (let character of characters) for (let goal of character.goals) if (goal.actor == me) goal.actor = character;
+  // sanitize setup
+  for (let character of characters) for (let goal of character.goals) if (goal.actor == author) goal.actor = character;
+
+  // init
+  let firstAction: Attempt | undefined = undefined;
+  let firstCharacter: Character | undefined = undefined;
+  for (let character of characters) {
+    const next = whatTheyAreTryingToDoNow(character);
+    if (next) {
+      firstAction = next;
+      firstCharacter = character;
+      break;
+    }
+  }
+  if (!firstCharacter || !firstAction) throw "cannot find first character or action";
+
+  const currentScene: Scene = createScene("introduction", firstCharacter, firstAction as News);
 
   // GO
   for (let turn = 1; turn < 5; turn++) {
@@ -367,7 +382,12 @@ function main(...characters: Character[]) {
     // react to news
     for (let news of currentTurnsNews)
       for (let character of characters)
-        for (let should of character.beliefs) if (isButtonPushed(news, should)) scheduleScene(createScene(character, news, "reaction"));
+        for (let belief of character.beliefs)
+          if (isButtonPushed(news, belief)) {
+            const reactionScene = createScene("reaction", character, news);
+            scheduleScene(reactionScene);
+            createSceneSet({ scene: currentScene, foreshadow: {}, choice: "ally" }, { scene: reactionScene, foreshadow: {} });
+          }
 
     // reset news
     oldNews.push(...currentTurnsNews);
@@ -379,15 +399,21 @@ function main(...characters: Character[]) {
 /////////
 
 interface Scene {
-  type: "reaction" /* to news */ | /* external */ "conflict" | "internal conflict" | "action";
+  type:
+    | "introduction" /* of a character, possibly the whole story */
+    | "action" /* including heavy dialogue */
+    | "reaction" /* to news */
+    | /* external */ "conflict"
+    | "internal conflict"
+    | "reflective";
   actor: Character;
   news: News;
 }
 
 const scenesTodo: Scene[] = [];
 
-function createScene(reactor: Character, news: News, type: Scene["type"]): Scene {
-  const scene: Scene = { type, news, actor: reactor };
+function createScene(type: Scene["type"], actor: Character, news: News): Scene {
+  const scene: Scene = { type, news, actor };
   return scene;
 }
 

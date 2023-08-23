@@ -1,14 +1,15 @@
 var tracking = [];
-function createCCC(choice, consequence, closure) {
+function createSceneSet(choice, consequence, closure) {
+    var news = {};
     var ccc = {
         choice: choice,
-        consequence: consequence || { foreshadow: choice.foreshadow, scene: null },
-        closure: closure || { scene: null }
+        consequence: consequence || { foreshadow: choice.foreshadow, scene: createScene("reaction", choice.scene.actor, news) },
+        closure: closure || { scene: createScene("reflective", choice.scene.actor, news) }
     };
     tracking.push(ccc);
     return ccc;
 }
-function getCCC(searchFn) {
+function getSceneSet(searchFn) {
     return tracking.filter(searchFn);
 }
 var makeNoDecision = undefined;
@@ -227,7 +228,7 @@ function weCouldTry(actor, definition, noun, secondNoun, failingAction) {
     failingAction.fullfilledBy.push(circumvention);
     return "failed";
 }
-var me = {
+var author = {
     name: "myself",
     beliefs: [],
     goals: []
@@ -235,7 +236,7 @@ var me = {
 function createMyGoal(definition, noun, secondNoun) {
     var circumvention = {
         verb: definition.verb,
-        actor: me,
+        actor: author,
         definition: definition,
         noun: noun,
         secondNoun: secondNoun,
@@ -266,36 +267,54 @@ function main() {
     for (var _i = 0; _i < arguments.length; _i++) {
         characters[_i] = arguments[_i];
     }
-    // clean up init
+    // sanitize setup
     for (var _a = 0, characters_1 = characters; _a < characters_1.length; _a++) {
         var character = characters_1[_a];
         for (var _b = 0, _c = character.goals; _b < _c.length; _b++) {
             var goal = _c[_b];
-            if (goal.actor == me)
+            if (goal.actor == author)
                 goal.actor = character;
         }
     }
+    // init
+    var firstAction = undefined;
+    var firstCharacter = undefined;
+    for (var _d = 0, characters_2 = characters; _d < characters_2.length; _d++) {
+        var character = characters_2[_d];
+        var next = whatTheyAreTryingToDoNow(character);
+        if (next) {
+            firstAction = next;
+            firstCharacter = character;
+            break;
+        }
+    }
+    if (!firstCharacter || !firstAction)
+        throw "cannot find first character or action";
+    var currentScene = createScene("introduction", firstCharacter, firstAction);
     // GO
     for (var turn = 1; turn < 5; turn++) {
         produceParagraphs(characters);
         console.log("TURN", turn);
         // characters act
-        for (var _d = 0, characters_2 = characters; _d < characters_2.length; _d++) {
-            var character = characters_2[_d];
+        for (var _e = 0, characters_3 = characters; _e < characters_3.length; _e++) {
+            var character = characters_3[_e];
             var next = whatTheyAreTryingToDoNow(character);
             console.log(character.name, "next action is", next ? stringifyAttempt(next) : "Nothing");
             if (next)
                 doThing(next, character);
         }
         // react to news
-        for (var _e = 0, currentTurnsNews_1 = currentTurnsNews; _e < currentTurnsNews_1.length; _e++) {
-            var news = currentTurnsNews_1[_e];
-            for (var _f = 0, characters_3 = characters; _f < characters_3.length; _f++) {
-                var character = characters_3[_f];
-                for (var _g = 0, _h = character.beliefs; _g < _h.length; _g++) {
-                    var should = _h[_g];
-                    if (isButtonPushed(news, should))
-                        scheduleScene(createScene(character, news, "reaction"));
+        for (var _f = 0, currentTurnsNews_1 = currentTurnsNews; _f < currentTurnsNews_1.length; _f++) {
+            var news = currentTurnsNews_1[_f];
+            for (var _g = 0, characters_4 = characters; _g < characters_4.length; _g++) {
+                var character = characters_4[_g];
+                for (var _h = 0, _j = character.beliefs; _h < _j.length; _h++) {
+                    var belief = _j[_h];
+                    if (isButtonPushed(news, belief)) {
+                        var reactionScene = createScene("reaction", character, news);
+                        scheduleScene(reactionScene);
+                        createSceneSet({ scene: currentScene, foreshadow: {}, choice: "ally" }, { scene: reactionScene, foreshadow: {} });
+                    }
                 }
             }
         }
@@ -306,8 +325,8 @@ function main() {
     produceParagraphs(characters);
 }
 var scenesTodo = [];
-function createScene(reactor, news, type) {
-    var scene = { type: type, news: news, actor: reactor };
+function createScene(type, actor, news) {
+    var scene = { type: type, news: news, actor: actor };
     return scene;
 }
 function scheduleScene(scene) {

@@ -6,18 +6,32 @@ interface Desireable extends Record<string, any> {
   owner?: Character;
 }
 
-interface WorldState {
-  desireables: Desireable[];
-}
+type NewsSensitivity = "suggested" | Omit<Attempt["status"], "untried">;
 
 interface News extends Attempt {
-  age?: number; // #/turns?
+  level: NewsSensitivity;
+  onlyKnownBy?: Character[];
 }
 
-function disagrees(character: Character, state: WorldState, recentActionLearned: News, desireablesAffected: Desireable[]) {
-  return character.shoulds.filter(should => {});
+function createNewsItem(attempt: Attempt): News {
+  const newsItem = { ...attempt, level: attempt.status == "untried" ? "suggested" : attempt.status };
+  currentTurnsNews.push(newsItem);
+  console.log("NEWS", newsItem);
+  return newsItem;
 }
 
-function isButtonsPushed(character: Character, state: WorldState, recentActionLearned: News, desireablesAffected: Desireable[]): boolean {
-  return character.shoulds.filter(should => {}).length > 0;
+const oldNews: News[] = [];
+let currentTurnsNews: News[] = [];
+
+function isButtonPushed(news: News, belief: ShouldBe): boolean {
+  const changeStatements = news.definition.rulebooks?.moveDesireables?.(news) || [];
+  if (!changeStatements || !changeStatements.length) return false;
+  for (const statement of changeStatements) {
+    if (statement[0] != belief.resource) continue;
+    if (statement[1] != belief.property) continue;
+    // if (statement[2] != belief.toValue) return true;
+    // if (statement[3] != belief.toValue) return true;
+    return true;
+  }
+  return false;
 }

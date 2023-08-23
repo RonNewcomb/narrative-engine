@@ -1,8 +1,22 @@
-type Button = any;
+interface ShouldBe {
+  resource: Desireable;
+  property: string;
+  shouldBe: "=" | "!=";
+  toValue: any | any[];
+  /** default to Success */
+  sensitivity?: NewsSensitivity;
+}
+
+type ShouldBeStatement = [
+  resource: ShouldBe["resource"],
+  property: ShouldBe["property"],
+  shouldBe: ShouldBe["shouldBe"],
+  toValue: ShouldBe["toValue"]
+];
 
 interface Character {
   name: string;
-  shoulds: Button[];
+  beliefs: ShouldBe[];
   think: () => void;
   //act: Act;
 
@@ -48,7 +62,7 @@ interface ActionDefinition {
   // create: (...rest: any[]) => Attempt;
   rulebooks?: {
     check?: RulebookWithOutcome;
-    moveDesireables?: Rulebook;
+    moveDesireables?: (attempt: Attempt) => ShouldBeStatement[];
     news?: Rulebook;
   };
 }
@@ -87,27 +101,24 @@ function printAttempt(attempt: Attempt) {
 function executeRulebook(attempt: Attempt): RuleOutcome {
   const rulebooks = attempt.definition.rulebooks;
   if (!rulebooks) return makeNoDecision;
+  let outcome: RuleOutcome = makeNoDecision;
   if (rulebooks.check)
     for (const rule of rulebooks.check.rules || []) {
-      const outcome = rule(attempt);
-      if (outcome == "failed") {
+      const ruleResult = rule(attempt);
+      if (ruleResult == "failed") {
         attempt.meddlingCheckRule = rule;
-        return outcome;
+        outcome = ruleResult;
+        break;
       }
     }
-  if (rulebooks.moveDesireables)
-    for (const rule of rulebooks.moveDesireables.rules || []) {
-      const outcome = rule(attempt);
-      // if (outcome == "failed") attempt.meddlingCheckRule = rule;
-      // if (!!outcome) return outcome;
-    }
-  if (rulebooks.news)
-    for (const rule of rulebooks.news.rules || []) {
-      const outcome = rule(attempt);
-      // if (outcome == "failed") reasonActionFailed = rule;
-      // if (!!outcome) return outcome;
-    }
-  return makeNoDecision;
+  if (rulebooks.moveDesireables && outcome != "failed") {
+    const shouldBeStatements = rulebooks.moveDesireables(attempt);
+    for (const statement of shouldBeStatements) moveDesireable(...statement);
+  }
+  for (const rule of rulebooks.news?.rules || [createNewsItem]) {
+    const ruleResult = rule(attempt);
+  }
+  return outcome;
 }
 
 /** performs the action */
@@ -302,15 +313,54 @@ function createGoal(actor: Character, definition: ActionDefinition, noun?: Noun,
   return circumvention;
 }
 
+//////////
+
+function moveDesireable(
+  resource: ShouldBe["resource"],
+  property: ShouldBe["property"],
+  shouldBe: ShouldBe["shouldBe"],
+  toValue: ShouldBe["toValue"]
+) {
+  switch (shouldBe) {
+    case "=":
+      resource[property] = toValue;
+      return;
+    default:
+      throw "Unknown operation on desireable resource " + shouldBe;
+  }
+}
+
+///////////
+
 function main(...characters: Character[]) {
-  for (let turn = 1; turn < 4; turn++) {
+  for (let turn = 1; turn < 5; turn++) {
     produceParagraphs(characters);
     console.log("TURN", turn);
+
+    // characters act
     for (let character of characters) {
       const next = whatTheyAreTryingToDoNow(character);
-      console.log("Their next action is", next ? stringifyAttempt(next) : "Nothing");
+      console.log(character.name, "next action is", next ? stringifyAttempt(next) : "Nothing");
       if (next) doThing(next, character);
+    }
+
+    // react to news
+    for (let news of currentTurnsNews)
+      for (let character of characters) {
+        for (let should of character.beliefs) if (isButtonPushed(news, should)) createScene(character, news);
+      }
+
+    // reset news
+    if (currentTurnsNews.length) {
+      oldNews.push(...currentTurnsNews);
+      currentTurnsNews = [];
     }
   }
   produceParagraphs(characters);
+}
+
+/////////
+
+function createScene(character: Character, news: News) {
+  console.log("SCHEDULED SCENE for", character.name, "about", stringifyAction(news));
 }

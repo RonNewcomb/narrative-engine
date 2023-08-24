@@ -145,7 +145,8 @@ function playStory(firstScene: Scene, characters: Character[], actionset: Action
 }
 
 /** outputs: scene success/failure/complication and news of what happened */
-function playScene(scene: Scene, actionset: ActionDefinition[]): News[] {
+function playScene(scene: Scene, actions: ActionDefinition[]): News[] {
+  actionset = actions;
   const character = scene.actor;
   let sceneAction = whatTheyAreTryingToDoNow(character);
   console.log("BEGIN", scene.type, "SCENE:", character.name, sceneAction ? stringifyAttempt(sceneAction) : "Nothing");
@@ -156,21 +157,29 @@ function playScene(scene: Scene, actionset: ActionDefinition[]): News[] {
   return currentTurnsNews;
 }
 
-const RealizingProblem: ActionDefinition = {
-  verb: "realizing",
+const GettingBadNews: ActionDefinition = {
+  verb: "getting bad _ news violating _ belief",
   rulebooks: {
     check: {
       rules: [
         attempt => {
-          console.log('"Oh i need a ', attempt.noun?.name || attempt.noun, '."');
-          return makeNoDecision;
+          const news = attempt.noun as any as Attempt;
+          const belief = attempt.secondNoun as any as ShouldBe;
+          console.log('"', printAttempt(news), ' is bad news."');
+
+          const actions = findActions(news, belief);
+          for (const action of actions) weCouldTry(attempt.actor, action, news.noun, news.secondNoun, attempt);
+
+          return "failed";
         },
       ],
     },
   },
 };
 
-function findActions(actionset: ActionDefinition[], badNews: Attempt, shouldBe: ShouldBe): ActionDefinition[] {
+let actionset: ActionDefinition[];
+
+function findActions(badNews: Attempt, shouldBe: ShouldBe): ActionDefinition[] {
   const retval: ActionDefinition[] = [];
   for (const action of actionset) {
     const effects = action.rulebooks?.moveDesireables?.(badNews) || [];
@@ -181,15 +190,15 @@ function findActions(actionset: ActionDefinition[], badNews: Attempt, shouldBe: 
   return retval;
 }
 
-function realizingIssue(character: Character, scene: ReactionScene, actionset: ActionDefinition[]): Attempt {
-  const news = scene.news;
-  const goal = createMyGoal(RealizingProblem, news.noun, news.secondNoun);
-  goal.actor = character;
-  character.goals.push(goal);
-  const actions = findActions(actionset, scene.news, scene.belief);
-  for (const action of actions) weCouldTry(character, action, news.noun, news.secondNoun, goal);
-  return goal;
-}
+// function realizingIssue(character: Character, scene: ReactionScene, actionset: ActionDefinition[]): Attempt {
+//   weCouldTry(character, GettingBadNews, scene.news as any, scene.belief as any, undefined);
+//   // const goal = createMyGoal(GettingBadNews, scene.news as any, scene.belief as any);
+//   // goal.actor = character;
+//   // character.goals.push(goal);
+//   const actions = findActions(actionset, scene.news, scene.belief);
+//   for (const action of actions) weCouldTry(character, action, scene.news.noun, scene.news.secondNoun, goal);
+//   return goal;
+// }
 
 function runNewsCycle(newss: News[], sceneJustFinished: Scene, characters: Character[]) {
   for (const news of newss)

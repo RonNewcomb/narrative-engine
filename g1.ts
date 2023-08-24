@@ -17,8 +17,6 @@ const desireables: Desireable[] = [
 
 ////////////////
 
-const Waiting: ActionDefinition = { verb: "wait" };
-
 const Exiting: ActionDefinition = {
   verb: "exit",
   rulebooks: {
@@ -28,9 +26,21 @@ const Exiting: ActionDefinition = {
   },
 };
 
-const Taking: ActionDefinition = { verb: "take" };
+const Waiting: ActionDefinition = { verb: "wait" };
 
-const TakingOff: ActionDefinition = { verb: "take off" };
+const Taking: ActionDefinition = {
+  verb: "take",
+  rulebooks: {
+    moveDesireables: attempt => [["owned", attempt.noun!, "=", true]],
+  },
+};
+
+const Dropping: ActionDefinition = {
+  verb: "drop",
+  rulebooks: {
+    moveDesireables: attempt => [["owned", attempt.noun!, "=", false]],
+  },
+};
 
 const Opening: ActionDefinition = {
   verb: "open",
@@ -41,10 +51,16 @@ const Opening: ActionDefinition = {
         attempt => (attempt.noun?.isLocked ? weCouldTry(attempt.actor, Unlocking, attempt.noun, undefined, attempt) : "success"),
       ],
     },
+    moveDesireables: attempt => [["isOpen", attempt.noun!, "=", true]],
   },
 };
 
-const Closing: ActionDefinition = { verb: "close" };
+const Closing: ActionDefinition = {
+  verb: "close",
+  rulebooks: {
+    moveDesireables: attempt => [["isOpen", attempt.noun!, "=", false]],
+  },
+};
 
 const Unlocking: ActionDefinition = {
   verb: "unlock _ with",
@@ -58,13 +74,42 @@ const Unlocking: ActionDefinition = {
   },
 };
 
-const Locking: ActionDefinition = { verb: "lock" };
-
-const Dropping: ActionDefinition = { verb: "wait" };
+const Locking: ActionDefinition = {
+  verb: "lock _ with",
+  rulebooks: {
+    check: {
+      rules: [
+        // second noun must be key
+        attempt => (attempt.secondNoun?.isKey ? "success" : weCouldTry(attempt.actor, Realizing, doorkey, undefined, attempt)),
+        // need to own key
+        attempt =>
+          attempt.secondNoun?.owner == attempt.actor
+            ? "success"
+            : weCouldTry(attempt.actor, Taking, attempt.secondNoun, undefined, attempt),
+      ],
+    },
+    moveDesireables: attempt => [["isLocked", attempt.noun!, "=", true]],
+  },
+};
 
 const AskingFor: ActionDefinition = { verb: "asking _ for" };
 
-const PuttingOn: ActionDefinition = { verb: "putting _ on" };
+const Realizing: ActionDefinition = {
+  verb: "realizing",
+  rulebooks: {
+    check: {
+      rules: [
+        attempt => {
+          console.log("Oh i need a ", attempt.noun?.name ?? attempt.noun);
+
+          const action = findCounterAction(actionset, scene.news, scene.belief);
+          if (action) weCouldTry(attempt.actor, action, attempt.noun, attempt.secondNoun, attempt);
+          return "failed";
+        },
+      ],
+    },
+  },
+};
 
 /////////////////
 
@@ -82,4 +127,7 @@ const Zafra: Character = {
 
 ////////////
 
-main(Rose, Zafra);
+const characters = [Rose, Zafra];
+const actionset = [Waiting, Exiting, Taking, Dropping, Locking, Unlocking, Opening, Closing, Realizing, AskingFor];
+
+main(characters, actionset);

@@ -30,7 +30,7 @@ interface Attempt {
   actor: Character;
   definition: ActionDefinition;
   status: "untried" | "failed" | "partly successful" | "successful";
-  meddlingCheckRule?: Rule;
+  meddlingCheckRule?: Rule | RuleWithOutcome;
   fulfills: Attempt | undefined; // .parent
   fullfilledBy: Attempt[]; // .children
 }
@@ -268,9 +268,9 @@ function weCouldTry(
   definition: ActionDefinition,
   noun: Noun | undefined,
   secondNoun: Noun | undefined,
-  failingAction: Attempt
+  failingAction: Attempt | undefined
 ): "failed" {
-  console.log(actor.name, "could try", definition.verb, "before", stringifyAttempt(failingAction));
+  console.log(actor.name, "could try", definition.verb, "before", failingAction && stringifyAttempt(failingAction));
   const circumvention: Attempt = {
     verb: definition.verb,
     actor,
@@ -282,7 +282,8 @@ function weCouldTry(
     fulfills: failingAction,
     fullfilledBy: [],
   };
-  failingAction.fullfilledBy.push(circumvention);
+  if (failingAction) failingAction.fullfilledBy.push(circumvention);
+  else actor.goals.push(circumvention);
   return "failed";
 }
 
@@ -337,52 +338,42 @@ function moveDesireable(
 
 ///////////
 
-function main(...characters: Character[]) {
+function main(characters: Character[], actionset: ActionDefinition[]) {
   // sanitize setup
   for (let character of characters) for (let goal of character.goals) if (goal.actor == author) goal.actor = character;
 
   // init
-  let firstAction: Attempt | undefined = undefined;
-  let firstCharacter: Character | undefined = undefined;
-  for (let character of characters) {
-    const next = whatTheyAreTryingToDoNow(character);
-    if (next) {
-      firstAction = next;
-      firstCharacter = character;
-      break;
-    }
-  }
-  if (!firstCharacter || !firstAction) throw "cannot find first character or action";
+  const initialScenes: Scene[] = characters
+    .map(character => ({ character, action: whatTheyAreTryingToDoNow(character) }))
+    .filter(todo => !!todo.action)
+    .map(todo => createScene("introduction", todo.character, todo.action as News));
 
-  const currentScene: Scene = createScene("introduction", firstCharacter, firstAction as News);
+  if (!initialScenes.length) throw "cannot find first character and action. No one has a Goal.";
+  console.log(initialScenes.length, "initial scenes");
+  const initialScene: Scene = initialScenes[0];
+
+  const ccc: Choi6eWithForeshadowing = {
+    choice: "ally",
+    foreshadow: {},
+    scene: initialScene,
+  };
+  createSceneSet(ccc);
 
   // GO
-  for (let turn = 1; turn < 5; turn++) {
-    produceParagraphs(characters);
-    console.log("TURN", turn);
+  playStory(initialScene, characters);
 
-    // characters act // creates scene types of Action
-    for (let character of characters) {
-      const next = whatTheyAreTryingToDoNow(character);
-      console.log(character.name, "next action is", next ? stringifyAttempt(next) : "Nothing");
-      if (next) doThing(next, character);
-    }
-
-    // react to news // creates scene types of Reaction
-    for (let news of currentTurnsNews)
-      for (let character of characters)
-        for (let belief of character.beliefs)
-          if (isButtonPushed(news, belief)) {
-            const reactionScene = createScene("reaction", character, news);
-            scheduleScene(reactionScene);
-            createSceneSet({ scene: currentScene, foreshadow: {}, choice: "ally" }, { scene: reactionScene, foreshadow: {} });
-          }
-
-    // reset news
-    oldNews.push(...currentTurnsNews);
-    currentTurnsNews = [];
-  }
+  // debug
   produceParagraphs(characters);
 }
 
 /////////
+
+function findCounterAction(actionset: ActionDefinition[], attempt: Attempt, shouldBe: ShouldBe): ActionDefinition | undefined {
+  for (const action of actionset) {
+    const effects = action.rulebooks?.moveDesireables?.(attempt) || [];
+    for (const e of effects)
+      if (shouldBe.property == e[0] && shouldBe.ofDesireable == e[1] && shouldBe.shouldBe == e[2] && shouldBe.toValue == e[3])
+        return action;
+  }
+  return undefined;
+}

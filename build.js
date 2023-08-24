@@ -1,14 +1,15 @@
-var scenesTodo = [];
-function createScene(type, actor, news) {
-    var scene = type == "reaction" ? { type: type, news: news, actor: actor } : { type: type, actor: actor };
+function createScene(type, actor, news, belief) {
+    var scene = type == "reaction" ? { type: type, news: news, belief: belief, actor: actor } : { type: type, actor: actor };
     return scene;
 }
+///////////
+var scenesTodo = [];
 function scheduleScene(scene) {
     var character = scene.actor;
     console.log("SCHEDULED", scene.type, "SCENE for", character.name, "about", scene.type == "reaction" && stringifyAction(scene.news));
     scenesTodo.push(scene);
 }
-var tracking = [];
+var sceneStack = [];
 function createSceneSet(choice, consequence, closure) {
     var news = {};
     var ccc = {
@@ -16,11 +17,70 @@ function createSceneSet(choice, consequence, closure) {
         consequence: consequence || { foreshadow: choice.foreshadow, scene: createScene("reaction", choice.scene.actor, news) },
         closure: closure || { scene: createScene("reflective", choice.scene.actor) }
     };
-    tracking.push(ccc);
+    sceneStack.push(ccc);
     return ccc;
 }
-function getSceneSet(searchFn) {
-    return tracking.filter(searchFn);
+function getNextScene() {
+    var startScenes = sceneStack.filter(function (s) { return !s.choice.scene.isFinished; });
+    if (startScenes.length)
+        return startScenes[0].choice.scene;
+    var midScenes = sceneStack.filter(function (s) { return !s.consequence.scene.isFinished; });
+    if (midScenes.length)
+        return midScenes[0].consequence.scene;
+    var endScenes = sceneStack.filter(function (s) { return !s.closure.scene.isFinished; });
+    if (endScenes.length)
+        return endScenes.reverse()[0].closure.scene;
+    return null;
+}
+function playStory(firstScene, characters) {
+    var turn = 0;
+    for (var currentScene = firstScene; currentScene != null; currentScene = getNextScene()) {
+        produceParagraphs(characters);
+        console.log("TURN", ++turn);
+        // characters act // creates scene types of Action
+        var news = playScene(currentScene);
+        // react to news // creates scene types of Reaction
+        runNewsCycle(news, currentScene, characters);
+        if (turn > 5)
+            break;
+    }
+}
+/** outputs: scene success/failure/complication and news of what happened */
+function playScene(scene) {
+    var character = scene.actor;
+    var sceneAction = whatTheyAreTryingToDoNow(character);
+    console.log("BEGIN", scene.type, "SCENE:", character.name, sceneAction ? stringifyAttempt(sceneAction) : "Nothing");
+    //if (!sceneAction) sceneAction = findAction(actionset, effect, shouldBe);
+    if (!sceneAction)
+        throw "no action -- run AI to pick a scene-action that does/un-does the news? adjusts for it?";
+    scene.result = doThing(sceneAction, character);
+    scene.isFinished = true;
+    return currentTurnsNews;
+}
+var Reacting = {
+    verb: "reacting"
+};
+function runNewsCycle(newss, sceneJustFinished, characters) {
+    for (var _i = 0, newss_1 = newss; _i < newss_1.length; _i++) {
+        var news = newss_1[_i];
+        for (var _a = 0, characters_1 = characters; _a < characters_1.length; _a++) {
+            var character = characters_1[_a];
+            for (var _b = 0, _c = character.beliefs; _b < _c.length; _b++) {
+                var belief = _c[_b];
+                if (isButtonPushed(news, belief)) {
+                    var reactionScene = createScene("reaction", character, news, belief);
+                    // move this somewhere
+                    var counterAction = findCounterAction(actionset, news, belief);
+                    weCouldTry(character, counterAction, news.noun, news.secondNoun, undefined);
+                    //scheduleScene(reactionScene);
+                    createSceneSet({ scene: sceneJustFinished, foreshadow: {}, choice: "ally" }, { scene: reactionScene, foreshadow: {} });
+                }
+            }
+        }
+    }
+    // reset news
+    oldNews.push.apply(oldNews, currentTurnsNews);
+    currentTurnsNews = [];
 }
 var makeNoDecision = undefined;
 var pretendItWorked = "success";
@@ -212,7 +272,7 @@ var whatTheyWillDoNext = function (actor) {
 // };
 /** attaches a suggestion to the tree */
 function weCouldTry(actor, definition, noun, secondNoun, failingAction) {
-    console.log(actor.name, "could try", definition.verb, "before", stringifyAttempt(failingAction));
+    console.log(actor.name, "could try", definition.verb, "before", failingAction && stringifyAttempt(failingAction));
     var circumvention = {
         verb: definition.verb,
         actor: actor,
@@ -224,7 +284,10 @@ function weCouldTry(actor, definition, noun, secondNoun, failingAction) {
         fulfills: failingAction,
         fullfilledBy: []
     };
-    failingAction.fullfilledBy.push(circumvention);
+    if (failingAction)
+        failingAction.fullfilledBy.push(circumvention);
+    else
+        actor.goals.push(circumvention);
     return "failed";
 }
 var author = {
@@ -261,69 +324,50 @@ function moveDesireable(property, ofDesireable, shouldBe, toValue) {
     }
 }
 ///////////
-function main() {
-    var characters = [];
-    for (var _i = 0; _i < arguments.length; _i++) {
-        characters[_i] = arguments[_i];
-    }
+function main(characters, actionset) {
     // sanitize setup
-    for (var _a = 0, characters_1 = characters; _a < characters_1.length; _a++) {
-        var character = characters_1[_a];
-        for (var _b = 0, _c = character.goals; _b < _c.length; _b++) {
-            var goal = _c[_b];
+    for (var _i = 0, characters_2 = characters; _i < characters_2.length; _i++) {
+        var character = characters_2[_i];
+        for (var _a = 0, _b = character.goals; _a < _b.length; _a++) {
+            var goal = _b[_a];
             if (goal.actor == author)
                 goal.actor = character;
         }
     }
     // init
-    var firstAction = undefined;
-    var firstCharacter = undefined;
-    for (var _d = 0, characters_2 = characters; _d < characters_2.length; _d++) {
-        var character = characters_2[_d];
-        var next = whatTheyAreTryingToDoNow(character);
-        if (next) {
-            firstAction = next;
-            firstCharacter = character;
-            break;
-        }
-    }
-    if (!firstCharacter || !firstAction)
-        throw "cannot find first character or action";
-    var currentScene = createScene("introduction", firstCharacter, firstAction);
+    var initialScenes = characters
+        .map(function (character) { return ({ character: character, action: whatTheyAreTryingToDoNow(character) }); })
+        .filter(function (todo) { return !!todo.action; })
+        .map(function (todo) { return createScene("introduction", todo.character, todo.action); });
+    if (!initialScenes.length)
+        throw "cannot find first character and action. No one has a Goal.";
+    console.log(initialScenes.length, "initial scenes");
+    var initialScene = initialScenes[0];
+    var ccc = {
+        choice: "ally",
+        foreshadow: {},
+        scene: initialScene
+    };
+    createSceneSet(ccc);
     // GO
-    for (var turn = 1; turn < 5; turn++) {
-        produceParagraphs(characters);
-        console.log("TURN", turn);
-        // characters act // creates scene types of Action
-        for (var _e = 0, characters_3 = characters; _e < characters_3.length; _e++) {
-            var character = characters_3[_e];
-            var next = whatTheyAreTryingToDoNow(character);
-            console.log(character.name, "next action is", next ? stringifyAttempt(next) : "Nothing");
-            if (next)
-                doThing(next, character);
-        }
-        // react to news // creates scene types of Reaction
-        for (var _f = 0, currentTurnsNews_1 = currentTurnsNews; _f < currentTurnsNews_1.length; _f++) {
-            var news = currentTurnsNews_1[_f];
-            for (var _g = 0, characters_4 = characters; _g < characters_4.length; _g++) {
-                var character = characters_4[_g];
-                for (var _h = 0, _j = character.beliefs; _h < _j.length; _h++) {
-                    var belief = _j[_h];
-                    if (isButtonPushed(news, belief)) {
-                        var reactionScene = createScene("reaction", character, news);
-                        scheduleScene(reactionScene);
-                        createSceneSet({ scene: currentScene, foreshadow: {}, choice: "ally" }, { scene: reactionScene, foreshadow: {} });
-                    }
-                }
-            }
-        }
-        // reset news
-        oldNews.push.apply(oldNews, currentTurnsNews);
-        currentTurnsNews = [];
-    }
+    playStory(initialScene, characters);
+    // debug
     produceParagraphs(characters);
 }
 /////////
+function findCounterAction(actionset, attempt, shouldBe) {
+    var _a, _b;
+    for (var _i = 0, actionset_1 = actionset; _i < actionset_1.length; _i++) {
+        var action = actionset_1[_i];
+        var effects = ((_b = (_a = action.rulebooks) === null || _a === void 0 ? void 0 : _a.moveDesireables) === null || _b === void 0 ? void 0 : _b.call(_a, attempt)) || [];
+        for (var _c = 0, effects_1 = effects; _c < effects_1.length; _c++) {
+            var e = effects_1[_c];
+            if (shouldBe.property == e[0] && shouldBe.ofDesireable == e[1] && shouldBe.shouldBe == e[2] && shouldBe.toValue == e[3])
+                return action;
+        }
+    }
+    return undefined;
+}
 /// <reference path="./narrativeEngine.ts"/>
 var __assign = (this && this.__assign) || function () {
     __assign = Object.assign || function(t) {
@@ -381,7 +425,6 @@ var desireables = [
     door,
 ];
 ////////////////
-var Waiting = { verb: "wait" };
 var Exiting = {
     verb: "exit",
     rulebooks: {
@@ -390,8 +433,19 @@ var Exiting = {
         }
     }
 };
-var Taking = { verb: "take" };
-var TakingOff = { verb: "take off" };
+var Waiting = { verb: "wait" };
+var Taking = {
+    verb: "take",
+    rulebooks: {
+        moveDesireables: function (attempt) { return [["owned", attempt.noun, "=", true]]; }
+    }
+};
+var Dropping = {
+    verb: "drop",
+    rulebooks: {
+        moveDesireables: function (attempt) { return [["owned", attempt.noun, "=", false]]; }
+    }
+};
 var Opening = {
     verb: "open",
     rulebooks: {
@@ -400,10 +454,16 @@ var Opening = {
                 // attempt => (attempt.noun ? "successful" : weCouldTry(attempt.actor, Unlocking, attempt.noun, undefined, attempt)),
                 function (attempt) { var _a; return (((_a = attempt.noun) === null || _a === void 0 ? void 0 : _a.isLocked) ? weCouldTry(attempt.actor, Unlocking, attempt.noun, undefined, attempt) : "success"); },
             ]
-        }
+        },
+        moveDesireables: function (attempt) { return [["isOpen", attempt.noun, "=", true]]; }
     }
 };
-var Closing = { verb: "close" };
+var Closing = {
+    verb: "close",
+    rulebooks: {
+        moveDesireables: function (attempt) { return [["isOpen", attempt.noun, "=", false]]; }
+    }
+};
 var Unlocking = {
     verb: "unlock _ with",
     rulebooks: {
@@ -415,10 +475,43 @@ var Unlocking = {
         moveDesireables: function (attempt) { return [["isLocked", attempt.noun, "=", false]]; }
     }
 };
-var Locking = { verb: "lock" };
-var Dropping = { verb: "wait" };
+var Locking = {
+    verb: "lock _ with",
+    rulebooks: {
+        check: {
+            rules: [
+                // second noun must be key
+                function (attempt) { var _a; return (((_a = attempt.secondNoun) === null || _a === void 0 ? void 0 : _a.isKey) ? "success" : weCouldTry(attempt.actor, Realizing, doorkey, undefined, attempt)); },
+                // need to own key
+                function (attempt) {
+                    var _a;
+                    return ((_a = attempt.secondNoun) === null || _a === void 0 ? void 0 : _a.owner) == attempt.actor
+                        ? "success"
+                        : weCouldTry(attempt.actor, Taking, attempt.secondNoun, undefined, attempt);
+                },
+            ]
+        },
+        moveDesireables: function (attempt) { return [["isLocked", attempt.noun, "=", true]]; }
+    }
+};
 var AskingFor = { verb: "asking _ for" };
-var PuttingOn = { verb: "putting _ on" };
+var Realizing = {
+    verb: "realizing",
+    rulebooks: {
+        check: {
+            rules: [
+                function (attempt) {
+                    var _a, _b;
+                    console.log("Oh i need a ", (_b = (_a = attempt.noun) === null || _a === void 0 ? void 0 : _a.name) !== null && _b !== void 0 ? _b : attempt.noun);
+                    var action = findCounterAction(actionset, scene.news, scene.belief);
+                    if (action)
+                        weCouldTry(attempt.actor, action, attempt.noun, attempt.secondNoun, attempt);
+                    return "failed";
+                },
+            ]
+        }
+    }
+};
 /////////////////
 var Rose = {
     name: "Rose",
@@ -431,4 +524,6 @@ var Zafra = {
     goals: []
 };
 ////////////
-main(Rose, Zafra);
+var characters = [Rose, Zafra];
+var actionset = [Waiting, Exiting, Taking, Dropping, Locking, Unlocking, Opening, Closing, Realizing, AskingFor];
+main(characters, actionset);

@@ -110,7 +110,4 @@ const Zafra: Character = {
 
 ////////////
 
-const characters = [Rose, Zafra];
-const actionset = [Waiting, Exiting, Taking, Dropping, Locking, Unlocking, Opening, Closing, AskingFor];
-
-main(characters, actionset);
+main([Rose, Zafra], [Waiting, Exiting, Taking, Dropping, Locking, Unlocking, Opening, Closing, AskingFor]);

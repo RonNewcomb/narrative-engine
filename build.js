@@ -33,29 +33,30 @@ function getNextScene() {
         return endScenes.reverse()[0].closure.scene;
     return null;
 }
-function playStory(firstScene, characters) {
+function playStory(firstScene, characters, actionset) {
     var turn = 0;
     for (var currentScene = firstScene; currentScene != null; currentScene = getNextScene()) {
         produceParagraphs(characters);
         console.log("TURN", ++turn);
         // characters act // creates scene types of Action
-        var news = playScene(currentScene);
+        var news = playScene(currentScene, actionset);
         // react to news // creates scene types of Reaction
         runNewsCycle(news, currentScene, characters);
-        if (turn > 5)
+        if (turn > 7)
             break;
     }
 }
 /** outputs: scene success/failure/complication and news of what happened */
-function playScene(scene) {
+function playScene(scene, actionset) {
     var character = scene.actor;
     var sceneAction = whatTheyAreTryingToDoNow(character);
     console.log("BEGIN", scene.type, "SCENE:", character.name, sceneAction ? stringifyAttempt(sceneAction) : "Nothing");
     if (!sceneAction && scene.type == "reaction")
-        sceneAction = realizingIssue(character, scene);
+        sceneAction = realizingIssue(character, scene, actionset);
     if (!sceneAction)
-        throw "no action -- run AI to pick a scene-action that does/un-does the news? adjusts for it?";
-    scene.result = doThing(sceneAction, character);
+        console.error("no action -- run AI to pick a scene-action that does/un-does the news? adjusts for it?");
+    if (sceneAction)
+        scene.result = doThing(sceneAction, character);
     scene.isFinished = true;
     return currentTurnsNews;
 }
@@ -66,21 +67,19 @@ var RealizingProblem = {
             rules: [
                 function (attempt) {
                     var _a;
-                    console.log("Oh i need a ", ((_a = attempt.noun) === null || _a === void 0 ? void 0 : _a.name) || attempt.noun);
-                    // const actions = findCounterActions(actionset, scene.news, scene.belief);
-                    // for (const action of actions) weCouldTry(attempt.actor, action, attempt.noun, attempt.secondNoun, attempt);
+                    console.log('"Oh i need a ', ((_a = attempt.noun) === null || _a === void 0 ? void 0 : _a.name) || attempt.noun, '."');
                     return makeNoDecision;
                 },
             ]
         }
     }
 };
-function findCounterActions(actionset, attempt, shouldBe) {
+function findActions(actionset, badNews, shouldBe) {
     var _a, _b;
     var retval = [];
     for (var _i = 0, actionset_1 = actionset; _i < actionset_1.length; _i++) {
         var action = actionset_1[_i];
-        var effects = ((_b = (_a = action.rulebooks) === null || _a === void 0 ? void 0 : _a.moveDesireables) === null || _b === void 0 ? void 0 : _b.call(_a, attempt)) || [];
+        var effects = ((_b = (_a = action.rulebooks) === null || _a === void 0 ? void 0 : _a.moveDesireables) === null || _b === void 0 ? void 0 : _b.call(_a, badNews)) || [];
         for (var _c = 0, effects_1 = effects; _c < effects_1.length; _c++) {
             var e = effects_1[_c];
             if (shouldBe.property == e[0] && shouldBe.ofDesireable == e[1] && shouldBe.shouldBe == e[2] && shouldBe.toValue == e[3])
@@ -89,12 +88,12 @@ function findCounterActions(actionset, attempt, shouldBe) {
     }
     return retval;
 }
-function realizingIssue(character, scene) {
+function realizingIssue(character, scene, actionset) {
     var news = scene.news;
     var goal = createMyGoal(RealizingProblem, news.noun, news.secondNoun);
     goal.actor = character;
     character.goals.push(goal);
-    var actions = findCounterActions(actionset, scene.news, scene.belief);
+    var actions = findActions(actionset, scene.news, scene.belief);
     for (var _i = 0, actions_1 = actions; _i < actions_1.length; _i++) {
         var action = actions_1[_i];
         weCouldTry(character, action, news.noun, news.secondNoun, goal);
@@ -110,8 +109,6 @@ function runNewsCycle(newss, sceneJustFinished, characters) {
                 var belief = _c[_b];
                 if (isButtonPushed(news, belief)) {
                     var reactionScene = createScene("reaction", character, news, belief);
-                    // move this somewhere
-                    realizingIssue(character, reactionScene);
                     //scheduleScene(reactionScene);
                     createSceneSet({ scene: sceneJustFinished, foreshadow: {}, choice: "ally" }, { scene: reactionScene, foreshadow: {} });
                 }
@@ -390,7 +387,7 @@ function main(characters, actionset) {
     };
     createSceneSet(ccc);
     // GO
-    playStory(initialScene, characters);
+    playStory(initialScene, characters, actionset);
     // debug
     produceParagraphs(characters);
 }
@@ -534,6 +531,4 @@ var Zafra = {
     goals: []
 };
 ////////////
-var characters = [Rose, Zafra];
-var actionset = [Waiting, Exiting, Taking, Dropping, Locking, Unlocking, Opening, Closing, AskingFor];
-main(characters, actionset);
+main([Rose, Zafra], [Waiting, Exiting, Taking, Dropping, Locking, Unlocking, Opening, Closing, AskingFor]);

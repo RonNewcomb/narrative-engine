@@ -360,7 +360,7 @@ function main(characters: Character[], actionset: ActionDefinition[]) {
   createSceneSet(ccc);
 
   // GO
-  playStory(initialScene, characters);
+  playStory(initialScene, characters, actionset);
 
   // debug
   produceParagraphs(characters);

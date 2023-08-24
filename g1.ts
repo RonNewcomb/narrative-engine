@@ -79,8 +79,8 @@ const Locking: ActionDefinition = {
   rulebooks: {
     check: {
       rules: [
-        // second noun must be key
-        attempt => (attempt.secondNoun?.isKey ? "success" : weCouldTry(attempt.actor, Realizing, doorkey, undefined, attempt)),
+        // // second noun must be key
+        // attempt => (attempt.secondNoun?.isKey ? "success" : weCouldTry(attempt.actor, Realizing, doorkey, undefined, attempt)),
         // need to own key
         attempt =>
           attempt.secondNoun?.owner == attempt.actor
@@ -93,23 +93,6 @@ const Locking: ActionDefinition = {
 };
 
 const AskingFor: ActionDefinition = { verb: "asking _ for" };
-
-const Realizing: ActionDefinition = {
-  verb: "realizing",
-  rulebooks: {
-    check: {
-      rules: [
-        attempt => {
-          console.log("Oh i need a ", attempt.noun?.name ?? attempt.noun);
-
-          const action = findCounterAction(actionset, scene.news, scene.belief);
-          if (action) weCouldTry(attempt.actor, action, attempt.noun, attempt.secondNoun, attempt);
-          return "failed";
-        },
-      ],
-    },
-  },
-};
 
 /////////////////
 
@@ -128,6 +111,6 @@ const Zafra: Character = {
 ////////////
 
 const characters = [Rose, Zafra];
-const actionset = [Waiting, Exiting, Taking, Dropping, Locking, Unlocking, Opening, Closing, Realizing, AskingFor];
+const actionset = [Waiting, Exiting, Taking, Dropping, Locking, Unlocking, Opening, Closing, AskingFor];
 
 main(characters, actionset);

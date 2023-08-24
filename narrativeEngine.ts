@@ -367,13 +367,3 @@ function main(characters: Character[], actionset: ActionDefinition[]) {
 }
 
 /////////
-
-function findCounterAction(actionset: ActionDefinition[], attempt: Attempt, shouldBe: ShouldBe): ActionDefinition | undefined {
-  for (const action of actionset) {
-    const effects = action.rulebooks?.moveDesireables?.(attempt) || [];
-    for (const e of effects)
-      if (shouldBe.property == e[0] && shouldBe.ofDesireable == e[1] && shouldBe.shouldBe == e[2] && shouldBe.toValue == e[3])
-        return action;
-  }
-  return undefined;
-}

@@ -12,9 +12,10 @@ function scheduleScene(scene) {
 var sceneStack = [];
 function createSceneSet(choice, consequence, closure) {
     var news = {};
+    var belief = {};
     var ccc = {
         choice: choice,
-        consequence: consequence || { foreshadow: choice.foreshadow, scene: createScene("reaction", choice.scene.actor, news) },
+        consequence: consequence || { foreshadow: choice.foreshadow, scene: createScene("reaction", choice.scene.actor, news, belief) },
         closure: closure || { scene: createScene("reflective", choice.scene.actor) }
     };
     sceneStack.push(ccc);
@@ -50,16 +51,56 @@ function playScene(scene) {
     var character = scene.actor;
     var sceneAction = whatTheyAreTryingToDoNow(character);
     console.log("BEGIN", scene.type, "SCENE:", character.name, sceneAction ? stringifyAttempt(sceneAction) : "Nothing");
-    //if (!sceneAction) sceneAction = findAction(actionset, effect, shouldBe);
+    if (!sceneAction && scene.type == "reaction")
+        sceneAction = realizingIssue(character, scene);
     if (!sceneAction)
         throw "no action -- run AI to pick a scene-action that does/un-does the news? adjusts for it?";
     scene.result = doThing(sceneAction, character);
     scene.isFinished = true;
     return currentTurnsNews;
 }
-var Reacting = {
-    verb: "reacting"
+var RealizingProblem = {
+    verb: "realizing",
+    rulebooks: {
+        check: {
+            rules: [
+                function (attempt) {
+                    var _a;
+                    console.log("Oh i need a ", ((_a = attempt.noun) === null || _a === void 0 ? void 0 : _a.name) || attempt.noun);
+                    // const actions = findCounterActions(actionset, scene.news, scene.belief);
+                    // for (const action of actions) weCouldTry(attempt.actor, action, attempt.noun, attempt.secondNoun, attempt);
+                    return makeNoDecision;
+                },
+            ]
+        }
+    }
 };
+function findCounterActions(actionset, attempt, shouldBe) {
+    var _a, _b;
+    var retval = [];
+    for (var _i = 0, actionset_1 = actionset; _i < actionset_1.length; _i++) {
+        var action = actionset_1[_i];
+        var effects = ((_b = (_a = action.rulebooks) === null || _a === void 0 ? void 0 : _a.moveDesireables) === null || _b === void 0 ? void 0 : _b.call(_a, attempt)) || [];
+        for (var _c = 0, effects_1 = effects; _c < effects_1.length; _c++) {
+            var e = effects_1[_c];
+            if (shouldBe.property == e[0] && shouldBe.ofDesireable == e[1] && shouldBe.shouldBe == e[2] && shouldBe.toValue == e[3])
+                retval.push(action);
+        }
+    }
+    return retval;
+}
+function realizingIssue(character, scene) {
+    var news = scene.news;
+    var goal = createMyGoal(RealizingProblem, news.noun, news.secondNoun);
+    goal.actor = character;
+    character.goals.push(goal);
+    var actions = findCounterActions(actionset, scene.news, scene.belief);
+    for (var _i = 0, actions_1 = actions; _i < actions_1.length; _i++) {
+        var action = actions_1[_i];
+        weCouldTry(character, action, news.noun, news.secondNoun, goal);
+    }
+    return goal;
+}
 function runNewsCycle(newss, sceneJustFinished, characters) {
     for (var _i = 0, newss_1 = newss; _i < newss_1.length; _i++) {
         var news = newss_1[_i];
@@ -70,8 +111,7 @@ function runNewsCycle(newss, sceneJustFinished, characters) {
                 if (isButtonPushed(news, belief)) {
                     var reactionScene = createScene("reaction", character, news, belief);
                     // move this somewhere
-                    var counterAction = findCounterAction(actionset, news, belief);
-                    weCouldTry(character, counterAction, news.noun, news.secondNoun, undefined);
+                    realizingIssue(character, reactionScene);
                     //scheduleScene(reactionScene);
                     createSceneSet({ scene: sceneJustFinished, foreshadow: {}, choice: "ally" }, { scene: reactionScene, foreshadow: {} });
                 }
@@ -355,19 +395,6 @@ function main(characters, actionset) {
     produceParagraphs(characters);
 }
 /////////
-function findCounterAction(actionset, attempt, shouldBe) {
-    var _a, _b;
-    for (var _i = 0, actionset_1 = actionset; _i < actionset_1.length; _i++) {
-        var action = actionset_1[_i];
-        var effects = ((_b = (_a = action.rulebooks) === null || _a === void 0 ? void 0 : _a.moveDesireables) === null || _b === void 0 ? void 0 : _b.call(_a, attempt)) || [];
-        for (var _c = 0, effects_1 = effects; _c < effects_1.length; _c++) {
-            var e = effects_1[_c];
-            if (shouldBe.property == e[0] && shouldBe.ofDesireable == e[1] && shouldBe.shouldBe == e[2] && shouldBe.toValue == e[3])
-                return action;
-        }
-    }
-    return undefined;
-}
 /// <reference path="./narrativeEngine.ts"/>
 var __assign = (this && this.__assign) || function () {
     __assign = Object.assign || function(t) {
@@ -480,8 +507,8 @@ var Locking = {
     rulebooks: {
         check: {
             rules: [
-                // second noun must be key
-                function (attempt) { var _a; return (((_a = attempt.secondNoun) === null || _a === void 0 ? void 0 : _a.isKey) ? "success" : weCouldTry(attempt.actor, Realizing, doorkey, undefined, attempt)); },
+                // // second noun must be key
+                // attempt => (attempt.secondNoun?.isKey ? "success" : weCouldTry(attempt.actor, Realizing, doorkey, undefined, attempt)),
                 // need to own key
                 function (attempt) {
                     var _a;
@@ -495,23 +522,6 @@ var Locking = {
     }
 };
 var AskingFor = { verb: "asking _ for" };
-var Realizing = {
-    verb: "realizing",
-    rulebooks: {
-        check: {
-            rules: [
-                function (attempt) {
-                    var _a, _b;
-                    console.log("Oh i need a ", (_b = (_a = attempt.noun) === null || _a === void 0 ? void 0 : _a.name) !== null && _b !== void 0 ? _b : attempt.noun);
-                    var action = findCounterAction(actionset, scene.news, scene.belief);
-                    if (action)
-                        weCouldTry(attempt.actor, action, attempt.noun, attempt.secondNoun, attempt);
-                    return "failed";
-                },
-            ]
-        }
-    }
-};
 /////////////////
 var Rose = {
     name: "Rose",
@@ -525,5 +535,5 @@ var Zafra = {
 };
 ////////////
 var characters = [Rose, Zafra];
-var actionset = [Waiting, Exiting, Taking, Dropping, Locking, Unlocking, Opening, Closing, Realizing, AskingFor];
+var actionset = [Waiting, Exiting, Taking, Dropping, Locking, Unlocking, Opening, Closing, AskingFor];
 main(characters, actionset);

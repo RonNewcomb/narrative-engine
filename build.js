@@ -135,91 +135,17 @@ function runNewsCycle(newss, sceneJustFinished) {
     (_a = story.history).push.apply(_a, story.currentTurnsNews);
     story.currentTurnsNews = [];
 }
-var makeNoDecision = undefined;
-var pretendItWorked = "success";
-/////////// debug
-function stringify(obj) {
-    return JSON.stringify(obj, function (key, value) {
-        return key == "actor" && !!value
-            ? "\\\\".concat(value.name)
-            : key == "fulfills" && !!value
-                ? "\\\\<backlink>"
-                : key == "definition"
-                    ? undefined
-                    : value;
-    }, 4);
-}
-function stringifyAction(act) {
-    var _a, _b, _c;
-    if (!act)
-        return "[no act]";
-    var nounName = ((_a = act.noun) === null || _a === void 0 ? void 0 : _a["name"]) || act.noun;
-    var noun2Name = ((_b = act.secondNoun) === null || _b === void 0 ? void 0 : _b["name"]) || act.secondNoun;
-    var rearrange = act.verb.includes("_");
-    var predicate = rearrange ? act.verb.replace("_", nounName || "") : act.verb;
-    return (((_c = act.actor) === null || _c === void 0 ? void 0 : _c.name) || "") + " " + predicate + " " + (noun2Name || "") + (rearrange ? "" : " " + (nounName || ""));
-}
-function stringifyAttempt(attempt) {
-    if (!attempt)
-        return "[no attempt]";
-    return stringifyAction(attempt) + " (" + attempt.status + ")";
-}
-function printAttempt(attempt) {
-    console.log("  '" + stringifyAttempt(attempt) + '"');
-}
-//////////// action machinery
-function executeRulebook(attempt) {
-    var _a;
-    var rulebooks = attempt.definition.rulebooks;
-    if (!rulebooks)
-        return makeNoDecision;
-    var outcome = makeNoDecision;
-    if (rulebooks.check)
-        for (var _i = 0, _b = rulebooks.check.rules || []; _i < _b.length; _i++) {
-            var rule = _b[_i];
-            var ruleResult = rule(attempt);
-            if (ruleResult == "failed") {
-                //attempt.meddlingCheckRule = rule;
-                outcome = ruleResult;
-                break;
-            }
-        }
-    if (rulebooks.moveDesireables && outcome != "failed") {
-        var shouldBeStatements = rulebooks.moveDesireables(attempt);
-        for (var _c = 0, shouldBeStatements_1 = shouldBeStatements; _c < shouldBeStatements_1.length; _c++) {
-            var statement = shouldBeStatements_1[_c];
-            moveDesireable.apply(void 0, statement);
-        }
-    }
-    for (var _d = 0, _e = ((_a = rulebooks.news) === null || _a === void 0 ? void 0 : _a.rules) || [createNewsItem]; _d < _e.length; _d++) {
-        var rule = _e[_d];
-        var ruleResult = rule(attempt);
-    }
-    return outcome;
-}
-/** performs the action */
-function doThingAsAScene(thisAttempt, viewpointCharacter) {
-    doThing(thisAttempt, viewpointCharacter);
-    while (thisAttempt.status == "partly successful") {
-        var subAttempt = whatTheyAreTryingToDoNowRegarding(thisAttempt.actor, thisAttempt);
-        console.log("same scene, now", stringifyAttempt(subAttempt));
-        if (subAttempt)
-            doThing(subAttempt, viewpointCharacter);
-    }
-    return thisAttempt.status == "successful" ? "success" : thisAttempt.status == "failed" ? "failed" : "failed";
-}
-/** performs the action */
-function doThing(thisAttempt, viewpointCharacter) {
-    // DO the currentAction and get status
-    var outcome = executeRulebook(thisAttempt);
-    console.log(thisAttempt.verb, "is done:", outcome);
-    thisAttempt.status = outcome != "failed" ? "successful" : thisAttempt.fullfilledBy.length > 0 ? "partly successful" : "failed";
-    // update trees to record result
-    if (thisAttempt.status == "partly successful")
-        console.log("circumventions outcome:", outcome, ".  Could be fulfilled by:", thisAttempt.fullfilledBy.map(stringifyAttempt));
-    return thisAttempt.status;
-}
 /////////// Planner AI
+/** attaches a suggestion to the tree */
+function weCouldTry(actor, definition, noun, secondNoun, failingAction) {
+    console.log(actor.name, "could try", definition.verb, "before", failingAction && stringifyAttempt(failingAction));
+    var circumvention = createAttempt(actor, definition, noun, secondNoun, failingAction);
+    if (failingAction)
+        failingAction.fullfilledBy.push(circumvention);
+    else
+        actor.goals.push(circumvention);
+    return "failed";
+}
 var hindered = function (it) {
     return (it.status == "failed" || it.status == "partly successful") &&
         it.fullfilledBy.filter(function (at) { return at.status == "untried"; }).length > 0 &&
@@ -340,6 +266,95 @@ var whatTheyWillDoNext = function (actor) {
 //   for (const item of attempts()) if (act == item.action) mostRecentAnswer = item;
 //   return mostRecentAnswer;
 // };
+/// <reference path="planningTree.ts"/>
+var makeNoDecision = undefined;
+var pretendItWorked = "success";
+/////////// debug
+function stringify(obj) {
+    return JSON.stringify(obj, function (key, value) {
+        return key == "actor" && !!value
+            ? "\\\\".concat(value.name)
+            : key == "fulfills" && !!value
+                ? "\\\\<backlink>"
+                : key == "definition"
+                    ? undefined
+                    : value;
+    }, 4);
+}
+function stringifyAction(act) {
+    var _a, _b, _c;
+    if (!act)
+        return "[no act]";
+    var nounName = ((_a = act.noun) === null || _a === void 0 ? void 0 : _a["name"]) || act.noun;
+    var noun2Name = ((_b = act.secondNoun) === null || _b === void 0 ? void 0 : _b["name"]) || act.secondNoun;
+    var rearrange = act.verb.includes("_");
+    var predicate = rearrange ? act.verb.replace("_", nounName || "") : act.verb;
+    return (((_c = act.actor) === null || _c === void 0 ? void 0 : _c.name) || "") + " " + predicate + " " + (noun2Name || "") + (rearrange ? "" : " " + (nounName || ""));
+}
+function stringifyAttempt(attempt) {
+    if (!attempt)
+        return "[no attempt]";
+    return stringifyAction(attempt) + " (" + attempt.status + ")";
+}
+function printAttempt(attempt) {
+    console.log("  '" + stringifyAttempt(attempt) + '"');
+}
+//////////// action machinery
+function executeRulebook(attempt) {
+    var _a;
+    var rulebooks = attempt.definition.rulebooks;
+    if (!rulebooks)
+        return makeNoDecision;
+    var outcome = makeNoDecision;
+    if (rulebooks.check)
+        for (var _i = 0, _b = rulebooks.check.rules || []; _i < _b.length; _i++) {
+            var rule = _b[_i];
+            var ruleResult = rule(attempt);
+            if (ruleResult == "failed") {
+                //attempt.meddlingCheckRule = rule;
+                outcome = ruleResult;
+                break;
+            }
+        }
+    if (rulebooks.moveDesireables && outcome != "failed") {
+        var shouldBeStatements = rulebooks.moveDesireables(attempt);
+        for (var _c = 0, shouldBeStatements_1 = shouldBeStatements; _c < shouldBeStatements_1.length; _c++) {
+            var statement = shouldBeStatements_1[_c];
+            moveDesireable.apply(void 0, statement);
+        }
+    }
+    for (var _d = 0, _e = ((_a = rulebooks.news) === null || _a === void 0 ? void 0 : _a.rules) || [createNewsItem]; _d < _e.length; _d++) {
+        var rule = _e[_d];
+        var ruleResult = rule(attempt);
+    }
+    return outcome;
+}
+/** performs the action */
+function doThingAsAScene(thisAttempt, viewpointCharacter) {
+    doThing(thisAttempt, viewpointCharacter);
+    while (thisAttempt.status == "partly successful") {
+        var subAttempt = whatTheyAreTryingToDoNowRegarding(thisAttempt.actor, thisAttempt);
+        console.log("same scene, now", stringifyAttempt(subAttempt));
+        if (subAttempt)
+            doThing(subAttempt, viewpointCharacter);
+        else {
+            console.log("Stuck:", stringifyAttempt(thisAttempt));
+            break;
+        }
+    }
+    return thisAttempt.status == "successful" ? "success" : thisAttempt.status == "failed" ? "failed" : "failed";
+}
+/** performs the action */
+function doThing(thisAttempt, viewpointCharacter) {
+    // DO the currentAction and get status
+    var outcome = executeRulebook(thisAttempt);
+    console.log(thisAttempt.verb, "is done:", outcome);
+    thisAttempt.status = outcome != "failed" ? "successful" : thisAttempt.fullfilledBy.length > 0 ? "partly successful" : "failed";
+    // update trees to record result
+    if (thisAttempt.status == "partly successful")
+        console.log("circumventions outcome:", outcome, ".  Could be fulfilled by:", thisAttempt.fullfilledBy.map(stringifyAttempt));
+    return thisAttempt.status;
+}
 function createAttempt(actor, definition, noun, secondNoun, parentAction) {
     var circumvention = {
         verb: definition.verb,
@@ -353,16 +368,6 @@ function createAttempt(actor, definition, noun, secondNoun, parentAction) {
         fullfilledBy: [],
     };
     return circumvention;
-}
-/** attaches a suggestion to the tree */
-function weCouldTry(actor, definition, noun, secondNoun, failingAction) {
-    console.log(actor.name, "could try", definition.verb, "before", failingAction && stringifyAttempt(failingAction));
-    var circumvention = createAttempt(actor, definition, noun, secondNoun, failingAction);
-    if (failingAction)
-        failingAction.fullfilledBy.push(circumvention);
-    else
-        actor.goals.push(circumvention);
-    return "failed";
 }
 var author = {
     name: "myself",
@@ -387,7 +392,6 @@ function createMyBelief(property, ofDesireable, shouldBe, toValue, sensitivity) 
     var belief = { property: property, ofDesireable: ofDesireable, shouldBe: shouldBe, toValue: toValue, sensitivity: sensitivity };
     return belief;
 }
-//////////
 function moveDesireable(property, ofDesireable, shouldBe, toValue) {
     switch (shouldBe) {
         case "=":
@@ -422,7 +426,6 @@ function main(characters, actionset) {
     // debug
     produceParagraphs(characters);
 }
-/////////
 /// <reference path="./narrativeEngine.ts"/>
 var __assign = (this && this.__assign) || function () {
     __assign = Object.assign || function(t) {

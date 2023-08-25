@@ -125,12 +125,12 @@ function playStory(firstScene: Scene | undefined, characters: Character[], actio
 }
 
 /** outputs: scene success/failure/complication and news of what happened */
-function playScene<N, SN>(scene: Scene): News[] {
+function playScene(scene: Scene): News[] {
   const character = scene.actor;
-  let sceneAction = whatTheyAreTryingToDoNow(character);
-  console.log("BEGIN", scene.pulse.verb, "SCENE:", character.name, sceneAction ? stringifyAttempt(sceneAction) : "Nothing");
+  const sceneAction = scene.pulse; // whatTheyAreTryingToDoNow(character);
+  console.log("BEGIN", scene.pulse.verb, "SCENE:", character.name, stringifyAttempt(sceneAction));
   if (!sceneAction) console.error("no action -- run AI to pick a scene-action that does/un-does the news? adjusts for it?");
-  if (sceneAction) scene.result = doThing(sceneAction, character);
+  if (sceneAction) scene.result = doThingAsAScene(sceneAction, character);
   scene.isFinished = true;
   return story.currentTurnsNews;
 }
@@ -182,6 +182,7 @@ function runNewsCycle(newss: News[], sceneJustFinished: Scene) {
     for (const character of story.characters)
       for (const belief of character.beliefs)
         if (isButtonPushed(news, belief)) {
+          console.log("((But", character.name, " didn't like ", stringifyAttempt(news), ".))");
           const sceneAction = createAttempt<News, ShouldBe>(character, GettingBadNews, news, belief, undefined);
           const reactionScene = createScene(character, sceneAction);
           //scheduleScene(reactionScene);

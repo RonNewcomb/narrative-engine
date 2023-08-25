@@ -58,12 +58,12 @@ function playStory(firstScene, characters, actionset) {
 /** outputs: scene success/failure/complication and news of what happened */
 function playScene(scene) {
     var character = scene.actor;
-    var sceneAction = whatTheyAreTryingToDoNow(character);
-    console.log("BEGIN", scene.pulse.verb, "SCENE:", character.name, sceneAction ? stringifyAttempt(sceneAction) : "Nothing");
+    var sceneAction = scene.pulse; // whatTheyAreTryingToDoNow(character);
+    console.log("BEGIN", scene.pulse.verb, "SCENE:", character.name, stringifyAttempt(sceneAction));
     if (!sceneAction)
         console.error("no action -- run AI to pick a scene-action that does/un-does the news? adjusts for it?");
     if (sceneAction)
-        scene.result = doThing(sceneAction, character);
+        scene.result = doThingAsAScene(sceneAction, character);
     scene.isFinished = true;
     return story.currentTurnsNews;
 }
@@ -122,6 +122,7 @@ function runNewsCycle(newss, sceneJustFinished) {
             for (var _d = 0, _e = character.beliefs; _d < _e.length; _d++) {
                 var belief = _e[_d];
                 if (isButtonPushed(news, belief)) {
+                    console.log("((But", character.name, " didn't like ", stringifyAttempt(news), ".))");
                     var sceneAction = createAttempt(character, GettingBadNews, news, belief, undefined);
                     var reactionScene = createScene(character, sceneAction);
                     //scheduleScene(reactionScene);
@@ -150,13 +151,17 @@ function stringify(obj) {
 }
 function stringifyAction(act) {
     var _a, _b, _c;
-    var rearrange = act.verb.includes("_");
+    if (!act)
+        return "[no act]";
     var nounName = ((_a = act.noun) === null || _a === void 0 ? void 0 : _a["name"]) || act.noun;
     var noun2Name = ((_b = act.secondNoun) === null || _b === void 0 ? void 0 : _b["name"]) || act.secondNoun;
+    var rearrange = act.verb.includes("_");
     var predicate = rearrange ? act.verb.replace("_", nounName || "") : act.verb;
     return (((_c = act.actor) === null || _c === void 0 ? void 0 : _c.name) || "") + " " + predicate + " " + (noun2Name || "") + (rearrange ? "" : " " + (nounName || ""));
 }
 function stringifyAttempt(attempt) {
+    if (!attempt)
+        return "[no attempt]";
     return stringifyAction(attempt) + " (" + attempt.status + ")";
 }
 function printAttempt(attempt) {
@@ -193,11 +198,18 @@ function executeRulebook(attempt) {
     return outcome;
 }
 /** performs the action */
-function doThing(thisAttempt, actor) {
-    if (!thisAttempt)
-        throw "no TODO";
-    if (!actor)
-        throw "no ACTOR";
+function doThingAsAScene(thisAttempt, viewpointCharacter) {
+    doThing(thisAttempt, viewpointCharacter);
+    while (thisAttempt.status == "partly successful") {
+        var subAttempt = whatTheyAreTryingToDoNowRegarding(thisAttempt.actor, thisAttempt);
+        console.log("same scene, now", stringifyAttempt(subAttempt));
+        if (subAttempt)
+            doThing(subAttempt, viewpointCharacter);
+    }
+    return thisAttempt.status == "successful" ? "success" : thisAttempt.status == "failed" ? "failed" : "failed";
+}
+/** performs the action */
+function doThing(thisAttempt, viewpointCharacter) {
     // DO the currentAction and get status
     var outcome = executeRulebook(thisAttempt);
     console.log(thisAttempt.verb, "is done:", outcome);
@@ -205,7 +217,7 @@ function doThing(thisAttempt, actor) {
     // update trees to record result
     if (thisAttempt.status == "partly successful")
         console.log("circumventions outcome:", outcome, ".  Could be fulfilled by:", thisAttempt.fullfilledBy.map(stringifyAttempt));
-    return makeNoDecision;
+    return thisAttempt.status;
 }
 /////////// Planner AI
 var hindered = function (it) {
@@ -289,10 +301,8 @@ var howTheyCan = function (actor, act) {
 //   for (const item of list) choices.push(item);
 //   return choices;
 // };
-var whatTheyAreTryingToDoNow = function (actor) {
-    var thisAct = actor.goals.find(function (g) { return g.status == "partly successful"; }) || actor.goals.find(function (g) { return g.status == "untried"; });
-    if (!thisAct)
-        return undefined;
+var whatTheyAreTryingToDoNowRegarding = function (actor, act) {
+    var thisAct = act;
     if (thisAct.status == "untried")
         return thisAct;
     // let details:Attempt|undefined = thisAct;// thisAct.fullfilledBy.find(at => inThePresent(at));
@@ -309,6 +319,12 @@ var whatTheyAreTryingToDoNow = function (actor) {
     console.log("  Q: What is", actor.name, "trying to do now?");
     console.log("  A: " + (thisAct ? stringifyAttempt(thisAct) : "nothing"));
     return thisAct; // [the most finely detailed, and hindered,]
+};
+var whatTheyAreTryingToDoNow = function (actor) {
+    var thisAct = actor.goals.find(function (g) { return g.status == "partly successful"; }) || actor.goals.find(function (g) { return g.status == "untried"; });
+    if (!thisAct)
+        return undefined;
+    return whatTheyAreTryingToDoNowRegarding(actor, thisAct);
 };
 var whatTheyWillDoNext = function (actor) {
     var current = whatTheyAreTryingToDoNow(actor);

@@ -80,15 +80,17 @@ function stringify(obj: any): string {
   );
 }
 
-function stringifyAction(act: Attempt): string {
-  const rearrange = act.verb.includes("_");
+function stringifyAction(act: Attempt | undefined): string {
+  if (!act) return "[no act]";
   const nounName = act.noun?.["name"] || act.noun;
   const noun2Name = act.secondNoun?.["name"] || act.secondNoun;
+  const rearrange = act.verb.includes("_");
   const predicate = rearrange ? act.verb.replace("_", nounName || "") : act.verb;
   return (act.actor?.name || "") + " " + predicate + " " + (noun2Name || "") + (rearrange ? "" : " " + (nounName || ""));
 }
 
-function stringifyAttempt(attempt: Attempt): string {
+function stringifyAttempt(attempt: Attempt | undefined): string {
+  if (!attempt) return "[no attempt]";
   return stringifyAction(attempt) + " (" + attempt.status + ")";
 }
 
@@ -122,10 +124,20 @@ function executeRulebook(attempt: Attempt): RuleOutcome {
 }
 
 /** performs the action */
-function doThing(thisAttempt: Attempt, actor: Character) {
-  if (!thisAttempt) throw "no TODO";
-  if (!actor) throw "no ACTOR";
+function doThingAsAScene(thisAttempt: Attempt, viewpointCharacter: Character): RuleOutcome {
+  doThing(thisAttempt, viewpointCharacter);
 
+  while (thisAttempt.status == "partly successful") {
+    let subAttempt = whatTheyAreTryingToDoNowRegarding(thisAttempt.actor, thisAttempt);
+    console.log("same scene, now", stringifyAttempt(subAttempt));
+    if (subAttempt) doThing(subAttempt, viewpointCharacter);
+  }
+
+  return thisAttempt.status == "successful" ? "success" : thisAttempt.status == "failed" ? "failed" : "failed";
+}
+
+/** performs the action */
+function doThing(thisAttempt: Attempt, viewpointCharacter: Character): Attempt["status"] {
   // DO the currentAction and get status
   const outcome = executeRulebook(thisAttempt);
   console.log(thisAttempt.verb, "is done:", outcome);
@@ -136,7 +148,7 @@ function doThing(thisAttempt: Attempt, actor: Character) {
   if (thisAttempt.status == "partly successful")
     console.log("circumventions outcome:", outcome, ".  Could be fulfilled by:", thisAttempt.fullfilledBy.map(stringifyAttempt));
 
-  return makeNoDecision;
+  return thisAttempt.status;
 }
 
 /////////// Planner AI
@@ -230,9 +242,8 @@ const howTheyCan = (actor: Character, act: Attempt): Attempt[] => {
 //   return choices;
 // };
 
-const whatTheyAreTryingToDoNow = (actor: Character): Attempt | undefined => {
-  let thisAct = actor.goals.find(g => g.status == "partly successful") || actor.goals.find(g => g.status == "untried");
-  if (!thisAct) return undefined;
+const whatTheyAreTryingToDoNowRegarding = (actor: Character, act: Attempt<any, any>): Attempt | undefined => {
+  let thisAct: Attempt<any, any> | undefined = act;
   if (thisAct.status == "untried") return thisAct;
   // let details:Attempt|undefined = thisAct;// thisAct.fullfilledBy.find(at => inThePresent(at));
   let previous: Attempt | undefined = thisAct;
@@ -248,6 +259,12 @@ const whatTheyAreTryingToDoNow = (actor: Character): Attempt | undefined => {
   console.log("  Q: What is", actor.name, "trying to do now?");
   console.log("  A: " + (thisAct ? stringifyAttempt(thisAct) : "nothing"));
   return thisAct; // [the most finely detailed, and hindered,]
+};
+
+const whatTheyAreTryingToDoNow = (actor: Character): Attempt | undefined => {
+  let thisAct = actor.goals.find(g => g.status == "partly successful") || actor.goals.find(g => g.status == "untried");
+  if (!thisAct) return undefined;
+  return whatTheyAreTryingToDoNowRegarding(actor, thisAct);
 };
 
 const whatTheyWillDoNext = (actor: Character): Attempt | undefined => {

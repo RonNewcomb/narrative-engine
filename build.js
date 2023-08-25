@@ -11,11 +11,10 @@ function createScene(actor, pulse) {
     var scene = { pulse: pulse, actor: actor };
     return scene;
 }
-var sceneStack = [];
 function createSceneSet(choice, consequence, closure) {
     var actor = choice.scene.actor;
     var news = choice.scene.pulse;
-    var reflect = createAttempt(actor, ReflectUpon, news.noun, news.secondNoun, news);
+    var reflect = createAttempt(actor, ReflectUpon, news, undefined, news);
     var ccc = {
         choice: choice,
         consequence: consequence,
@@ -23,37 +22,41 @@ function createSceneSet(choice, consequence, closure) {
             scene: createScene(choice.scene.actor, reflect),
         },
     };
-    sceneStack.push(ccc);
+    story.sceneStack.push(ccc);
     return ccc;
 }
 function getNextScene() {
-    var startScenes = sceneStack.filter(function (s) { return !s.choice.scene.isFinished; });
+    var startScenes = story.sceneStack.filter(function (s) { return !s.choice.scene.isFinished; });
     if (startScenes.length)
         return startScenes[0].choice.scene;
-    var midScenes = sceneStack.filter(function (s) { return s.consequence && !s.consequence.scene.isFinished; });
+    var midScenes = story.sceneStack.filter(function (s) { return s.consequence && !s.consequence.scene.isFinished; });
     if (midScenes.length)
         return midScenes[0].consequence.scene;
-    var endScenes = sceneStack.filter(function (s) { return !s.closure.scene.isFinished; });
+    var endScenes = story.sceneStack.filter(function (s) { return !s.closure.scene.isFinished; });
     if (endScenes.length)
         return endScenes.reverse()[0].closure.scene;
-    return null;
+    console.log("END STORY", story.sceneStack);
+    return undefined;
 }
+var story = { characters: [], actionset: [], sceneStack: [], history: [], currentTurnsNews: [] };
 function playStory(firstScene, characters, actionset) {
+    story = { characters: characters, actionset: actionset, sceneStack: [], history: [], currentTurnsNews: [] };
+    if (firstScene)
+        createSceneSet({ choice: "ally", scene: firstScene });
     var turn = 0;
-    for (var currentScene = firstScene; currentScene != null; currentScene = getNextScene()) {
+    for (var currentScene = firstScene; currentScene; currentScene = getNextScene()) {
         produceParagraphs(characters);
         console.log("TURN", ++turn);
         // characters act // creates scene types of Action
-        var news = playScene(currentScene, actionset);
+        var news = playScene(currentScene);
         // react to news // creates scene types of Reaction
-        runNewsCycle(news, currentScene, characters);
+        runNewsCycle(news, currentScene);
         if (turn > 7)
             break;
     }
 }
 /** outputs: scene success/failure/complication and news of what happened */
-function playScene(scene, actions) {
-    actionset = actions;
+function playScene(scene) {
     var character = scene.actor;
     var sceneAction = whatTheyAreTryingToDoNow(character);
     console.log("BEGIN", scene.pulse.verb, "SCENE:", character.name, sceneAction ? stringifyAttempt(sceneAction) : "Nothing");
@@ -62,10 +65,15 @@ function playScene(scene, actions) {
     if (sceneAction)
         scene.result = doThing(sceneAction, character);
     scene.isFinished = true;
-    return currentTurnsNews;
+    return story.currentTurnsNews;
 }
 var ReflectUpon = {
     verb: "reflecting upon _",
+    rulebooks: {
+        news: {
+            rules: [function (attempt) { return console.log(attempt.actor, "reflected."); }, createNewsItem],
+        },
+    },
 };
 var GettingBadNews = {
     verb: "getting bad _ news violating _ belief",
@@ -83,11 +91,11 @@ var GettingBadNews = {
                     function findActions(badNews, shouldBe) {
                         var _a, _b;
                         var retval = [];
-                        for (var _i = 0, actionset_1 = actionset; _i < actionset_1.length; _i++) {
-                            var action = actionset_1[_i];
+                        for (var _i = 0, _c = story.actionset; _i < _c.length; _i++) {
+                            var action = _c[_i];
                             var effects = ((_b = (_a = action.rulebooks) === null || _a === void 0 ? void 0 : _a.moveDesireables) === null || _b === void 0 ? void 0 : _b.call(_a, badNews)) || [];
-                            for (var _c = 0, effects_1 = effects; _c < effects_1.length; _c++) {
-                                var e = effects_1[_c];
+                            for (var _d = 0, effects_1 = effects; _d < effects_1.length; _d++) {
+                                var e = effects_1[_d];
                                 if (shouldBe.property == e[0] && shouldBe.ofDesireable == e[1] && shouldBe.shouldBe == e[2] && shouldBe.toValue == e[3])
                                     retval.push(action);
                             }
@@ -105,14 +113,14 @@ var GettingBadNews = {
         },
     },
 };
-var actionset;
-function runNewsCycle(newss, sceneJustFinished, characters) {
+function runNewsCycle(newss, sceneJustFinished) {
+    var _a;
     for (var _i = 0, newss_1 = newss; _i < newss_1.length; _i++) {
         var news = newss_1[_i];
-        for (var _a = 0, characters_1 = characters; _a < characters_1.length; _a++) {
-            var character = characters_1[_a];
-            for (var _b = 0, _c = character.beliefs; _b < _c.length; _b++) {
-                var belief = _c[_b];
+        for (var _b = 0, _c = story.characters; _b < _c.length; _b++) {
+            var character = _c[_b];
+            for (var _d = 0, _e = character.beliefs; _d < _e.length; _d++) {
+                var belief = _e[_d];
                 if (isButtonPushed(news, belief)) {
                     var sceneAction = createAttempt(character, GettingBadNews, news, belief, undefined);
                     var reactionScene = createScene(character, sceneAction);
@@ -123,8 +131,8 @@ function runNewsCycle(newss, sceneJustFinished, characters) {
         }
     }
     // reset news
-    oldNews.push.apply(oldNews, currentTurnsNews);
-    currentTurnsNews = [];
+    (_a = story.history).push.apply(_a, story.currentTurnsNews);
+    story.currentTurnsNews = [];
 }
 var makeNoDecision = undefined;
 var pretendItWorked = "success";
@@ -376,8 +384,8 @@ function moveDesireable(property, ofDesireable, shouldBe, toValue) {
 ///////////
 function main(characters, actionset) {
     // sanitize setup
-    for (var _i = 0, characters_2 = characters; _i < characters_2.length; _i++) {
-        var character = characters_2[_i];
+    for (var _i = 0, characters_1 = characters; _i < characters_1.length; _i++) {
+        var character = characters_1[_i];
         for (var _a = 0, _b = character.goals; _a < _b.length; _a++) {
             var goal = _b[_a];
             if (goal.actor == author)
@@ -393,11 +401,6 @@ function main(characters, actionset) {
         throw "cannot find first character and action. No one has a Goal.";
     console.log(initialScenes.length, "initial scenes");
     var initialScene = initialScenes[0];
-    var ccc = {
-        choice: "ally",
-        scene: initialScene,
-    };
-    createSceneSet(ccc);
     // GO
     playStory(initialScene, characters, actionset);
     // debug
@@ -418,12 +421,10 @@ var __assign = (this && this.__assign) || function () {
 };
 function createNewsItem(attempt) {
     var newsItem = __assign(__assign({}, attempt), { level: attempt.status == "untried" ? "suggested" : attempt.status });
-    currentTurnsNews.push(newsItem);
+    story.currentTurnsNews.push(newsItem);
     //console.log("NEWS", newsItem);
     return newsItem;
 }
-var oldNews = [];
-var currentTurnsNews = [];
 function isButtonPushed(news, belief) {
     var _a, _b;
     var changeStatements = ((_b = (_a = news.definition.rulebooks) === null || _a === void 0 ? void 0 : _a.moveDesireables) === null || _b === void 0 ? void 0 : _b.call(_a, news)) || [];

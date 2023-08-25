@@ -66,8 +66,6 @@ interface ChoiceConsequenceClosure {
   closure: ClosureFromInteriorReflection;
 }
 
-const sceneStack: ChoiceConsequenceClosure[] = [];
-
 function createSceneSet(
   choice: Choi6eWithForeshadowing,
   consequence?: ConsequenceWithForeshadowedNewsProvingAgency,
@@ -75,7 +73,7 @@ function createSceneSet(
 ): ChoiceConsequenceClosure {
   const actor = choice.scene.actor;
   const news = choice.scene.pulse;
-  const reflect = createAttempt(actor, ReflectUpon, news.noun, news.secondNoun, news);
+  const reflect = createAttempt(actor, ReflectUpon, news, undefined, news);
   const ccc: ChoiceConsequenceClosure = {
     choice,
     consequence,
@@ -83,49 +81,67 @@ function createSceneSet(
       scene: createScene(choice.scene.actor, reflect),
     },
   };
-  sceneStack.push(ccc);
+  story.sceneStack.push(ccc);
   return ccc;
 }
 
-function getNextScene(): Scene | null {
-  const startScenes = sceneStack.filter(s => !s.choice.scene.isFinished);
+function getNextScene(): Scene | undefined {
+  const startScenes = story.sceneStack.filter(s => !s.choice.scene.isFinished);
   if (startScenes.length) return startScenes[0].choice.scene;
-  const midScenes = sceneStack.filter(s => s.consequence && !s.consequence.scene.isFinished);
+  const midScenes = story.sceneStack.filter(s => s.consequence && !s.consequence.scene.isFinished);
   if (midScenes.length) return midScenes[0].consequence!.scene;
-  const endScenes = sceneStack.filter(s => !s.closure.scene.isFinished);
+  const endScenes = story.sceneStack.filter(s => !s.closure.scene.isFinished);
   if (endScenes.length) return endScenes.reverse()[0].closure.scene;
-  return null;
+  console.log("END STORY", story.sceneStack);
+  return undefined;
 }
 
-function playStory(firstScene: Scene, characters: Character[], actionset: ActionDefinition<any, any>[]): void {
+let story: {
+  characters: Character[];
+  actionset: ActionDefinition<any, any>[];
+
+  sceneStack: ChoiceConsequenceClosure[];
+  history: News[];
+  currentTurnsNews: News[];
+} = { characters: [], actionset: [], sceneStack: [], history: [], currentTurnsNews: [] };
+
+function playStory(firstScene: Scene | undefined, characters: Character[], actionset: ActionDefinition<any, any>[]): void {
+  story = { characters, actionset, sceneStack: [], history: [], currentTurnsNews: [] };
+
+  if (firstScene) createSceneSet({ choice: "ally", scene: firstScene });
+
   let turn = 0;
-  for (let currentScene: Scene | null = firstScene; currentScene != null; currentScene = getNextScene()) {
+  for (let currentScene = firstScene; currentScene; currentScene = getNextScene()) {
     produceParagraphs(characters);
     console.log("TURN", ++turn);
 
     // characters act // creates scene types of Action
-    const news = playScene(currentScene, actionset);
+    const news = playScene(currentScene);
     // react to news // creates scene types of Reaction
-    runNewsCycle(news, currentScene, characters);
+    runNewsCycle(news, currentScene);
 
     if (turn > 7) break;
   }
 }
 
 /** outputs: scene success/failure/complication and news of what happened */
-function playScene<N, SN>(scene: Scene, actions: ActionDefinition<N, SN>[]): News[] {
-  actionset = actions;
+function playScene<N, SN>(scene: Scene): News[] {
   const character = scene.actor;
   let sceneAction = whatTheyAreTryingToDoNow(character);
   console.log("BEGIN", scene.pulse.verb, "SCENE:", character.name, sceneAction ? stringifyAttempt(sceneAction) : "Nothing");
   if (!sceneAction) console.error("no action -- run AI to pick a scene-action that does/un-does the news? adjusts for it?");
   if (sceneAction) scene.result = doThing(sceneAction, character);
   scene.isFinished = true;
-  return currentTurnsNews;
+  return story.currentTurnsNews;
 }
 
 const ReflectUpon: AbstractActionDefinition<Attempt> = {
   verb: "reflecting upon _",
+  rulebooks: {
+    news: {
+      rules: [attempt => console.log(attempt.actor, "reflected."), createNewsItem],
+    },
+  },
 };
 
 const GettingBadNews: AbstractActionDefinition<News, ShouldBe> = {
@@ -142,7 +158,7 @@ const GettingBadNews: AbstractActionDefinition<News, ShouldBe> = {
 
           function findActions(badNews: Attempt<any, any>, shouldBe: ShouldBe): ActionDefinition<any, any>[] {
             const retval: ActionDefinition<any, any>[] = [];
-            for (const action of actionset) {
+            for (const action of story.actionset) {
               const effects = action.rulebooks?.moveDesireables?.(badNews) || [];
               for (const e of effects)
                 if (shouldBe.property == e[0] && shouldBe.ofDesireable == e[1] && shouldBe.shouldBe == e[2] && shouldBe.toValue == e[3])
@@ -161,11 +177,9 @@ const GettingBadNews: AbstractActionDefinition<News, ShouldBe> = {
   },
 };
 
-let actionset: ActionDefinition<any, any>[];
-
-function runNewsCycle(newss: News[], sceneJustFinished: Scene, characters: Character[]) {
+function runNewsCycle(newss: News[], sceneJustFinished: Scene) {
   for (const news of newss)
-    for (const character of characters)
+    for (const character of story.characters)
       for (const belief of character.beliefs)
         if (isButtonPushed(news, belief)) {
           const sceneAction = createAttempt<News, ShouldBe>(character, GettingBadNews, news, belief, undefined);
@@ -175,6 +189,6 @@ function runNewsCycle(newss: News[], sceneJustFinished: Scene, characters: Chara
         }
 
   // reset news
-  oldNews.push(...currentTurnsNews);
-  currentTurnsNews = [];
+  story.history.push(...story.currentTurnsNews);
+  story.currentTurnsNews = [];
 }

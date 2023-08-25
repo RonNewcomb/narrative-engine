@@ -2,4 +2,223 @@
     <script src="./build.js"></script>
 </head>
 
-<body></body>
+<body>
+    <pre>
+    12:33:22.535 build.js:394 1 'initial scenes'
+12:33:22.535 build.js:447 [
+    {
+        "name": "Rose",
+        "beliefs": [],
+        "goals": [
+            {
+                "verb": "exit",
+                "actor": "\\\\Rose",
+                "status": "untried",
+                "fullfilledBy": []
+            }
+        ]
+    },
+    {
+        "name": "Zafra",
+        "beliefs": [
+            {
+                "property": "isLocked",
+                "ofDesireable": {
+                    "name": "door",
+                    "isLocked": true
+                },
+                "shouldBe": "=",
+                "toValue": true
+            }
+        ],
+        "goals": []
+    }
+]
+12:33:22.535 build.js:45 TURN 1
+12:33:22.535 build.js:59 BEGIN exit SCENE: Rose Rose exit   (untried)
+12:33:22.536 build.js:335 Rose could try unlock _ with before Rose exit   (untried)
+12:33:22.536 build.js:195 exit is done: failed
+12:33:22.536 build.js:199 circumventions outcome: failed .  Could be fulfilled by: ['Rose unlock door with  (untried)']
+12:33:22.536 build.js:447 [
+    {
+        "name": "Rose",
+        "beliefs": [],
+        "goals": [
+            {
+                "verb": "exit",
+                "actor": "\\\\Rose",
+                "status": "partly successful",
+                "fullfilledBy": [
+                    {
+                        "verb": "unlock _ with",
+                        "actor": "\\\\Rose",
+                        "noun": {
+                            "name": "door",
+                            "isLocked": true
+                        },
+                        "status": "untried",
+                        "fulfills": "\\\\<backlink>",
+                        "fullfilledBy": []
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Zafra",
+        "beliefs": [
+            {
+                "property": "isLocked",
+                "ofDesireable": {
+                    "name": "door",
+                    "isLocked": true
+                },
+                "shouldBe": "=",
+                "toValue": true
+            }
+        ],
+        "goals": []
+    }
+]
+12:33:22.536 build.js:45 TURN 2
+12:33:22.536 build.js:301   Q: What is Rose trying to do now?
+12:33:22.537 build.js:302   A: Rose unlock door with  (untried)
+12:33:22.537 build.js:59 BEGIN reflecting upon _ SCENE: Rose Rose unlock door with  (untried)
+12:33:22.537 build.js:195 unlock _ with is done: undefined
+12:33:22.537 build.js:447 [
+    {
+        "name": "Rose",
+        "beliefs": [],
+        "goals": [
+            {
+                "verb": "exit",
+                "actor": "\\\\Rose",
+                "status": "partly successful",
+                "fullfilledBy": [
+                    {
+                        "verb": "unlock _ with",
+                        "actor": "\\\\Rose",
+                        "noun": {
+                            "name": "door",
+                            "isLocked": false
+                        },
+                        "status": "successful",
+                        "fulfills": "\\\\<backlink>",
+                        "fullfilledBy": []
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Zafra",
+        "beliefs": [
+            {
+                "property": "isLocked",
+                "ofDesireable": {
+                    "name": "door",
+                    "isLocked": false
+                },
+                "shouldBe": "=",
+                "toValue": true
+            }
+        ],
+        "goals": []
+    }
+]
+12:33:22.537 build.js:45 TURN 3
+12:33:22.537 build.js:59 BEGIN getting bad _ news violating _ belief SCENE: Zafra Nothing
+12:33:22.537 build.js:61  no action -- run AI to pick a scene-action that does/un-does the news? adjusts for it?
+playScene @ build.js:61
+playStory @ build.js:47
+main @ build.js:402
+(anonymous) @ build.js:548
+12:33:22.537 build.js:447 [
+    {
+        "name": "Rose",
+        "beliefs": [],
+        "goals": [
+            {
+                "verb": "exit",
+                "actor": "\\\\Rose",
+                "status": "partly successful",
+                "fullfilledBy": [
+                    {
+                        "verb": "unlock _ with",
+                        "actor": "\\\\Rose",
+                        "noun": {
+                            "name": "door",
+                            "isLocked": false
+                        },
+                        "status": "successful",
+                        "fulfills": "\\\\<backlink>",
+                        "fullfilledBy": []
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Zafra",
+        "beliefs": [
+            {
+                "property": "isLocked",
+                "ofDesireable": {
+                    "name": "door",
+                    "isLocked": false
+                },
+                "shouldBe": "=",
+                "toValue": true
+            }
+        ],
+        "goals": []
+    }
+]
+12:33:22.537 build.js:45 TURN 4
+12:33:22.537 build.js:301   Q: What is Rose trying to do now?
+12:33:22.537 build.js:302   A: Rose exit   (partly successful)
+12:33:22.537 build.js:59 BEGIN reflecting upon _ SCENE: Rose Rose exit   (partly successful)
+12:33:22.537 build.js:195 exit is done: undefined
+12:33:22.538 build.js:447 [
+    {
+        "name": "Rose",
+        "beliefs": [],
+        "goals": [
+            {
+                "verb": "exit",
+                "actor": "\\\\Rose",
+                "status": "successful",
+                "fullfilledBy": [
+                    {
+                        "verb": "unlock _ with",
+                        "actor": "\\\\Rose",
+                        "noun": {
+                            "name": "door",
+                            "isLocked": false
+                        },
+                        "status": "successful",
+                        "fulfills": "\\\\<backlink>",
+                        "fullfilledBy": []
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Zafra",
+        "beliefs": [
+            {
+                "property": "isLocked",
+                "ofDesireable": {
+                    "name": "door",
+                    "isLocked": false
+                },
+                "shouldBe": "=",
+                "toValue": true
+            }
+        ],
+        "goals": []
+    }
+]
+</pre>
+</body>

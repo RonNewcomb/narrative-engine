@@ -17,13 +17,10 @@ interface News extends Attempt {
 
 function createNewsItem(attempt: Attempt): News {
   const newsItem = { ...attempt, level: attempt.status == "untried" ? "suggested" : attempt.status };
-  currentTurnsNews.push(newsItem);
+  story.currentTurnsNews.push(newsItem);
   //console.log("NEWS", newsItem);
   return newsItem;
 }
-
-const oldNews: News[] = [];
-let currentTurnsNews: News[] = [];
 
 function isButtonPushed(news: News, belief: ShouldBe): boolean {
   const changeStatements = news.definition.rulebooks?.moveDesireables?.(news) || [];

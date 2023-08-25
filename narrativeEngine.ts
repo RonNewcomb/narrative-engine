@@ -371,12 +371,6 @@ function main(characters: Character[], actionset: ActionDefinition<any, any>[]) 
   console.log(initialScenes.length, "initial scenes");
   const initialScene: Scene = initialScenes[0];
 
-  const ccc: Choi6eWithForeshadowing = {
-    choice: "ally",
-    scene: initialScene,
-  };
-  createSceneSet(ccc);
-
   // GO
   playStory(initialScene, characters, actionset);
 

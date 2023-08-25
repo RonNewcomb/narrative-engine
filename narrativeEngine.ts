@@ -1,4 +1,4 @@
-interface ShouldBe {
+interface ShouldBe extends Resource {
   property: string;
   ofDesireable: Desireable;
   shouldBe: "=" | "in";
@@ -17,49 +17,51 @@ type ShouldBeStatement = [
 interface Character {
   name: string;
   beliefs: ShouldBe[];
-  goals: Attempt[];
+  goals: Attempt<any, any>[];
 }
 
 /** An action which has failed.  Attempts record which Check rule prevented the action and whether the action could or should be re-attempted later.
  *  For a re-attempt to be successful, certain pre-requisites need to be 'fulfilled' (a relation) by other actions, so the same Check rule doesn't
  *  simply stop the action again. */
-interface Attempt {
+interface Attempt<N = Resource, SN = Resource> extends Resource {
   verb: Verb;
-  noun?: Noun;
-  secondNoun?: Noun;
+  noun?: N;
+  secondNoun?: SN;
   actor: Character;
-  definition: ActionDefinition;
+  definition: AbstractActionDefinition<N, SN>;
   status: "untried" | "failed" | "partly successful" | "successful";
-  meddlingCheckRule?: Rule | RuleWithOutcome;
-  fulfills: Attempt | undefined; // .parent
-  fullfilledBy: Attempt[]; // .children
+  //meddlingCheckRule?: Rule<N, SN> | RuleWithOutcome<N, SN>;
+  fulfills: Attempt<any, any> | undefined; // .parent
+  fullfilledBy: Attempt<any, any>[]; // .children
 }
 
 type Verb = string;
 type Noun = Desireable;
 
-type RuleWithOutcome = ((attempt: Attempt) => RuleOutcome) & { name?: string };
-type Rule = ((attempt: Attempt) => void) & { name?: string };
+type RuleWithOutcome<N, SN> = ((attempt: Attempt<N, SN>) => RuleOutcome) & { name?: string };
+type Rule<N, SN> = ((attempt: Attempt<N, SN>) => void) & { name?: string };
 
 type RuleOutcome = "success" | "failed" | undefined;
 const makeNoDecision: RuleOutcome = undefined;
 const pretendItWorked: RuleOutcome = "success";
 
-interface Rulebook {
-  rules: Rule[];
+interface Rulebook<N, SN> {
+  rules: Rule<N, SN>[];
 }
-interface RulebookWithOutcome {
-  rules: RuleWithOutcome[];
+interface RulebookWithOutcome<N, SN> {
+  rules: RuleWithOutcome<N, SN>[];
 }
 
-interface ActionDefinition {
+interface AbstractActionDefinition<N = Resource, SN = Resource> {
   verb: Verb;
   rulebooks?: {
-    check?: RulebookWithOutcome;
-    moveDesireables?: (attempt: Attempt) => ShouldBeStatement[];
-    news?: Rulebook;
+    check?: RulebookWithOutcome<N, SN>;
+    moveDesireables?: (attempt: Attempt<N, SN>) => ShouldBeStatement[];
+    news?: Rulebook<N, SN>;
   };
 }
+
+interface ActionDefinition<N = Noun, SN = Noun> extends AbstractActionDefinition<Noun, Noun> {}
 
 /////////// debug
 
@@ -80,8 +82,10 @@ function stringify(obj: any): string {
 
 function stringifyAction(act: Attempt): string {
   const rearrange = act.verb.includes("_");
-  const predicate = rearrange ? act.verb.replace("_", act.noun?.name || "") : act.verb;
-  return (act.actor?.name || "") + " " + predicate + " " + (act.secondNoun?.name || "") + (rearrange ? "" : " " + (act.noun?.name || ""));
+  const nounName = act.noun?.["name"] || act.noun;
+  const noun2Name = act.secondNoun?.["name"] || act.secondNoun;
+  const predicate = rearrange ? act.verb.replace("_", nounName || "") : act.verb;
+  return (act.actor?.name || "") + " " + predicate + " " + (noun2Name || "") + (rearrange ? "" : " " + (nounName || ""));
 }
 
 function stringifyAttempt(attempt: Attempt): string {
@@ -102,7 +106,7 @@ function executeRulebook(attempt: Attempt): RuleOutcome {
     for (const rule of rulebooks.check.rules || []) {
       const ruleResult = rule(attempt);
       if (ruleResult == "failed") {
-        attempt.meddlingCheckRule = rule;
+        //attempt.meddlingCheckRule = rule;
         outcome = ruleResult;
         break;
       }
@@ -262,26 +266,37 @@ const whatTheyWillDoNext = (actor: Character): Attempt | undefined => {
 //   return mostRecentAnswer;
 // };
 
-/** attaches a suggestion to the tree */
-function weCouldTry(
+function createAttempt<N extends Resource, SN extends Resource>(
   actor: Character,
-  definition: ActionDefinition,
-  noun: Noun | undefined,
-  secondNoun: Noun | undefined,
-  failingAction: Attempt | undefined
-): "failed" {
-  console.log(actor.name, "could try", definition.verb, "before", failingAction && stringifyAttempt(failingAction));
-  const circumvention: Attempt = {
+  definition: AbstractActionDefinition<N, SN>,
+  noun: N | undefined,
+  secondNoun: SN | undefined,
+  parentAction: Attempt<any, any> | undefined
+): Attempt<N, SN> {
+  const circumvention: Attempt<N, SN> = {
     verb: definition.verb,
     actor,
     definition,
-    noun,
+    noun: noun,
     secondNoun,
     status: "untried",
-    meddlingCheckRule: undefined,
-    fulfills: failingAction,
+    //meddlingCheckRule: undefined,
+    fulfills: parentAction,
     fullfilledBy: [],
   };
+  return circumvention;
+}
+
+/** attaches a suggestion to the tree */
+function weCouldTry<N extends Resource, SN extends Resource>(
+  actor: Character,
+  definition: AbstractActionDefinition<N, SN>,
+  noun: N | undefined,
+  secondNoun: SN | undefined,
+  failingAction: Attempt<any, any> | undefined
+): "failed" {
+  console.log(actor.name, "could try", definition.verb, "before", failingAction && stringifyAttempt(failingAction));
+  const circumvention = createAttempt(actor, definition, noun, secondNoun, failingAction);
   if (failingAction) failingAction.fullfilledBy.push(circumvention);
   else actor.goals.push(circumvention);
   return "failed";
@@ -293,15 +308,19 @@ const author: Character = {
   goals: [],
 };
 
-function createMyGoal(definition: ActionDefinition, noun?: Noun, secondNoun?: Noun): Attempt {
-  const circumvention: Attempt = {
+function createMyGoal<N extends Noun, SN extends Noun>(
+  definition: AbstractActionDefinition<N, SN>,
+  noun?: N,
+  secondNoun?: SN
+): Attempt<N, SN> {
+  const circumvention: Attempt<N, SN> = {
     verb: definition.verb,
     actor: author,
     definition,
     noun,
     secondNoun,
     status: "untried",
-    meddlingCheckRule: undefined,
+    //meddlingCheckRule: undefined,
     fulfills: undefined,
     fullfilledBy: [],
   };
@@ -338,7 +357,7 @@ function moveDesireable(
 
 ///////////
 
-function main(characters: Character[], actionset: ActionDefinition[]) {
+function main(characters: Character[], actionset: ActionDefinition<any, any>[]) {
   // sanitize setup
   for (let character of characters) for (let goal of character.goals) if (goal.actor == author) goal.actor = character;
 
@@ -346,7 +365,7 @@ function main(characters: Character[], actionset: ActionDefinition[]) {
   const initialScenes: Scene[] = characters
     .map(character => ({ character, action: whatTheyAreTryingToDoNow(character) }))
     .filter(todo => !!todo.action)
-    .map(todo => createScene("introduction", todo.character, todo.action as News));
+    .map(todo => createScene(todo.character, todo.action!));
 
   if (!initialScenes.length) throw "cannot find first character and action. No one has a Goal.";
   console.log(initialScenes.length, "initial scenes");
@@ -354,7 +373,6 @@ function main(characters: Character[], actionset: ActionDefinition[]) {
 
   const ccc: Choi6eWithForeshadowing = {
     choice: "ally",
-    foreshadow: {},
     scene: initialScene,
   };
   createSceneSet(ccc);

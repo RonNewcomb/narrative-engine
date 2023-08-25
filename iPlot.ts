@@ -1,6 +1,8 @@
 /// <reference path="./narrativeEngine.ts"/>
 
-interface Desireable extends Record<string, any> {
+interface Resource {}
+
+interface Desireable extends Record<string, any>, Resource {
   name: string;
   number?: number;
   owner?: Character;

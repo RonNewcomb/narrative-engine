@@ -83,7 +83,9 @@ const Locking: ActionDefinition = {
         // attempt => (attempt.secondNoun?.isKey ? "success" : weCouldTry(attempt.actor, Realizing, doorkey, undefined, attempt)),
         // need to own key
         attempt =>
-          attempt.secondNoun?.owner == attempt.actor
+          !attempt.secondNoun
+            ? "failed"
+            : attempt.secondNoun?.owner == attempt.actor
             ? "success"
             : weCouldTry(attempt.actor, Taking, attempt.secondNoun, undefined, attempt),
       ],

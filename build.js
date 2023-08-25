@@ -1,22 +1,27 @@
-function createScene(type, actor, news, belief) {
-    var scene = type == "reaction" ? { type: type, news: news, belief: belief, actor: actor } : { type: type, actor: actor };
+// interface ReflectiveScene extends BaseScene {
+//   type: "reflective";
+//   actor: Character;
+//   // can a ShouldBe be supported, ArgMap-like, by smaller ShouldBes,
+//   // so that each reflective scene knocks down a supporting ShouldBe until no support exists,
+//   // and a final blow to break the larger ShouldBe ?
+// }
+// SuspenseScene -- scene with a lot of tension
+// DramaticScene -- scene with strong emotion
+function createScene(actor, pulse) {
+    var scene = { pulse: pulse, actor: actor };
     return scene;
-}
-///////////
-var scenesTodo = [];
-function scheduleScene(scene) {
-    var character = scene.actor;
-    console.log("SCHEDULED", scene.type, "SCENE for", character.name, "about", scene.type == "reaction" && stringifyAction(scene.news));
-    scenesTodo.push(scene);
 }
 var sceneStack = [];
 function createSceneSet(choice, consequence, closure) {
-    var news = {};
-    var belief = {};
+    var actor = choice.scene.actor;
+    var news = choice.scene.pulse;
+    var reflect = createAttempt(actor, ReflectUpon, news.noun, news.secondNoun, news);
     var ccc = {
         choice: choice,
-        consequence: consequence || { foreshadow: choice.foreshadow, scene: createScene("reaction", choice.scene.actor, news, belief) },
-        closure: closure || { scene: createScene("reflective", choice.scene.actor) }
+        consequence: consequence,
+        closure: closure || {
+            scene: createScene(choice.scene.actor, reflect),
+        },
     };
     sceneStack.push(ccc);
     return ccc;
@@ -25,7 +30,7 @@ function getNextScene() {
     var startScenes = sceneStack.filter(function (s) { return !s.choice.scene.isFinished; });
     if (startScenes.length)
         return startScenes[0].choice.scene;
-    var midScenes = sceneStack.filter(function (s) { return !s.consequence.scene.isFinished; });
+    var midScenes = sceneStack.filter(function (s) { return s.consequence && !s.consequence.scene.isFinished; });
     if (midScenes.length)
         return midScenes[0].consequence.scene;
     var endScenes = sceneStack.filter(function (s) { return !s.closure.scene.isFinished; });
@@ -51,9 +56,7 @@ function playScene(scene, actions) {
     actionset = actions;
     var character = scene.actor;
     var sceneAction = whatTheyAreTryingToDoNow(character);
-    console.log("BEGIN", scene.type, "SCENE:", character.name, sceneAction ? stringifyAttempt(sceneAction) : "Nothing");
-    if (!sceneAction && scene.type == "reaction")
-        sceneAction = realizingIssue(character, scene, actionset);
+    console.log("BEGIN", scene.pulse.verb, "SCENE:", character.name, sceneAction ? stringifyAttempt(sceneAction) : "Nothing");
     if (!sceneAction)
         console.error("no action -- run AI to pick a scene-action that does/un-does the news? adjusts for it?");
     if (sceneAction)
@@ -61,6 +64,9 @@ function playScene(scene, actions) {
     scene.isFinished = true;
     return currentTurnsNews;
 }
+var ReflectUpon = {
+    verb: "reflecting upon _",
+};
 var GettingBadNews = {
     verb: "getting bad _ news violating _ belief",
     rulebooks: {
@@ -69,7 +75,25 @@ var GettingBadNews = {
                 function (attempt) {
                     var news = attempt.noun;
                     var belief = attempt.secondNoun;
+                    if (!news)
+                        throw "missing News for GettingBadNews";
+                    if (!belief)
+                        throw "missing Belief for GettingBadNews";
                     console.log('"', printAttempt(news), ' is bad news."');
+                    function findActions(badNews, shouldBe) {
+                        var _a, _b;
+                        var retval = [];
+                        for (var _i = 0, actionset_1 = actionset; _i < actionset_1.length; _i++) {
+                            var action = actionset_1[_i];
+                            var effects = ((_b = (_a = action.rulebooks) === null || _a === void 0 ? void 0 : _a.moveDesireables) === null || _b === void 0 ? void 0 : _b.call(_a, badNews)) || [];
+                            for (var _c = 0, effects_1 = effects; _c < effects_1.length; _c++) {
+                                var e = effects_1[_c];
+                                if (shouldBe.property == e[0] && shouldBe.ofDesireable == e[1] && shouldBe.shouldBe == e[2] && shouldBe.toValue == e[3])
+                                    retval.push(action);
+                            }
+                        }
+                        return retval;
+                    }
                     var actions = findActions(news, belief);
                     for (var _i = 0, actions_1 = actions; _i < actions_1.length; _i++) {
                         var action = actions_1[_i];
@@ -77,34 +101,11 @@ var GettingBadNews = {
                     }
                     return "failed";
                 },
-            ]
-        }
-    }
+            ],
+        },
+    },
 };
 var actionset;
-function findActions(badNews, shouldBe) {
-    var _a, _b;
-    var retval = [];
-    for (var _i = 0, actionset_1 = actionset; _i < actionset_1.length; _i++) {
-        var action = actionset_1[_i];
-        var effects = ((_b = (_a = action.rulebooks) === null || _a === void 0 ? void 0 : _a.moveDesireables) === null || _b === void 0 ? void 0 : _b.call(_a, badNews)) || [];
-        for (var _c = 0, effects_1 = effects; _c < effects_1.length; _c++) {
-            var e = effects_1[_c];
-            if (shouldBe.property == e[0] && shouldBe.ofDesireable == e[1] && shouldBe.shouldBe == e[2] && shouldBe.toValue == e[3])
-                retval.push(action);
-        }
-    }
-    return retval;
-}
-// function realizingIssue(character: Character, scene: ReactionScene, actionset: ActionDefinition[]): Attempt {
-//   weCouldTry(character, GettingBadNews, scene.news as any, scene.belief as any, undefined);
-//   // const goal = createMyGoal(GettingBadNews, scene.news as any, scene.belief as any);
-//   // goal.actor = character;
-//   // character.goals.push(goal);
-//   const actions = findActions(actionset, scene.news, scene.belief);
-//   for (const action of actions) weCouldTry(character, action, scene.news.noun, scene.news.secondNoun, goal);
-//   return goal;
-// }
 function runNewsCycle(newss, sceneJustFinished, characters) {
     for (var _i = 0, newss_1 = newss; _i < newss_1.length; _i++) {
         var news = newss_1[_i];
@@ -113,7 +114,8 @@ function runNewsCycle(newss, sceneJustFinished, characters) {
             for (var _b = 0, _c = character.beliefs; _b < _c.length; _b++) {
                 var belief = _c[_b];
                 if (isButtonPushed(news, belief)) {
-                    var reactionScene = createScene("reaction", character, news, belief);
+                    var sceneAction = createAttempt(character, GettingBadNews, news, belief, undefined);
+                    var reactionScene = createScene(character, sceneAction);
                     //scheduleScene(reactionScene);
                     createSceneSet({ scene: sceneJustFinished, foreshadow: {}, choice: "ally" }, { scene: reactionScene, foreshadow: {} });
                 }
@@ -139,10 +141,12 @@ function stringify(obj) {
     }, 4);
 }
 function stringifyAction(act) {
-    var _a, _b, _c, _d;
+    var _a, _b, _c;
     var rearrange = act.verb.includes("_");
-    var predicate = rearrange ? act.verb.replace("_", ((_a = act.noun) === null || _a === void 0 ? void 0 : _a.name) || "") : act.verb;
-    return (((_b = act.actor) === null || _b === void 0 ? void 0 : _b.name) || "") + " " + predicate + " " + (((_c = act.secondNoun) === null || _c === void 0 ? void 0 : _c.name) || "") + (rearrange ? "" : " " + (((_d = act.noun) === null || _d === void 0 ? void 0 : _d.name) || ""));
+    var nounName = ((_a = act.noun) === null || _a === void 0 ? void 0 : _a["name"]) || act.noun;
+    var noun2Name = ((_b = act.secondNoun) === null || _b === void 0 ? void 0 : _b["name"]) || act.secondNoun;
+    var predicate = rearrange ? act.verb.replace("_", nounName || "") : act.verb;
+    return (((_c = act.actor) === null || _c === void 0 ? void 0 : _c.name) || "") + " " + predicate + " " + (noun2Name || "") + (rearrange ? "" : " " + (nounName || ""));
 }
 function stringifyAttempt(attempt) {
     return stringifyAction(attempt) + " (" + attempt.status + ")";
@@ -162,7 +166,7 @@ function executeRulebook(attempt) {
             var rule = _b[_i];
             var ruleResult = rule(attempt);
             if (ruleResult == "failed") {
-                attempt.meddlingCheckRule = rule;
+                //attempt.meddlingCheckRule = rule;
                 outcome = ruleResult;
                 break;
             }
@@ -312,9 +316,7 @@ var whatTheyWillDoNext = function (actor) {
 //   for (const item of attempts()) if (act == item.action) mostRecentAnswer = item;
 //   return mostRecentAnswer;
 // };
-/** attaches a suggestion to the tree */
-function weCouldTry(actor, definition, noun, secondNoun, failingAction) {
-    console.log(actor.name, "could try", definition.verb, "before", failingAction && stringifyAttempt(failingAction));
+function createAttempt(actor, definition, noun, secondNoun, parentAction) {
     var circumvention = {
         verb: definition.verb,
         actor: actor,
@@ -322,10 +324,16 @@ function weCouldTry(actor, definition, noun, secondNoun, failingAction) {
         noun: noun,
         secondNoun: secondNoun,
         status: "untried",
-        meddlingCheckRule: undefined,
-        fulfills: failingAction,
-        fullfilledBy: []
+        //meddlingCheckRule: undefined,
+        fulfills: parentAction,
+        fullfilledBy: [],
     };
+    return circumvention;
+}
+/** attaches a suggestion to the tree */
+function weCouldTry(actor, definition, noun, secondNoun, failingAction) {
+    console.log(actor.name, "could try", definition.verb, "before", failingAction && stringifyAttempt(failingAction));
+    var circumvention = createAttempt(actor, definition, noun, secondNoun, failingAction);
     if (failingAction)
         failingAction.fullfilledBy.push(circumvention);
     else
@@ -335,7 +343,7 @@ function weCouldTry(actor, definition, noun, secondNoun, failingAction) {
 var author = {
     name: "myself",
     beliefs: [],
-    goals: []
+    goals: [],
 };
 function createMyGoal(definition, noun, secondNoun) {
     var circumvention = {
@@ -345,9 +353,9 @@ function createMyGoal(definition, noun, secondNoun) {
         noun: noun,
         secondNoun: secondNoun,
         status: "untried",
-        meddlingCheckRule: undefined,
+        //meddlingCheckRule: undefined,
         fulfills: undefined,
-        fullfilledBy: []
+        fullfilledBy: [],
     };
     return circumvention;
 }
@@ -380,15 +388,14 @@ function main(characters, actionset) {
     var initialScenes = characters
         .map(function (character) { return ({ character: character, action: whatTheyAreTryingToDoNow(character) }); })
         .filter(function (todo) { return !!todo.action; })
-        .map(function (todo) { return createScene("introduction", todo.character, todo.action); });
+        .map(function (todo) { return createScene(todo.character, todo.action); });
     if (!initialScenes.length)
         throw "cannot find first character and action. No one has a Goal.";
     console.log(initialScenes.length, "initial scenes");
     var initialScene = initialScenes[0];
     var ccc = {
         choice: "ally",
-        foreshadow: {},
-        scene: initialScene
+        scene: initialScene,
     };
     createSceneSet(ccc);
     // GO
@@ -458,22 +465,22 @@ var Exiting = {
     verb: "exit",
     rulebooks: {
         check: {
-            rules: [function (attempt) { return (!door.isLocked ? "success" : weCouldTry(attempt.actor, Unlocking, door, undefined, attempt)); }]
-        }
-    }
+            rules: [function (attempt) { return (!door.isLocked ? "success" : weCouldTry(attempt.actor, Unlocking, door, undefined, attempt)); }],
+        },
+    },
 };
 var Waiting = { verb: "wait" };
 var Taking = {
     verb: "take",
     rulebooks: {
-        moveDesireables: function (attempt) { return [["owned", attempt.noun, "=", true]]; }
-    }
+        moveDesireables: function (attempt) { return [["owned", attempt.noun, "=", true]]; },
+    },
 };
 var Dropping = {
     verb: "drop",
     rulebooks: {
-        moveDesireables: function (attempt) { return [["owned", attempt.noun, "=", false]]; }
-    }
+        moveDesireables: function (attempt) { return [["owned", attempt.noun, "=", false]]; },
+    },
 };
 var Opening = {
     verb: "open",
@@ -482,16 +489,16 @@ var Opening = {
             rules: [
                 // attempt => (attempt.noun ? "successful" : weCouldTry(attempt.actor, Unlocking, attempt.noun, undefined, attempt)),
                 function (attempt) { var _a; return (((_a = attempt.noun) === null || _a === void 0 ? void 0 : _a.isLocked) ? weCouldTry(attempt.actor, Unlocking, attempt.noun, undefined, attempt) : "success"); },
-            ]
+            ],
         },
-        moveDesireables: function (attempt) { return [["isOpen", attempt.noun, "=", true]]; }
-    }
+        moveDesireables: function (attempt) { return [["isOpen", attempt.noun, "=", true]]; },
+    },
 };
 var Closing = {
     verb: "close",
     rulebooks: {
-        moveDesireables: function (attempt) { return [["isOpen", attempt.noun, "=", false]]; }
-    }
+        moveDesireables: function (attempt) { return [["isOpen", attempt.noun, "=", false]]; },
+    },
 };
 var Unlocking = {
     verb: "unlock _ with",
@@ -499,10 +506,10 @@ var Unlocking = {
         check: {
             rules: [
             // attempt => (attempt.secondNoun?.isKey ? "success" : weCouldTry(attempt.actor, Taking, attempt.secondNoun, undefined, attempt)),
-            ]
+            ],
         },
-        moveDesireables: function (attempt) { return [["isLocked", attempt.noun, "=", false]]; }
-    }
+        moveDesireables: function (attempt) { return [["isLocked", attempt.noun, "=", false]]; },
+    },
 };
 var Locking = {
     verb: "lock _ with",
@@ -514,26 +521,28 @@ var Locking = {
                 // need to own key
                 function (attempt) {
                     var _a;
-                    return ((_a = attempt.secondNoun) === null || _a === void 0 ? void 0 : _a.owner) == attempt.actor
-                        ? "success"
-                        : weCouldTry(attempt.actor, Taking, attempt.secondNoun, undefined, attempt);
+                    return !attempt.secondNoun
+                        ? "failed"
+                        : ((_a = attempt.secondNoun) === null || _a === void 0 ? void 0 : _a.owner) == attempt.actor
+                            ? "success"
+                            : weCouldTry(attempt.actor, Taking, attempt.secondNoun, undefined, attempt);
                 },
-            ]
+            ],
         },
-        moveDesireables: function (attempt) { return [["isLocked", attempt.noun, "=", true]]; }
-    }
+        moveDesireables: function (attempt) { return [["isLocked", attempt.noun, "=", true]]; },
+    },
 };
 var AskingFor = { verb: "asking _ for" };
 /////////////////
 var Rose = {
     name: "Rose",
     beliefs: [],
-    goals: [createMyGoal(Exiting)]
+    goals: [createMyGoal(Exiting)],
 };
 var Zafra = {
     name: "Zafra",
     beliefs: [createMyBelief("isLocked", door, "=", true)],
-    goals: []
+    goals: [],
 };
 ////////////
 main([Rose, Zafra], [Waiting, Exiting, Taking, Dropping, Locking, Unlocking, Opening, Closing, AskingFor]);

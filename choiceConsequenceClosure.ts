@@ -92,7 +92,7 @@ function getNextScene(): Scene | undefined {
   if (midScenes.length) return midScenes[0].consequence!.scene;
   const endScenes = story.sceneStack.filter(s => !s.closure.scene.isFinished);
   if (endScenes.length) return endScenes.reverse()[0].closure.scene;
-  console.log("END STORY", story.sceneStack);
+  console_log("END STORY", story.sceneStack);
   return undefined;
 }
 
@@ -113,7 +113,7 @@ function playStory(firstScene: Scene | undefined, characters: Character[], actio
   let turn = 0;
   for (let currentScene = firstScene; currentScene; currentScene = getNextScene()) {
     produceParagraphs(characters);
-    console.log("TURN", ++turn);
+    console_log("TURN", ++turn);
 
     // characters act // creates scene types of Action
     const news = playScene(currentScene);
@@ -128,8 +128,8 @@ function playStory(firstScene: Scene | undefined, characters: Character[], actio
 function playScene(scene: Scene): News[] {
   const character = scene.actor;
   const sceneAction = scene.pulse; // whatTheyAreTryingToDoNow(character);
-  console.log("BEGIN", scene.pulse.verb, "SCENE:", character.name, stringifyAttempt(sceneAction));
-  if (!sceneAction) console.error("no action -- run AI to pick a scene-action that does/un-does the news? adjusts for it?");
+  console_log("BEGIN", scene.pulse.verb, "SCENE:", character.name, stringifyAttempt(sceneAction));
+  if (!sceneAction) console_error("no action -- run AI to pick a scene-action that does/un-does the news? adjusts for it?");
   if (sceneAction) scene.result = doThingAsAScene(sceneAction, character);
   scene.isFinished = true;
   return story.currentTurnsNews;
@@ -139,7 +139,7 @@ const ReflectUpon: AbstractActionDefinition<Attempt> = {
   verb: "reflecting upon _",
   rulebooks: {
     news: {
-      rules: [attempt => console.log(attempt.actor, "reflected."), createNewsItem],
+      rules: [attempt => console_log(attempt.actor, "reflected."), createNewsItem],
     },
   },
 };
@@ -154,7 +154,7 @@ const GettingBadNews: AbstractActionDefinition<News, ShouldBe> = {
           const belief = attempt.secondNoun;
           if (!news) throw "missing News for GettingBadNews";
           if (!belief) throw "missing Belief for GettingBadNews";
-          console.log('"', printAttempt(news), ' is bad news."');
+          console_log('"', printAttempt(news), ' is bad news."');
 
           function findActions(badNews: Attempt<any, any>, shouldBe: ShouldBe): ActionDefinition<any, any>[] {
             const retval: ActionDefinition<any, any>[] = [];
@@ -182,7 +182,7 @@ function runNewsCycle(newss: News[], sceneJustFinished: Scene) {
     for (const character of story.characters)
       for (const belief of character.beliefs)
         if (isButtonPushed(news, belief)) {
-          console.log("((But", character.name, " didn't like ", stringifyAttempt(news), ".))");
+          console_log("((But", character.name, " didn't like ", stringifyAttempt(news), ".))");
           const sceneAction = createAttempt<News, ShouldBe>(character, GettingBadNews, news, belief, undefined);
           const reactionScene = createScene(character, sceneAction);
           //scheduleScene(reactionScene);

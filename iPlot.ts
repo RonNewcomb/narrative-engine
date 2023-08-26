@@ -18,7 +18,7 @@ interface News extends Attempt {
 function createNewsItem(attempt: Attempt): News {
   const newsItem = { ...attempt, level: attempt.status == "untried" ? "suggested" : attempt.status };
   story.currentTurnsNews.push(newsItem);
-  //console.log("NEWS", newsItem);
+  //console_log("NEWS", newsItem);
   return newsItem;
 }
 

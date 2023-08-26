@@ -4,6 +4,6 @@ interface Information {}
 
 function produceParagraphs(information: Information): string {
   const paragraph = stringify(information);
-  console.log(paragraph);
+  console_log(paragraph);
   return paragraph;
 }

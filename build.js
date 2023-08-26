@@ -35,7 +35,7 @@ function getNextScene() {
     var endScenes = story.sceneStack.filter(function (s) { return !s.closure.scene.isFinished; });
     if (endScenes.length)
         return endScenes.reverse()[0].closure.scene;
-    console.log("END STORY", story.sceneStack);
+    console_log("END STORY", story.sceneStack);
     return undefined;
 }
 var story = { characters: [], actionset: [], sceneStack: [], history: [], currentTurnsNews: [] };
@@ -46,7 +46,7 @@ function playStory(firstScene, characters, actionset) {
     var turn = 0;
     for (var currentScene = firstScene; currentScene; currentScene = getNextScene()) {
         produceParagraphs(characters);
-        console.log("TURN", ++turn);
+        console_log("TURN", ++turn);
         // characters act // creates scene types of Action
         var news = playScene(currentScene);
         // react to news // creates scene types of Reaction
@@ -59,9 +59,9 @@ function playStory(firstScene, characters, actionset) {
 function playScene(scene) {
     var character = scene.actor;
     var sceneAction = scene.pulse; // whatTheyAreTryingToDoNow(character);
-    console.log("BEGIN", scene.pulse.verb, "SCENE:", character.name, stringifyAttempt(sceneAction));
+    console_log("BEGIN", scene.pulse.verb, "SCENE:", character.name, stringifyAttempt(sceneAction));
     if (!sceneAction)
-        console.error("no action -- run AI to pick a scene-action that does/un-does the news? adjusts for it?");
+        console_error("no action -- run AI to pick a scene-action that does/un-does the news? adjusts for it?");
     if (sceneAction)
         scene.result = doThingAsAScene(sceneAction, character);
     scene.isFinished = true;
@@ -71,7 +71,7 @@ var ReflectUpon = {
     verb: "reflecting upon _",
     rulebooks: {
         news: {
-            rules: [function (attempt) { return console.log(attempt.actor, "reflected."); }, createNewsItem],
+            rules: [function (attempt) { return console_log(attempt.actor, "reflected."); }, createNewsItem],
         },
     },
 };
@@ -87,7 +87,7 @@ var GettingBadNews = {
                         throw "missing News for GettingBadNews";
                     if (!belief)
                         throw "missing Belief for GettingBadNews";
-                    console.log('"', printAttempt(news), ' is bad news."');
+                    console_log('"', printAttempt(news), ' is bad news."');
                     function findActions(badNews, shouldBe) {
                         var _a, _b;
                         var retval = [];
@@ -122,7 +122,7 @@ function runNewsCycle(newss, sceneJustFinished) {
             for (var _d = 0, _e = character.beliefs; _d < _e.length; _d++) {
                 var belief = _e[_d];
                 if (isButtonPushed(news, belief)) {
-                    console.log("((But", character.name, " didn't like ", stringifyAttempt(news), ".))");
+                    console_log("((But", character.name, " didn't like ", stringifyAttempt(news), ".))");
                     var sceneAction = createAttempt(character, GettingBadNews, news, belief, undefined);
                     var reactionScene = createScene(character, sceneAction);
                     //scheduleScene(reactionScene);
@@ -138,7 +138,7 @@ function runNewsCycle(newss, sceneJustFinished) {
 /////////// Planner AI
 /** attaches a suggestion to the tree */
 function weCouldTry(actor, definition, noun, secondNoun, failingAction) {
-    console.log(actor.name, "could try", definition.verb, "before", failingAction && stringifyAttempt(failingAction));
+    console_log(actor.name, "could try", definition.verb, "before", failingAction && stringifyAttempt(failingAction));
     var circumvention = createAttempt(actor, definition, noun, secondNoun, failingAction);
     if (failingAction)
         failingAction.fullfilledBy.push(circumvention);
@@ -204,13 +204,13 @@ var confusedAboutTiming;
 var howTheyCan = function (actor, act) {
     //[	return list of not in past attempts which fulfill act.]
     var options = act.fullfilledBy.filter(function (a) { return !inThePast(a); });
-    console.log("  Q: How can", actor.name, stringifyAttempt(act));
-    console.log("  A:", options.map(stringifyAttempt));
+    console_log("  Q: How can", actor.name, stringifyAttempt(act));
+    console_log("  A:", options.map(stringifyAttempt));
     return options;
     // let choices = [] as Attempt[];
     // const list = attempts().filter(at => !inThePast(at) && at.fulfills == act); // not in past attempts which fulfill act
     // for (const item of list) choices.push(item);
-    // console.log("  choices are", choices.map(stringifyAttempt));
+    // console_log("  choices are", choices.map(stringifyAttempt));
     // return choices;
 };
 // const howTheyCould = (actor: Character, act: Attempt): Attempt[] => {
@@ -242,8 +242,8 @@ var whatTheyAreTryingToDoNowRegarding = function (actor, act) {
     thisAct = previous.fullfilledBy.find(function (at) { return at.status == "successful"; })
         ? previous
         : previous.fullfilledBy.find(function (at) { return at.status == "untried"; });
-    console.log("  Q: What is", actor.name, "trying to do now?");
-    console.log("  A: " + (thisAct ? stringifyAttempt(thisAct) : "nothing"));
+    console_log("  Q: What is", actor.name, "trying to do now?");
+    console_log("  A: " + (thisAct ? stringifyAttempt(thisAct) : "nothing"));
     return thisAct; // [the most finely detailed, and hindered,]
 };
 var whatTheyAreTryingToDoNow = function (actor) {
@@ -256,8 +256,8 @@ var whatTheyWillDoNext = function (actor) {
     var current = whatTheyAreTryingToDoNow(actor);
     var untried = !current ? undefined : howTheyCan(actor, current).find(function (item) { return item.status == "untried"; });
     //actor.goals.action = Waiting;
-    console.log("  Q: What will", actor.name, "do next?");
-    console.log("  A: ", untried ? stringifyAttempt(untried) : "No options.");
+    console_log("  Q: What will", actor.name, "do next?");
+    console_log("  A: ", untried ? stringifyAttempt(untried) : "No options.");
     return untried; //actor.goals; // of actor. ["I don't know"]
 };
 // const whichActionFromTheAgendaOf = (act: Action, performer: Character): Attempt | undefined => {
@@ -297,7 +297,7 @@ function stringifyAttempt(attempt) {
     return stringifyAction(attempt) + " (" + attempt.status + ")";
 }
 function printAttempt(attempt) {
-    console.log("  '" + stringifyAttempt(attempt) + '"');
+    console_log("  '" + stringifyAttempt(attempt) + '"');
 }
 //////////// action machinery
 function executeRulebook(attempt) {
@@ -334,11 +334,11 @@ function doThingAsAScene(thisAttempt, viewpointCharacter) {
     doThing(thisAttempt, viewpointCharacter);
     while (thisAttempt.status == "partly successful") {
         var subAttempt = whatTheyAreTryingToDoNowRegarding(thisAttempt.actor, thisAttempt);
-        console.log("same scene, now", stringifyAttempt(subAttempt));
+        console_log("same scene, now", stringifyAttempt(subAttempt));
         if (subAttempt)
             doThing(subAttempt, viewpointCharacter);
         else {
-            console.log("Stuck:", stringifyAttempt(thisAttempt));
+            console_log("Stuck:", stringifyAttempt(thisAttempt));
             break;
         }
     }
@@ -348,11 +348,11 @@ function doThingAsAScene(thisAttempt, viewpointCharacter) {
 function doThing(thisAttempt, viewpointCharacter) {
     // DO the currentAction and get status
     var outcome = executeRulebook(thisAttempt);
-    console.log(thisAttempt.verb, "is done:", outcome);
+    console_log(thisAttempt.verb, "is done:", outcome);
     thisAttempt.status = outcome != "failed" ? "successful" : thisAttempt.fullfilledBy.length > 0 ? "partly successful" : "failed";
     // update trees to record result
     if (thisAttempt.status == "partly successful")
-        console.log("circumventions outcome:", outcome, ".  Could be fulfilled by:", thisAttempt.fullfilledBy.map(stringifyAttempt));
+        console_log("circumventions outcome:", outcome, ".  Could be fulfilled by:", thisAttempt.fullfilledBy.map(stringifyAttempt));
     return thisAttempt.status;
 }
 function createAttempt(actor, definition, noun, secondNoun, parentAction) {
@@ -419,7 +419,7 @@ function main(characters, actionset) {
         .map(function (todo) { return createScene(todo.character, todo.action); });
     if (!initialScenes.length)
         throw "cannot find first character and action. No one has a Goal.";
-    console.log(initialScenes.length, "initial scenes");
+    console_log(initialScenes.length, "initial scenes");
     var initialScene = initialScenes[0];
     // GO
     playStory(initialScene, characters, actionset);
@@ -441,7 +441,7 @@ var __assign = (this && this.__assign) || function () {
 function createNewsItem(attempt) {
     var newsItem = __assign(__assign({}, attempt), { level: attempt.status == "untried" ? "suggested" : attempt.status });
     story.currentTurnsNews.push(newsItem);
-    //console.log("NEWS", newsItem);
+    //console_log("NEWS", newsItem);
     return newsItem;
 }
 function isButtonPushed(news, belief) {
@@ -464,7 +464,7 @@ function isButtonPushed(news, belief) {
 /// <reference path="./narrativeEngine.ts"/>
 function produceParagraphs(information) {
     var paragraph = stringify(information);
-    console.log(paragraph);
+    console_log(paragraph);
     return paragraph;
 }
 /// <reference path="./iPlot.ts" />
@@ -565,4 +565,11 @@ var Zafra = {
     goals: [],
 };
 ////////////
+// const appendToDoc: (...data: any[]) => void = data => {
+//   const div = document.getElementById("current")!;
+//   const msg = Array.from(data).join("") + "\n";
+//   div.innerText = msg;
+// };
+var console_log = console.log;
+var console_error = console.error;
 main([Rose, Zafra], [Waiting, Exiting, Taking, Dropping, Locking, Unlocking, Opening, Closing, AskingFor]);

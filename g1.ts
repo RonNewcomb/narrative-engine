@@ -112,4 +112,13 @@ const Zafra: Character = {
 
 ////////////
 
+// const appendToDoc: (...data: any[]) => void = data => {
+//   const div = document.getElementById("current")!;
+//   const msg = Array.from(data).join("") + "\n";
+//   div.innerText = msg;
+// };
+
+const console_log: (...data: any[]) => void = console.log;
+const console_error: (...data: any[]) => void = console.error;
+
 main([Rose, Zafra], [Waiting, Exiting, Taking, Dropping, Locking, Unlocking, Opening, Closing, AskingFor]);

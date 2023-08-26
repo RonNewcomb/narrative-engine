@@ -97,7 +97,7 @@ function stringifyAttempt(attempt: Attempt | undefined): string {
 }
 
 function printAttempt(attempt: Attempt) {
-  console.log("  '" + stringifyAttempt(attempt) + '"');
+  console_log("  '" + stringifyAttempt(attempt) + '"');
 }
 
 //////////// action machinery
@@ -131,10 +131,10 @@ function doThingAsAScene(thisAttempt: Attempt, viewpointCharacter: Character): R
 
   while (thisAttempt.status == "partly successful") {
     let subAttempt = whatTheyAreTryingToDoNowRegarding(thisAttempt.actor, thisAttempt);
-    console.log("same scene, now", stringifyAttempt(subAttempt));
+    console_log("same scene, now", stringifyAttempt(subAttempt));
     if (subAttempt) doThing(subAttempt, viewpointCharacter);
     else {
-      console.log("Stuck:", stringifyAttempt(thisAttempt));
+      console_log("Stuck:", stringifyAttempt(thisAttempt));
       break;
     }
   }
@@ -146,13 +146,13 @@ function doThingAsAScene(thisAttempt: Attempt, viewpointCharacter: Character): R
 function doThing(thisAttempt: Attempt, viewpointCharacter: Character): Attempt["status"] {
   // DO the currentAction and get status
   const outcome = executeRulebook(thisAttempt);
-  console.log(thisAttempt.verb, "is done:", outcome);
+  console_log(thisAttempt.verb, "is done:", outcome);
 
   thisAttempt.status = outcome != "failed" ? "successful" : thisAttempt.fullfilledBy.length > 0 ? "partly successful" : "failed";
 
   // update trees to record result
   if (thisAttempt.status == "partly successful")
-    console.log("circumventions outcome:", outcome, ".  Could be fulfilled by:", thisAttempt.fullfilledBy.map(stringifyAttempt));
+    console_log("circumventions outcome:", outcome, ".  Could be fulfilled by:", thisAttempt.fullfilledBy.map(stringifyAttempt));
 
   return thisAttempt.status;
 }
@@ -242,7 +242,7 @@ function main(characters: Character[], actionset: ActionDefinition<any, any>[]) 
     .map(todo => createScene(todo.character, todo.action!));
 
   if (!initialScenes.length) throw "cannot find first character and action. No one has a Goal.";
-  console.log(initialScenes.length, "initial scenes");
+  console_log(initialScenes.length, "initial scenes");
   const initialScene: Scene = initialScenes[0];
 
   // GO

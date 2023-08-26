@@ -8,7 +8,7 @@ function weCouldTry<N extends Resource, SN extends Resource>(
   secondNoun: SN | undefined,
   failingAction: Attempt<any, any> | undefined
 ): "failed" {
-  console.log(actor.name, "could try", definition.verb, "before", failingAction && stringifyAttempt(failingAction));
+  console_log(actor.name, "could try", definition.verb, "before", failingAction && stringifyAttempt(failingAction));
   const circumvention = createAttempt(actor, definition, noun, secondNoun, failingAction);
   if (failingAction) failingAction.fullfilledBy.push(circumvention);
   else actor.goals.push(circumvention);
@@ -78,13 +78,13 @@ let confusedAboutTiming: boolean;
 const howTheyCan = (actor: Character, act: Attempt): Attempt[] => {
   //[	return list of not in past attempts which fulfill act.]
   const options = act.fullfilledBy.filter(a => !inThePast(a));
-  console.log("  Q: How can", actor.name, stringifyAttempt(act));
-  console.log("  A:", options.map(stringifyAttempt));
+  console_log("  Q: How can", actor.name, stringifyAttempt(act));
+  console_log("  A:", options.map(stringifyAttempt));
   return options;
   // let choices = [] as Attempt[];
   // const list = attempts().filter(at => !inThePast(at) && at.fulfills == act); // not in past attempts which fulfill act
   // for (const item of list) choices.push(item);
-  // console.log("  choices are", choices.map(stringifyAttempt));
+  // console_log("  choices are", choices.map(stringifyAttempt));
   // return choices;
 };
 
@@ -118,8 +118,8 @@ const whatTheyAreTryingToDoNowRegarding = (actor: Character, act: Attempt<any, a
   thisAct = previous.fullfilledBy.find(at => at.status == "successful")
     ? previous
     : previous.fullfilledBy.find(at => at.status == "untried");
-  console.log("  Q: What is", actor.name, "trying to do now?");
-  console.log("  A: " + (thisAct ? stringifyAttempt(thisAct) : "nothing"));
+  console_log("  Q: What is", actor.name, "trying to do now?");
+  console_log("  A: " + (thisAct ? stringifyAttempt(thisAct) : "nothing"));
   return thisAct; // [the most finely detailed, and hindered,]
 };
 
@@ -133,8 +133,8 @@ const whatTheyWillDoNext = (actor: Character): Attempt | undefined => {
   const current = whatTheyAreTryingToDoNow(actor);
   const untried = !current ? undefined : howTheyCan(actor, current).find(item => item.status == "untried");
   //actor.goals.action = Waiting;
-  console.log("  Q: What will", actor.name, "do next?");
-  console.log("  A: ", untried ? stringifyAttempt(untried) : "No options.");
+  console_log("  Q: What will", actor.name, "do next?");
+  console_log("  A: ", untried ? stringifyAttempt(untried) : "No options.");
   return untried; //actor.goals; // of actor. ["I don't know"]
 };
 

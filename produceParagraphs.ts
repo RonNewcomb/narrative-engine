@@ -1,8 +1,8 @@
-/// <reference path="./narrativeEngine.ts"/>
+import { console_log, stringify } from "./debug";
 
-interface Information {}
+export interface Information {}
 
-function produceParagraphs(information: Information): string {
+export function produceParagraphs(information: Information): string {
   const paragraph = stringify(information);
   console_log(paragraph);
   return paragraph;

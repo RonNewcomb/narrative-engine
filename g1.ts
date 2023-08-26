@@ -1,8 +1,8 @@
-/// <reference path="./iPlot.ts" />
-/// <reference path="./produceParagraphs.ts" />
-/// <reference path="./narrativeEngine.ts" />
-
-///////////////
+import type { ActionDefinition } from "./actions";
+import type { Character } from "./character";
+import type { Desireable } from "./iPlot";
+import { createMyBelief, createMyGoal, main } from "./narrativeEngine";
+import { weCouldTry } from "./planningTree";
 
 const doorkey: Desireable = { name: "door key", isKey: true };
 const door: Desireable = { name: "door", isLocked: true };
@@ -117,8 +117,5 @@ const Zafra: Character = {
 //   const msg = Array.from(data).join("") + "\n";
 //   div.innerText = msg;
 // };
-
-const console_log: (...data: any[]) => void = console.log;
-const console_error: (...data: any[]) => void = console.error;
 
 main([Rose, Zafra], [Waiting, Exiting, Taking, Dropping, Locking, Unlocking, Opening, Closing, AskingFor]);

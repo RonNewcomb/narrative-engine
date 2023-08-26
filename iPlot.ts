@@ -1,28 +1,16 @@
-/// <reference path="./narrativeEngine.ts"/>
+import type { ShouldBe } from "./beliefs";
+import type { Character } from "./character";
+import type { News } from "./news";
 
-interface Resource {}
+export interface Resource {}
 
-interface Desireable extends Record<string, any>, Resource {
+export interface Desireable extends Record<string, any>, Resource {
   name: string;
   number?: number;
   owner?: Character;
 }
 
-type NewsSensitivity = "suggested" | Omit<Attempt["status"], "untried">;
-
-interface News extends Attempt {
-  level: NewsSensitivity;
-  onlyKnownBy?: Character[];
-}
-
-function createNewsItem(attempt: Attempt): News {
-  const newsItem = { ...attempt, level: attempt.status == "untried" ? "suggested" : attempt.status };
-  story.currentTurnsNews.push(newsItem);
-  //console_log("NEWS", newsItem);
-  return newsItem;
-}
-
-function isButtonPushed(news: News, belief: ShouldBe): boolean {
+export function isButtonPushed(news: News, belief: ShouldBe): boolean {
   const changeStatements = news.definition.rulebooks?.moveDesireables?.(news) || [];
   if (!changeStatements || !changeStatements.length) return false;
   for (const statement of changeStatements) {

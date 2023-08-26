@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "lib": ["es2020", "dom"],
+    "module": "es2020",
+    //"outFile": "build.js",  // use rollup
+    "outDir": "build",
+    "strict": true,
+    "allowJs": false
+  },
+  "include": ["*.ts"]
+}

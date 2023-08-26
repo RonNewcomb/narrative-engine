@@ -1,7 +1,10 @@
-/////////// Planner AI
+import { createAttempt, type AbstractActionDefinition, type Attempt } from "./actions";
+import type { Character } from "./character";
+import { console_log, stringifyAttempt } from "./debug";
+import type { Resource } from "./iPlot";
 
 /** attaches a suggestion to the tree */
-function weCouldTry<N extends Resource, SN extends Resource>(
+export function weCouldTry<N extends Resource, SN extends Resource>(
   actor: Character,
   definition: AbstractActionDefinition<N, SN>,
   noun: N | undefined,
@@ -25,7 +28,7 @@ const hindered = (it: Attempt) =>
 const moot = (it: Attempt) => it.status == "untried" && it.fulfills && ["successful", "partly successful"].includes(it.fulfills.status);
 //attempts().some(at => ["successful", "partly successful"].includes(at.fulfills?.status || ""));
 //  it fulfills an [already] successful attempt || it fulfills a partly successful attempt));
-const inTheFuture = (it: Attempt) => it.status == "untried" && (!it.fulfills || inTheFuture(it.fulfills)); // attempts().every(at => at.fulfills?.status == "successful"); // it does not fulfill an [already] successful attempt;
+const inTheFuture = (it: Attempt): boolean => it.status == "untried" && (!it.fulfills || inTheFuture(it.fulfills)); // attempts().every(at => at.fulfills?.status == "successful"); // it does not fulfill an [already] successful attempt;
 const inThePresent = (it: Attempt) => hindered(it);
 const inThePast = (it: Attempt) =>
   it.status == "successful" ||
@@ -75,7 +78,7 @@ let confusedAboutTiming: boolean;
 //   return actor.goals;
 // };
 
-const howTheyCan = (actor: Character, act: Attempt): Attempt[] => {
+export const howTheyCan = (actor: Character, act: Attempt): Attempt[] => {
   //[	return list of not in past attempts which fulfill act.]
   const options = act.fullfilledBy.filter(a => !inThePast(a));
   console_log("  Q: How can", actor.name, stringifyAttempt(act));
@@ -104,7 +107,7 @@ const howTheyCan = (actor: Character, act: Attempt): Attempt[] => {
 //   return choices;
 // };
 
-const whatTheyAreTryingToDoNowRegarding = (actor: Character, act: Attempt<any, any>): Attempt | undefined => {
+export const whatTheyAreTryingToDoNowRegarding = (actor: Character, act: Attempt<any, any>): Attempt | undefined => {
   let thisAct: Attempt<any, any> | undefined = act;
   if (thisAct.status == "untried") return thisAct;
   // let details:Attempt|undefined = thisAct;// thisAct.fullfilledBy.find(at => inThePresent(at));
@@ -123,13 +126,13 @@ const whatTheyAreTryingToDoNowRegarding = (actor: Character, act: Attempt<any, a
   return thisAct; // [the most finely detailed, and hindered,]
 };
 
-const whatTheyAreTryingToDoNow = (actor: Character): Attempt | undefined => {
+export const whatTheyAreTryingToDoNow = (actor: Character): Attempt | undefined => {
   let thisAct = actor.goals.find(g => g.status == "partly successful") || actor.goals.find(g => g.status == "untried");
   if (!thisAct) return undefined;
   return whatTheyAreTryingToDoNowRegarding(actor, thisAct);
 };
 
-const whatTheyWillDoNext = (actor: Character): Attempt | undefined => {
+export const whatTheyWillDoNext = (actor: Character): Attempt | undefined => {
   const current = whatTheyAreTryingToDoNow(actor);
   const untried = !current ? undefined : howTheyCan(actor, current).find(item => item.status == "untried");
   //actor.goals.action = Waiting;

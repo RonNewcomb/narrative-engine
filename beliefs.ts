@@ -16,3 +16,18 @@ export type ShouldBeStatement = [
   shouldBe: ShouldBe["shouldBe"],
   toValue: ShouldBe["toValue"]
 ];
+
+export function moveDesireable(
+  property: ShouldBe["property"],
+  ofDesireable: ShouldBe["ofDesireable"],
+  shouldBe: ShouldBe["shouldBe"],
+  toValue: ShouldBe["toValue"]
+) {
+  switch (shouldBe) {
+    case "=":
+      ofDesireable[property] = toValue;
+      return;
+    default:
+      throw "Unknown operation on desireable resource " + shouldBe;
+  }
+}

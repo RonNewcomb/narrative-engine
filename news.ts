@@ -1,10 +1,10 @@
-import { Attempt, createAttempt } from "./actions";
-import { ShouldBe } from "./beliefs";
-import { Character } from "./character";
+import { createAttempt, type Attempt } from "./actions";
+import { type ShouldBe } from "./beliefs";
+import { type Character } from "./character";
 import { createSceneSet } from "./choiceConsequenceClosure";
 import { console_log, stringifyAttempt } from "./debug";
 import { isButtonPushed } from "./iPlot";
-import { GettingBadNews, Scene, createScene } from "./scene";
+import { GettingBadNews, createScene, type Scene } from "./scene";
 import { story } from "./story";
 
 export type NewsSensitivity = "suggested" | Omit<Attempt["status"], "untried">;

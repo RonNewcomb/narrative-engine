@@ -1,8 +1,7 @@
-import type { ShouldBeStatement } from "./beliefs";
+import { ShouldBeStatement, moveDesireable } from "./beliefs";
 import type { Character } from "./character";
 import { console_log, stringifyAttempt } from "./debug";
 import { type Desireable, type Resource } from "./iPlot";
-import { moveDesireable } from "./narrativeEngine";
 import { createNewsItem } from "./news";
 import { whatTheyAreTryingToDoNowRegarding } from "./planningTree";
 

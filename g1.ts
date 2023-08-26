@@ -1,8 +1,4 @@
-import type { ActionDefinition } from "./actions";
-import type { Character } from "./character";
-import type { Desireable } from "./iPlot";
-import { createMyBelief, createMyGoal, main } from "./narrativeEngine";
-import { weCouldTry } from "./planningTree";
+import { ActionDefinition, Character, Desireable, createMyBelief, createMyGoal, main, weCouldTry } from "./narrativeEngine";
 
 const doorkey: Desireable = { name: "door key", isKey: true };
 const door: Desireable = { name: "door", isLocked: true };

@@ -2,10 +2,13 @@ import { AbstractActionDefinition, ActionDefinition, Attempt, Noun } from "./act
 import { ShouldBe } from "./beliefs";
 import { Character, author } from "./character";
 import { console_log } from "./debug";
-import { whatTheyAreTryingToDoNow } from "./planningTree";
+import type { Desireable } from "./iPlot";
+import { weCouldTry, whatTheyAreTryingToDoNow } from "./planningTree";
 import { produceParagraphs } from "./produceParagraphs";
 import { Scene, createScene } from "./scene";
 import { playStory } from "./story";
+
+export { ActionDefinition, Character, Desireable, weCouldTry };
 
 export function createMyGoal<N extends Noun, SN extends Noun>(
   definition: AbstractActionDefinition<N, SN>,
@@ -35,21 +38,6 @@ export function createMyBelief(
 ): ShouldBe {
   const belief: ShouldBe = { property, ofDesireable, shouldBe, toValue, sensitivity };
   return belief;
-}
-
-export function moveDesireable(
-  property: ShouldBe["property"],
-  ofDesireable: ShouldBe["ofDesireable"],
-  shouldBe: ShouldBe["shouldBe"],
-  toValue: ShouldBe["toValue"]
-) {
-  switch (shouldBe) {
-    case "=":
-      ofDesireable[property] = toValue;
-      return;
-    default:
-      throw "Unknown operation on desireable resource " + shouldBe;
-  }
 }
 
 ///////////

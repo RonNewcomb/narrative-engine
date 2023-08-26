@@ -20,10 +20,10 @@ export function stringify(obj: any): string {
 
 export function stringifyAction(act: Attempt | undefined): string {
   if (!act) return "[no act]";
-  const nounName = act.noun?.name || act.noun;
-  const noun2Name = act.secondNoun?.name || act.secondNoun;
-  const rearrange = act.verb.includes("_");
-  const predicate = rearrange ? act.verb.replace("_", nounName || "") : act.verb;
+  const nounName: string = !act.noun ? "" : typeof act.noun === "string" ? act.noun : stringify(act.noun);
+  const noun2Name: string = !act.secondNoun ? "" : typeof act.secondNoun === "string" ? act.secondNoun : stringify(act.secondNoun);
+  const rearrange: boolean = act.verb.includes("_");
+  const predicate: string = rearrange ? act.verb.replace("_", nounName || "") : act.verb;
   return (act.actor?.name || "") + " " + predicate + " " + (noun2Name || "") + (rearrange ? "" : " " + (nounName || ""));
 }
 

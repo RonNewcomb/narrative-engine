@@ -1,4 +1,4 @@
-import { GettingBadNews } from "./actions";
+import { ReceivingImportantNews } from "./actions";
 import { createAttempt, type Attempt } from "./attempts";
 import { type ShouldBe } from "./beliefs";
 import { type Character } from "./character";
@@ -22,20 +22,21 @@ export function createNewsItem(attempt: Attempt): News {
 }
 
 export function reactionsToNews(news: News, scene: Scene): ConsequenceWithForeshadowedNewsProvingAgency[] {
-  const consequences: ConsequenceWithForeshadowedNewsProvingAgency[] = [];
+  const ccc = story.sceneStack.find(ccc => ccc.choice.scene == scene) || createSceneSet({ scene, choice: "ally" });
+  const newConsequences: ConsequenceWithForeshadowedNewsProvingAgency[] = [];
   for (const character of story.characters)
     if (character != news.actor)
       if (!news.onlyKnownBy || news.onlyKnownBy.includes(character))
         for (const belief of character.beliefs)
           if (isButtonPushed(news, belief)) {
             const foreshadowThis: ForeShadowing = { character, belief, news };
-            const sceneAction = createAttempt<News, ShouldBe>(character, GettingBadNews, news, belief, undefined);
+            const sceneAction = createAttempt<News, ShouldBe>(character, ReceivingImportantNews, news, belief, undefined);
             const reactionScene = createScene(character, sceneAction);
             const consequence: ConsequenceWithForeshadowedNewsProvingAgency = { scene: reactionScene, foreshadow: foreshadowThis };
-            consequences.push(consequence);
+            newConsequences.push(consequence);
           }
-  createSceneSet({ scene, /*foreshadow: foreshadowThis,*/ choice: "ally" }, consequences);
-  return consequences;
+  ccc.consequences.push(...newConsequences);
+  return newConsequences;
 }
 
 export function resetNewsCycle(): void {

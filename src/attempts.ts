@@ -1,9 +1,9 @@
 import { StuckForSolutions, type AbstractActionDefinition, type Verb } from "./actions";
 import type { Character } from "./character";
-import { console_log, stringifyAttempt } from "./debug";
 import type { Resource } from "./iPlot";
 import { createNewsItem, reactionsToNews, resetNewsCycle } from "./news";
 import { weCouldTry, whatTheyAreTryingToDoNowRegarding } from "./planningTree";
+import { console_log, stringifyAction, stringifyAttempt } from "./produceParagraphs";
 import { executeRulebook, type RuleOutcome } from "./rulebooks";
 import { Scene } from "./scene";
 
@@ -61,9 +61,9 @@ export function doThingAsAScene(thisAttempt: Attempt, currentScene: Scene): Rule
 function doThing(thisAttempt: Attempt, currentScene: Scene): Attempt["status"] {
   // DO the currentAction and get status
   const outcome = executeRulebook(thisAttempt);
-  console_log(thisAttempt.verb, "is done:", outcome);
-
   thisAttempt.status = outcome != "failed" ? "successful" : thisAttempt.fullfilledBy.length > 0 ? "partly successful" : "failed";
+
+  console_log("DONE:", stringifyAttempt(thisAttempt));
 
   if (thisAttempt.status == "partly successful")
     console_log((outcome || "seems to succeed") + ".  Could be fulfilled by:", thisAttempt.fullfilledBy.map(stringifyAttempt));
@@ -75,7 +75,7 @@ function doThing(thisAttempt: Attempt, currentScene: Scene): Attempt["status"] {
 
   for (const consequence of consequences) {
     const foreshadow = consequence.foreshadow!;
-    console_log("((But", foreshadow.character.name, " didn't like ", stringifyAttempt(foreshadow.news), ".))");
+    console_log("((But", foreshadow.character.name, " didn't like ", stringifyAction(foreshadow.news), ".))");
   }
 
   return thisAttempt.status;

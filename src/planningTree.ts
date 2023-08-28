@@ -1,8 +1,8 @@
 import type { AbstractActionDefinition } from "./actions";
 import { createAttempt, type Attempt } from "./attempts";
 import type { Character } from "./character";
-import { console_log, stringifyAttempt } from "./debug";
 import type { Resource } from "./iPlot";
+import { console_log, stringifyAction, stringifyAttempt } from "./produceParagraphs";
 
 /** attaches a suggestion to the tree */
 export function weCouldTry<N extends Resource, SN extends Resource>(
@@ -10,37 +10,29 @@ export function weCouldTry<N extends Resource, SN extends Resource>(
   definition: AbstractActionDefinition<N, SN>,
   noun: N | undefined,
   secondNoun: SN | undefined,
+  /** parent action */
   failingAction: Attempt<any, any> | undefined
 ): "failed" {
-  console_log(actor.name, "could try", definition.verb, "before", failingAction && stringifyAttempt(failingAction));
   const circumvention = createAttempt(actor, definition, noun, secondNoun, failingAction);
+  console_log(actor.name, "could try", stringifyAction(circumvention), "before", stringifyAttempt(failingAction));
   if (failingAction) failingAction.fullfilledBy.push(circumvention);
   else actor.goals.push(circumvention);
   return "failed";
 }
 
-const hindered = (it: Attempt) =>
+const inTheFuture = (it: Attempt): boolean => it.status == "untried" && (!it.fulfills || inTheFuture(it.fulfills));
+const inThePresent = (it: Attempt) =>
   (it.status == "failed" || it.status == "partly successful") &&
   it.fullfilledBy.filter(at => at.status == "untried").length > 0 &&
   it.fullfilledBy.filter(at => at.status == "successful").length == 0;
-// attempts().some(at => at.fulfills == it && at.status == "untried") &&
-// !attempts().some(at => at.fulfills == it && at.status == "successful");
-// there are untried attempts which fulfill it && there are no successful attempts which fulfill it;
-const moot = (it: Attempt) => it.status == "untried" && it.fulfills && ["successful", "partly successful"].includes(it.fulfills.status);
-//attempts().some(at => ["successful", "partly successful"].includes(at.fulfills?.status || ""));
-//  it fulfills an [already] successful attempt || it fulfills a partly successful attempt));
-const inTheFuture = (it: Attempt): boolean => it.status == "untried" && (!it.fulfills || inTheFuture(it.fulfills)); // attempts().every(at => at.fulfills?.status == "successful"); // it does not fulfill an [already] successful attempt;
-const inThePresent = (it: Attempt) => hindered(it);
 const inThePast = (it: Attempt) =>
   it.status == "successful" ||
   it.status == "partly successful" ||
   (it.status == "failed" && it.fullfilledBy.filter(at => at.status == "untried").length == 0);
-// !attempts().some(at => at.status == "untried" && at.fulfills == it)); //there are no untried attempts which fulfill it);
-const couldveBeen = (it: Attempt) => moot(it);
-//const isTopLevel = (it: Attempt) => !it.fulfills; // someone plans the cause of it  // it fulfills no higher goal
-const busy = (actor: Character) => !quiescent(actor);
-const quiescent = (actor: Character) => actor.goals.filter(at => !inThePast(at)).length > 0;
-//attempts().every(at => at.fulfills == actor.goals && inThePast(at)); // all attempts which [could possibly] fulfill goals of actor are in past;
+const couldveBeen = (it: Attempt) =>
+  it.status == "untried" && it.fulfills && ["successful", "partly successful"].includes(it.fulfills.status);
+const isTopLevel = (it: Attempt) => !it.fulfills; // someone plans the cause of it  // it fulfills no higher goal
+const busy = (actor: Character) => actor.goals.filter(at => !inThePast(at)).length == 0; // all attempts which [could possibly] fulfill goals of actor are in past;
 
 let confusedAboutTiming: boolean;
 

@@ -2,10 +2,9 @@ import type { AbstractActionDefinition, ActionDefinition, Noun } from "./actions
 import type { Attempt } from "./attempts";
 import { createMyBelief, type ShouldBe } from "./beliefs";
 import { author, type Character } from "./character";
-import { console_log } from "./debug";
 import type { Desireable } from "./iPlot";
 import { weCouldTry, whatTheyAreTryingToDoNow } from "./planningTree";
-import { produceParagraphs } from "./produceParagraphs";
+import { console_log, produceParagraphs } from "./produceParagraphs";
 import { createScene, type Scene } from "./scene";
 import { playStory } from "./story";
 

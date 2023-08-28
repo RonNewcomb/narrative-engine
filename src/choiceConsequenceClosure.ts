@@ -28,7 +28,7 @@ export interface ClosureFromInteriorReflection {
 
 export interface ChoiceConsequenceClosure {
   choice: Choi6eWithForeshadowing;
-  consequences?: ConsequenceWithForeshadowedNewsProvingAgency[];
+  consequences: ConsequenceWithForeshadowedNewsProvingAgency[];
   closure: ClosureFromInteriorReflection;
 }
 
@@ -37,12 +37,19 @@ export function createSceneSet(
   consequences?: ConsequenceWithForeshadowedNewsProvingAgency[],
   closure?: ClosureFromInteriorReflection
 ): ChoiceConsequenceClosure {
+  let alreadyKnown = story.sceneStack.find(ccc => ccc.choice.scene == choice.scene);
+  if (alreadyKnown) return alreadyKnown;
+  alreadyKnown = story.sceneStack.find(ccc => ccc.closure.scene == choice.scene);
+  if (alreadyKnown) return alreadyKnown;
+  alreadyKnown = story.sceneStack.find(ccc => ccc.consequences?.find(c => c.scene == choice.scene));
+  if (alreadyKnown) return alreadyKnown;
+  console.log("-- new scene set");
   const actor = choice.scene.actor;
   const news = choice.scene.pulse;
   const reflect = createAttempt(actor, ReflectUpon, news, undefined, news);
   const ccc: ChoiceConsequenceClosure = {
     choice,
-    consequences,
+    consequences: consequences || [],
     closure: closure || {
       scene: createScene(choice.scene.actor, reflect),
     },

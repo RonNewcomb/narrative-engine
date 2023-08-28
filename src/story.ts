@@ -1,9 +1,8 @@
 import type { ActionDefinition } from "./actions";
 import type { Character } from "./character";
 import { createSceneSet, type ChoiceConsequenceClosure } from "./choiceConsequenceClosure";
-import { console_log } from "./debug";
 import { News } from "./news";
-import { produceParagraphs } from "./produceParagraphs";
+import { console_log, produceParagraphs } from "./produceParagraphs";
 import { getNextScene, playScene, type Scene } from "./scene";
 
 export let story: {
@@ -26,6 +25,7 @@ export function playStory(firstScene: Scene | undefined, characters: Character[]
     // characters act // creates scene types of Action
     const outcome = playScene(currentScene);
 
+    console_log("END TURN", turn);
     produceParagraphs(characters);
     if (turn > 7) break;
   }

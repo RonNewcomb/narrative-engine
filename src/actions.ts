@@ -1,9 +1,9 @@
 import type { Attempt } from "./attempts";
 import type { ShouldBe, ShouldBeStatement } from "./beliefs";
-import { console_log, stringifyAttempt } from "./debug";
 import { type Desireable, type Resource } from "./iPlot";
 import { createNewsItem, type News } from "./news";
 import { weCouldTry } from "./planningTree";
+import { console_log, stringifyAttempt } from "./produceParagraphs";
 import { type Rulebook, type RulebookWithOutcome } from "./rulebooks";
 import { story } from "./story";
 
@@ -22,7 +22,7 @@ export interface AbstractActionDefinition<N = Resource, SN = Resource> {
 export interface ActionDefinition<N = Noun, SN = Noun> extends AbstractActionDefinition<Noun, Noun> {}
 
 export const ReflectUpon: AbstractActionDefinition<Attempt> = {
-  verb: "reflecting upon _",
+  verb: "reflecting upon attempt _",
   rulebooks: {
     news: {
       rules: [attempt => console_log(attempt.actor.name, "reflected."), createNewsItem],
@@ -30,16 +30,16 @@ export const ReflectUpon: AbstractActionDefinition<Attempt> = {
   },
 };
 
-export const GettingBadNews: AbstractActionDefinition<News, ShouldBe> = {
-  verb: "getting bad _ news violating _ belief",
+export const ReceivingImportantNews: AbstractActionDefinition<News, ShouldBe> = {
+  verb: "receiving news _ violating belief _",
   rulebooks: {
     check: {
       rules: [
         attempt => {
           const news = attempt.noun;
           const belief = attempt.secondNoun;
-          if (!news) throw "missing News for GettingBadNews";
-          if (!belief) throw "missing Belief for GettingBadNews";
+          if (!news) throw "missing News for ReceivingImportantNews";
+          if (!belief) throw "missing Belief for ReceivingImportantNews";
           console_log('"', stringifyAttempt(news), ' is bad news."');
 
           const actions = findActions(news, belief);

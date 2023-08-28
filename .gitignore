@@ -1,3 +1,2 @@
-*.js
 build
-build.js
+/build.js

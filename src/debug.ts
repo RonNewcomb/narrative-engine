@@ -20,8 +20,20 @@ export function stringify(obj: any): string {
 
 export function stringifyAction(act: Attempt | undefined): string {
   if (!act) return "[no act]";
-  const nounName: string = !act.noun ? "" : typeof act.noun === "string" ? act.noun : stringify(act.noun);
-  const noun2Name: string = !act.secondNoun ? "" : typeof act.secondNoun === "string" ? act.secondNoun : stringify(act.secondNoun);
+  const nounName: string = !act.noun
+    ? ""
+    : typeof act.noun === "string"
+    ? act.noun
+    : (act.noun as any).name
+    ? (act.noun as any).name
+    : stringify(act.noun);
+  const noun2Name: string = !act.secondNoun
+    ? ""
+    : typeof act.secondNoun === "string"
+    ? act.secondNoun
+    : (act.secondNoun as any).name
+    ? (act.secondNoun as any).name
+    : stringify(act.secondNoun);
   const rearrange: boolean = act.verb.includes("_");
   const predicate: string = rearrange ? act.verb.replace("_", nounName || "") : act.verb;
   return (act.actor?.name || "") + " " + predicate + " " + (noun2Name || "") + (rearrange ? "" : " " + (nounName || ""));

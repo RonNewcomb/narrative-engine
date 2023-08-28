@@ -2,7 +2,7 @@
   "compilerOptions": {
     "lib": ["es2020", "dom"],
     "module": "es2020",
-    //"outFile": "build.js",  // use rollup
+    //"outFile": "build.js",  // use rollup, or use all ambient files. tsc flatly refuses to outFile + esmodules
     "outDir": "build",
     "strict": true,
     "allowJs": false

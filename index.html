@@ -1,8 +1,8 @@
-<body>
+<body style="background-color: darkblue; color:white;">
     <pre id="current"></pre>
     <pre>
-        17:49:21.421 build.js:422 1 'initial scenes'
-        17:49:21.422 build.js:467 [
+        19:27:38.413 build.js:408 1 'initial scenes'
+        19:27:38.414 build.js:63 [
             {
                 "name": "Rose",
                 "beliefs": [],
@@ -31,21 +31,21 @@
                 "goals": []
             }
         ]
-        17:49:21.422 build.js:49 TURN 1
-        17:49:21.422 build.js:62 BEGIN exit SCENE: Rose Rose exit   (untried)
-        17:49:21.422 build.js:141 Rose could try unlock _ with before Rose exit   (untried)
-        17:49:21.422 build.js:351 exit is done: failed
-        17:49:21.422 build.js:355 circumventions outcome: failed .  Could be fulfilled by: ['Rose unlock door with  (untried)']
-        17:49:21.422 build.js:245   Q: What is Rose trying to do now?
-        17:49:21.422 build.js:246   A: Rose unlock door with  (untried)
-        17:49:21.422 build.js:337 same scene, now Rose unlock door with  (untried)
-        17:49:21.423 build.js:351 unlock _ with is done: undefined
-        17:49:21.423 build.js:245   Q: What is Rose trying to do now?
-        17:49:21.423 build.js:246   A: Rose exit   (partly successful)
-        17:49:21.423 build.js:337 same scene, now Rose exit   (partly successful)
-        17:49:21.423 build.js:351 exit is done: undefined
-        17:49:21.423 build.js:125 ((But Zafra  didn't like  Rose unlock door with  (untried) .))
-        17:49:21.423 build.js:467 [
+        19:27:38.414 build.js:75 TURN 1
+        19:27:38.414 build.js:115 BEGIN exit SCENE: Rose Rose exit   (untried)
+        19:27:38.414 build.js:318 Rose could try unlock _ with before Rose exit   (untried)
+        19:27:38.414 build.js:294 exit is done: failed
+        19:27:38.414 build.js:298 circumventions outcome: failed .  Could be fulfilled by: ['Rose unlock door with  (untried)']
+        19:27:38.415 build.js:355   Q: What is Rose trying to do now?
+        19:27:38.415 build.js:356   A: Rose unlock door with  (untried)
+        19:27:38.415 build.js:280 same scene, now Rose unlock door with  (untried)
+        19:27:38.415 build.js:294 unlock _ with is done: undefined
+        19:27:38.415 build.js:355   Q: What is Rose trying to do now?
+        19:27:38.415 build.js:356   A: Rose exit   (partly successful)
+        19:27:38.415 build.js:280 same scene, now Rose exit   (partly successful)
+        19:27:38.415 build.js:294 exit is done: undefined
+        19:27:38.415 build.js:230 ((But Zafra  didn't like  Rose unlock door with  (untried) .))
+        19:27:38.415 build.js:63 [
             {
                 "name": "Rose",
                 "beliefs": [],
@@ -86,23 +86,79 @@
                 "goals": []
             }
         ]
-        17:49:21.423 build.js:49 TURN 2
-        17:49:21.423 build.js:62 BEGIN getting bad _ news violating _ belief SCENE: Zafra Zafra getting bad [object Object] news violating _ belief [object Object] (untried)
-        17:49:21.423 build.js:300   'Rose unlock door with  (untried)"
-        17:49:21.423 build.js:90 " undefined  is bad news."
-        17:49:21.424 build.js:141 Zafra could try lock _ with before Zafra getting bad [object Object] news violating _ belief [object Object] (untried)
-        17:49:21.424 build.js:351 getting bad _ news violating _ belief is done: failed
-        17:49:21.424 build.js:355 circumventions outcome: failed .  Could be fulfilled by: ['Zafra lock door with  (untried)']
-        17:49:21.424 build.js:245   Q: What is Zafra trying to do now?
-        17:49:21.424 build.js:246   A: Zafra lock door with  (untried)
-        17:49:21.424 build.js:337 same scene, now Zafra lock door with  (untried)
-        17:49:21.424 build.js:351 lock _ with is done: failed
-        17:49:21.424 build.js:245   Q: What is Zafra trying to do now?
-        17:49:21.424 build.js:246   A: nothing
-        17:49:21.424 build.js:337 same scene, now [no attempt]
-        17:49:21.424 build.js:341 Stuck: Zafra getting bad [object Object] news violating _ belief [object Object] (partly successful)
-        17:49:21.424 build.js:125 ((But Zafra  didn't like  Zafra lock door with  (untried) .))
-        17:49:21.424 build.js:467 [
+        19:27:38.416 build.js:75 TURN 2
+        19:27:38.416 build.js:115 BEGIN getting bad _ news violating _ belief SCENE: Zafra Zafra getting bad {
+            "verb": "unlock _ with",
+            "actor": "\\\\Rose",
+            "noun": {
+                "name": "door",
+                "isLocked": false
+            },
+            "status": "untried",
+            "fulfills": "\\\\<backlink>",
+            "fullfilledBy": [],
+            "level": "suggested"
+        } news violating _ belief {
+            "property": "isLocked",
+            "ofDesireable": {
+                "name": "door",
+                "isLocked": false
+            },
+            "shouldBe": "=",
+            "toValue": true
+        } (untried)
+        19:27:38.416 build.js:48   'Rose unlock door with  (untried)"
+        19:27:38.416 build.js:143 " undefined  is bad news."
+        19:27:38.416 build.js:318 Zafra could try lock _ with before Zafra getting bad {
+            "verb": "unlock _ with",
+            "actor": "\\\\Rose",
+            "noun": {
+                "name": "door",
+                "isLocked": false
+            },
+            "status": "untried",
+            "fulfills": "\\\\<backlink>",
+            "fullfilledBy": [],
+            "level": "suggested"
+        } news violating _ belief {
+            "property": "isLocked",
+            "ofDesireable": {
+                "name": "door",
+                "isLocked": false
+            },
+            "shouldBe": "=",
+            "toValue": true
+        } (untried)
+        19:27:38.416 build.js:294 getting bad _ news violating _ belief is done: failed
+        19:27:38.416 build.js:298 circumventions outcome: failed .  Could be fulfilled by: ['Zafra lock door with  (untried)']
+        19:27:38.416 build.js:355   Q: What is Zafra trying to do now?
+        19:27:38.416 build.js:356   A: Zafra lock door with  (untried)
+        19:27:38.416 build.js:280 same scene, now Zafra lock door with  (untried)
+        19:27:38.416 build.js:294 lock _ with is done: failed
+        19:27:38.416 build.js:355   Q: What is Zafra trying to do now?
+        19:27:38.416 build.js:356   A: nothing
+        19:27:38.417 build.js:280 same scene, now [no attempt]
+        19:27:38.417 build.js:284 Stuck: Zafra getting bad {
+            "verb": "unlock _ with",
+            "actor": "\\\\Rose",
+            "noun": {
+                "name": "door",
+                "isLocked": false
+            },
+            "status": "untried",
+            "fulfills": "\\\\<backlink>",
+            "fullfilledBy": [],
+            "level": "suggested"
+        } news violating _ belief {
+            "property": "isLocked",
+            "ofDesireable": {
+                "name": "door",
+                "isLocked": false
+            },
+            "shouldBe": "=",
+            "toValue": true
+        } (partly successful)
+        19:27:38.417 build.js:63 [
             {
                 "name": "Rose",
                 "beliefs": [],
@@ -143,23 +199,28 @@
                 "goals": []
             }
         ]
-        17:49:21.424 build.js:49 TURN 3
-        17:49:21.424 build.js:62 BEGIN getting bad _ news violating _ belief SCENE: Zafra Zafra getting bad [object Object] news violating _ belief [object Object] (untried)
-        17:49:21.424 build.js:300   'Zafra lock door with  (untried)"
-        17:49:21.425 build.js:90 " undefined  is bad news."
-        17:49:21.425 build.js:141 Zafra could try lock _ with before Zafra getting bad [object Object] news violating _ belief [object Object] (untried)
-        17:49:21.425 build.js:351 getting bad _ news violating _ belief is done: failed
-        17:49:21.425 build.js:355 circumventions outcome: failed .  Could be fulfilled by: ['Zafra lock door with  (untried)']
-        17:49:21.425 build.js:245   Q: What is Zafra trying to do now?
-        17:49:21.425 build.js:246   A: Zafra lock door with  (untried)
-        17:49:21.425 build.js:337 same scene, now Zafra lock door with  (untried)
-        17:49:21.425 build.js:351 lock _ with is done: failed
-        17:49:21.425 build.js:245   Q: What is Zafra trying to do now?
-        17:49:21.425 build.js:246   A: nothing
-        17:49:21.425 build.js:337 same scene, now [no attempt]
-        17:49:21.425 build.js:341 Stuck: Zafra getting bad [object Object] news violating _ belief [object Object] (partly successful)
-        17:49:21.425 build.js:125 ((But Zafra  didn't like  Zafra lock door with  (untried) .))
-        17:49:21.425 build.js:467 [
+        19:27:38.417 build.js:75 TURN 3
+        19:27:38.417 build.js:115 BEGIN reflecting upon _ SCENE: Rose Rose reflecting upon {
+            "verb": "exit",
+            "actor": "\\\\Rose",
+            "status": "successful",
+            "fullfilledBy": [
+                {
+                    "verb": "unlock _ with",
+                    "actor": "\\\\Rose",
+                    "noun": {
+                        "name": "door",
+                        "isLocked": false
+                    },
+                    "status": "successful",
+                    "fulfills": "\\\\<backlink>",
+                    "fullfilledBy": []
+                }
+            ]
+        }  (untried)
+        19:27:38.417 build.js:127 {name: 'Rose', beliefs: Array(0), goals: Array(1)} 'reflected.'
+        19:27:38.417 build.js:294 reflecting upon _ is done: undefined
+        19:27:38.417 build.js:63 [
             {
                 "name": "Rose",
                 "beliefs": [],
@@ -200,251 +261,29 @@
                 "goals": []
             }
         ]
-        17:49:21.425 build.js:49 TURN 4
-        17:49:21.425 build.js:62 BEGIN getting bad _ news violating _ belief SCENE: Zafra Zafra getting bad [object Object] news violating _ belief [object Object] (untried)
-        17:49:21.425 build.js:300   'Zafra lock door with  (untried)"
-        17:49:21.426 build.js:90 " undefined  is bad news."
-        17:49:21.426 build.js:141 Zafra could try lock _ with before Zafra getting bad [object Object] news violating _ belief [object Object] (untried)
-        17:49:21.426 build.js:351 getting bad _ news violating _ belief is done: failed
-        17:49:21.426 build.js:355 circumventions outcome: failed .  Could be fulfilled by: ['Zafra lock door with  (untried)']
-        17:49:21.426 build.js:245   Q: What is Zafra trying to do now?
-        17:49:21.426 build.js:246   A: Zafra lock door with  (untried)
-        17:49:21.426 build.js:337 same scene, now Zafra lock door with  (untried)
-        17:49:21.426 build.js:351 lock _ with is done: failed
-        17:49:21.426 build.js:245   Q: What is Zafra trying to do now?
-        17:49:21.426 build.js:246   A: nothing
-        17:49:21.426 build.js:337 same scene, now [no attempt]
-        17:49:21.426 build.js:341 Stuck: Zafra getting bad [object Object] news violating _ belief [object Object] (partly successful)
-        17:49:21.426 build.js:125 ((But Zafra  didn't like  Zafra lock door with  (untried) .))
-        17:49:21.426 build.js:467 [
-            {
-                "name": "Rose",
-                "beliefs": [],
-                "goals": [
-                    {
-                        "verb": "exit",
-                        "actor": "\\\\Rose",
-                        "status": "successful",
-                        "fullfilledBy": [
-                            {
-                                "verb": "unlock _ with",
-                                "actor": "\\\\Rose",
-                                "noun": {
-                                    "name": "door",
-                                    "isLocked": false
-                                },
-                                "status": "successful",
-                                "fulfills": "\\\\<backlink>",
-                                "fullfilledBy": []
-                            }
-                        ]
-                    }
-                ]
-            },
-            {
-                "name": "Zafra",
-                "beliefs": [
-                    {
-                        "property": "isLocked",
-                        "ofDesireable": {
-                            "name": "door",
-                            "isLocked": false
-                        },
-                        "shouldBe": "=",
-                        "toValue": true
-                    }
-                ],
-                "goals": []
-            }
-        ]
-        17:49:21.426 build.js:49 TURN 5
-        17:49:21.426 build.js:62 BEGIN getting bad _ news violating _ belief SCENE: Zafra Zafra getting bad [object Object] news violating _ belief [object Object] (untried)
-        17:49:21.426 build.js:300   'Zafra lock door with  (untried)"
-        17:49:21.427 build.js:90 " undefined  is bad news."
-        17:49:21.427 build.js:141 Zafra could try lock _ with before Zafra getting bad [object Object] news violating _ belief [object Object] (untried)
-        17:49:21.427 build.js:351 getting bad _ news violating _ belief is done: failed
-        17:49:21.427 build.js:355 circumventions outcome: failed .  Could be fulfilled by: ['Zafra lock door with  (untried)']
-        17:49:21.427 build.js:245   Q: What is Zafra trying to do now?
-        17:49:21.427 build.js:246   A: Zafra lock door with  (untried)
-        17:49:21.427 build.js:337 same scene, now Zafra lock door with  (untried)
-        17:49:21.427 build.js:351 lock _ with is done: failed
-        17:49:21.427 build.js:245   Q: What is Zafra trying to do now?
-        17:49:21.427 build.js:246   A: nothing
-        17:49:21.427 build.js:337 same scene, now [no attempt]
-        17:49:21.427 build.js:341 Stuck: Zafra getting bad [object Object] news violating _ belief [object Object] (partly successful)
-        17:49:21.427 build.js:125 ((But Zafra  didn't like  Zafra lock door with  (untried) .))
-        17:49:21.427 build.js:467 [
-            {
-                "name": "Rose",
-                "beliefs": [],
-                "goals": [
-                    {
-                        "verb": "exit",
-                        "actor": "\\\\Rose",
-                        "status": "successful",
-                        "fullfilledBy": [
-                            {
-                                "verb": "unlock _ with",
-                                "actor": "\\\\Rose",
-                                "noun": {
-                                    "name": "door",
-                                    "isLocked": false
-                                },
-                                "status": "successful",
-                                "fulfills": "\\\\<backlink>",
-                                "fullfilledBy": []
-                            }
-                        ]
-                    }
-                ]
-            },
-            {
-                "name": "Zafra",
-                "beliefs": [
-                    {
-                        "property": "isLocked",
-                        "ofDesireable": {
-                            "name": "door",
-                            "isLocked": false
-                        },
-                        "shouldBe": "=",
-                        "toValue": true
-                    }
-                ],
-                "goals": []
-            }
-        ]
-        17:49:21.427 build.js:49 TURN 6
-        17:49:21.427 build.js:62 BEGIN getting bad _ news violating _ belief SCENE: Zafra Zafra getting bad [object Object] news violating _ belief [object Object] (untried)
-        17:49:21.428 build.js:300   'Zafra lock door with  (untried)"
-        17:49:21.428 build.js:90 " undefined  is bad news."
-        17:49:21.428 build.js:141 Zafra could try lock _ with before Zafra getting bad [object Object] news violating _ belief [object Object] (untried)
-        17:49:21.428 build.js:351 getting bad _ news violating _ belief is done: failed
-        17:49:21.428 build.js:355 circumventions outcome: failed .  Could be fulfilled by: ['Zafra lock door with  (untried)']
-        17:49:21.428 build.js:245   Q: What is Zafra trying to do now?
-        17:49:21.428 build.js:246   A: Zafra lock door with  (untried)
-        17:49:21.428 build.js:337 same scene, now Zafra lock door with  (untried)
-        17:49:21.428 build.js:351 lock _ with is done: failed
-        17:49:21.428 build.js:245   Q: What is Zafra trying to do now?
-        17:49:21.428 build.js:246   A: nothing
-        17:49:21.428 build.js:337 same scene, now [no attempt]
-        17:49:21.428 build.js:341 Stuck: Zafra getting bad [object Object] news violating _ belief [object Object] (partly successful)
-        17:49:21.428 build.js:125 ((But Zafra  didn't like  Zafra lock door with  (untried) .))
-        17:49:21.428 build.js:467 [
-            {
-                "name": "Rose",
-                "beliefs": [],
-                "goals": [
-                    {
-                        "verb": "exit",
-                        "actor": "\\\\Rose",
-                        "status": "successful",
-                        "fullfilledBy": [
-                            {
-                                "verb": "unlock _ with",
-                                "actor": "\\\\Rose",
-                                "noun": {
-                                    "name": "door",
-                                    "isLocked": false
-                                },
-                                "status": "successful",
-                                "fulfills": "\\\\<backlink>",
-                                "fullfilledBy": []
-                            }
-                        ]
-                    }
-                ]
-            },
-            {
-                "name": "Zafra",
-                "beliefs": [
-                    {
-                        "property": "isLocked",
-                        "ofDesireable": {
-                            "name": "door",
-                            "isLocked": false
-                        },
-                        "shouldBe": "=",
-                        "toValue": true
-                    }
-                ],
-                "goals": []
-            }
-        ]
-        17:49:21.428 build.js:49 TURN 7
-        17:49:21.428 build.js:62 BEGIN getting bad _ news violating _ belief SCENE: Zafra Zafra getting bad [object Object] news violating _ belief [object Object] (untried)
-        17:49:21.429 build.js:300   'Zafra lock door with  (untried)"
-        17:49:21.429 build.js:90 " undefined  is bad news."
-        17:49:21.429 build.js:141 Zafra could try lock _ with before Zafra getting bad [object Object] news violating _ belief [object Object] (untried)
-        17:49:21.429 build.js:351 getting bad _ news violating _ belief is done: failed
-        17:49:21.429 build.js:355 circumventions outcome: failed .  Could be fulfilled by: ['Zafra lock door with  (untried)']
-        17:49:21.429 build.js:245   Q: What is Zafra trying to do now?
-        17:49:21.429 build.js:246   A: Zafra lock door with  (untried)
-        17:49:21.429 build.js:337 same scene, now Zafra lock door with  (untried)
-        17:49:21.429 build.js:351 lock _ with is done: failed
-        17:49:21.429 build.js:245   Q: What is Zafra trying to do now?
-        17:49:21.429 build.js:246   A: nothing
-        17:49:21.429 build.js:337 same scene, now [no attempt]
-        17:49:21.429 build.js:341 Stuck: Zafra getting bad [object Object] news violating _ belief [object Object] (partly successful)
-        17:49:21.429 build.js:125 ((But Zafra  didn't like  Zafra lock door with  (untried) .))
-        17:49:21.429 build.js:467 [
-            {
-                "name": "Rose",
-                "beliefs": [],
-                "goals": [
-                    {
-                        "verb": "exit",
-                        "actor": "\\\\Rose",
-                        "status": "successful",
-                        "fullfilledBy": [
-                            {
-                                "verb": "unlock _ with",
-                                "actor": "\\\\Rose",
-                                "noun": {
-                                    "name": "door",
-                                    "isLocked": false
-                                },
-                                "status": "successful",
-                                "fulfills": "\\\\<backlink>",
-                                "fullfilledBy": []
-                            }
-                        ]
-                    }
-                ]
-            },
-            {
-                "name": "Zafra",
-                "beliefs": [
-                    {
-                        "property": "isLocked",
-                        "ofDesireable": {
-                            "name": "door",
-                            "isLocked": false
-                        },
-                        "shouldBe": "=",
-                        "toValue": true
-                    }
-                ],
-                "goals": []
-            }
-        ]
-        17:49:21.430 build.js:49 TURN 8
-        17:49:21.430 build.js:62 BEGIN getting bad _ news violating _ belief SCENE: Zafra Zafra getting bad [object Object] news violating _ belief [object Object] (untried)
-        17:49:21.430 build.js:300   'Zafra lock door with  (untried)"
-        17:49:21.430 build.js:90 " undefined  is bad news."
-        17:49:21.430 build.js:141 Zafra could try lock _ with before Zafra getting bad [object Object] news violating _ belief [object Object] (untried)
-        17:49:21.430 build.js:351 getting bad _ news violating _ belief is done: failed
-        17:49:21.430 build.js:355 circumventions outcome: failed .  Could be fulfilled by: ['Zafra lock door with  (untried)']
-        17:49:21.430 build.js:245   Q: What is Zafra trying to do now?
-        17:49:21.430 build.js:246   A: Zafra lock door with  (untried)
-        17:49:21.430 build.js:337 same scene, now Zafra lock door with  (untried)
-        17:49:21.430 build.js:351 lock _ with is done: failed
-        17:49:21.430 build.js:245   Q: What is Zafra trying to do now?
-        17:49:21.430 build.js:246   A: nothing
-        17:49:21.430 build.js:337 same scene, now [no attempt]
-        17:49:21.430 build.js:341 Stuck: Zafra getting bad [object Object] news violating _ belief [object Object] (partly successful)
-        17:49:21.430 build.js:125 ((But Zafra  didn't like  Zafra lock door with  (untried) .))
-        17:49:21.431 build.js:467 [
+        19:27:38.417 build.js:75 TURN 4
+        19:27:38.417 build.js:115 BEGIN reflecting upon _ SCENE: Rose Rose reflecting upon {
+            "verb": "exit",
+            "actor": "\\\\Rose",
+            "status": "successful",
+            "fullfilledBy": [
+                {
+                    "verb": "unlock _ with",
+                    "actor": "\\\\Rose",
+                    "noun": {
+                        "name": "door",
+                        "isLocked": false
+                    },
+                    "status": "successful",
+                    "fulfills": "\\\\<backlink>",
+                    "fullfilledBy": []
+                }
+            ]
+        }  (untried)
+        19:27:38.417 build.js:127 {name: 'Rose', beliefs: Array(0), goals: Array(1)} 'reflected.'
+        19:27:38.417 build.js:294 reflecting upon _ is done: undefined
+        19:27:38.417 build.js:108 END STORY (2) [{…}, {…}]
+        19:27:38.418 build.js:63 [
             {
                 "name": "Rose",
                 "beliefs": [],

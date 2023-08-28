@@ -24,14 +24,15 @@ export function createNewsItem(attempt: Attempt): News {
 export function runNewsCycle(newss: News[], sceneJustFinished: Scene) {
   for (const news of newss)
     for (const character of story.characters)
-      for (const belief of character.beliefs)
-        if (isButtonPushed(news, belief)) {
-          console_log("((But", character.name, " didn't like ", stringifyAttempt(news), ".))");
-          const sceneAction = createAttempt<News, ShouldBe>(character, GettingBadNews, news, belief, undefined);
-          const reactionScene = createScene(character, sceneAction);
-          //scheduleScene(reactionScene);
-          createSceneSet({ scene: sceneJustFinished, foreshadow: {}, choice: "ally" }, { scene: reactionScene, foreshadow: {} });
-        }
+      if (news.actor != character)
+        for (const belief of character.beliefs)
+          if (isButtonPushed(news, belief)) {
+            console_log("((But", character.name, " didn't like ", stringifyAttempt(news), ".))");
+            const sceneAction = createAttempt<News, ShouldBe>(character, GettingBadNews, news, belief, undefined);
+            const reactionScene = createScene(character, sceneAction);
+            //scheduleScene(reactionScene);
+            createSceneSet({ scene: sceneJustFinished, foreshadow: {}, choice: "ally" }, { scene: reactionScene, foreshadow: {} });
+          }
 
   // reset news
   story.history.push(...story.currentTurnsNews);

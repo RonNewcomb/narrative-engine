@@ -7,5 +7,5 @@
     "strict": true,
     "allowJs": false
   },
-  "include": ["*.ts"]
+  "include": ["src/*.ts"]
 }

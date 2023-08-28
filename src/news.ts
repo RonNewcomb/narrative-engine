@@ -25,7 +25,7 @@ export function createNewsItem(attempt: Attempt): News {
 export function runNewsCycle(newss: News[], sceneJustFinished: Scene) {
   for (const news of newss)
     for (const character of story.characters)
-      if (news.actor != character)
+      if (character != news.actor)
         for (const belief of character.beliefs)
           if (isButtonPushed(news, belief)) {
             console_log("((But", character.name, " didn't like ", stringifyAttempt(news), ".))");

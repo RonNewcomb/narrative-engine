@@ -1,10 +1,9 @@
-import { doThingAsAScene } from "./actions";
-import { Attempt } from "./attempts";
-import { Character } from "./character";
+import { doThingAsAScene, type Attempt } from "./attempts";
+import { type Character } from "./character";
 import { console_error, console_log, stringifyAttempt } from "./debug";
-import { Resource } from "./iPlot";
-import { News } from "./news";
-import { RuleOutcome } from "./rulebooks";
+import { type Resource } from "./iPlot";
+import { type News } from "./news";
+import { type RuleOutcome } from "./rulebooks";
 import { story } from "./story";
 
 /**

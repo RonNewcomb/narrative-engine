@@ -11,3 +11,7 @@ With rollup installed globally `npm i rollup --global`
 Pull up index.html, view F12 console
 
 Or use `--watch` on both commands in 2 different windows
+
+## notes
+
+- need to separate the actions & reactions from the actual reporting to the user. Can't foreshadow a reaction unless the machinery runs to discover one.

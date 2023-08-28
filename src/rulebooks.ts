@@ -23,7 +23,6 @@ export function executeRulebook(attempt: Attempt): RuleOutcome {
     for (const rule of rulebooks.check.rules || []) {
       const ruleResult = rule(attempt);
       if (ruleResult == "failed") {
-        //attempt.meddlingCheckRule = rule;
         outcome = ruleResult;
         break;
       }

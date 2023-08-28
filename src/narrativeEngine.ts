@@ -22,18 +22,16 @@ export function createMyGoal<N extends Noun, SN extends Noun>(
     noun,
     secondNoun,
     status: "untried",
-    //meddlingCheckRule: undefined,
     fulfills: undefined,
     fullfilledBy: [],
   };
   return circumvention;
 }
 
-///////////
-
 export function main(characters: Character[], actionset: ActionDefinition<any, any>[]) {
   // sanitize setup
-  for (let character of characters) for (let goal of character.goals) if (goal.actor == author) goal.actor = character;
+  for (const character of characters) if (!character.goals) character.goals = [];
+  for (const character of characters) for (const goal of character.goals) if (!goal.actor || goal.actor == author) goal.actor = character;
 
   // debug
   produceParagraphs(characters);
@@ -45,7 +43,7 @@ export function main(characters: Character[], actionset: ActionDefinition<any, a
     .map(todo => createScene(todo.character, todo.action!));
 
   if (!initialScenes.length) throw "cannot find first character and action. No one has a Goal.";
-  console_log(initialScenes.length, "initial scenes");
+  console_log(initialScenes.length + " initial scenes");
   const initialScene: Scene = initialScenes[0];
 
   // GO

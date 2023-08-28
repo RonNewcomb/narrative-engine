@@ -42,12 +42,12 @@ export function createAttempt<N extends Resource, SN extends Resource>(
 }
 
 export function doThingAsAScene(thisAttempt: Attempt, currentScene: Scene): RuleOutcome {
-  doThing(thisAttempt, currentScene);
+  thisAttempt = doThing(thisAttempt, currentScene);
 
   while (thisAttempt.status == "partly successful") {
     let subAttempt = whatTheyAreTryingToDoNowRegarding(thisAttempt.actor, thisAttempt);
     console_log("same scene, now", stringifyAttempt(subAttempt));
-    if (subAttempt) doThing(subAttempt, currentScene);
+    if (subAttempt) thisAttempt = doThing(subAttempt, currentScene);
     else {
       console_log("STUCK:", stringifyAttempt(thisAttempt));
       if (thisAttempt.actor.goals.includes(thisAttempt)) thisAttempt.actor.goals = thisAttempt.actor.goals.filter(g => g != thisAttempt);
@@ -58,7 +58,7 @@ export function doThingAsAScene(thisAttempt: Attempt, currentScene: Scene): Rule
   return thisAttempt.status == "successful" ? "success" : thisAttempt.status == "failed" ? "failed" : "failed";
 }
 
-function doThing(thisAttempt: Attempt, currentScene: Scene): Attempt["status"] {
+function doThing(thisAttempt: Attempt, currentScene: Scene): Attempt {
   // DO the currentAction and get status
   const outcome = executeRulebook(thisAttempt);
   thisAttempt.status = outcome != "failed" ? "successful" : thisAttempt.fullfilledBy.length > 0 ? "partly successful" : "failed";
@@ -78,5 +78,5 @@ function doThing(thisAttempt: Attempt, currentScene: Scene): Attempt["status"] {
     console_log("((But", foreshadow.character.name, " didn't like ", stringifyAction(foreshadow.news), ".))");
   }
 
-  return thisAttempt.status;
+  return thisAttempt;
 }

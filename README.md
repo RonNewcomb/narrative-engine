@@ -25,3 +25,27 @@ Setup desireables, actions on them, characters, and character beliefs about the 
 During a scene, run the character's action as a planning tree / Planner AI. Does multiple character actions in a loop.
 
 Running a character action involves executing the action definition's rulebook: check rules to see if failed, then rules to make the changes in desireables. After the action was deemed successful, failed, or partly, create a `news` item and run through all the other characters and their beliefs to see if there are any consequences to the action. If so, ChoiceConsequenceClosure attaches a consequence object to the scene.
+
+# Impure functions
+
+weCouldTry - attaches new child node to passed-in parent node... or to character.goals; doesn't return child node
+
+createNewsItem - pushes to story.currentTurnsNews
+
+createSceneSet - pushes to story.sceneStack
+
+reactionsToNews - calls above, also pushes to story.sceneStack consequences
+
+resetNewsCycle - pushes to story.history, story.currentTurnsNews
+
+doThing - mutates attempt.status
+
+doThingAsAScene - mutates character.goals, calls weCouldTry
+
+moveDesireable - mutates global desireables
+
+produceParagraphs - whole file is I/O
+
+executeRulebook - calls moveDesireable
+
+playScene - mutates scene.result, .isFinished; calls doThingAsAScene

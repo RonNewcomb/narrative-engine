@@ -2,8 +2,7 @@ import { GettingBadNews } from "./actions";
 import { createAttempt, type Attempt } from "./attempts";
 import { type ShouldBe } from "./beliefs";
 import { type Character } from "./character";
-import { createSceneSet } from "./choiceConsequenceClosure";
-import { console_log, stringifyAttempt } from "./debug";
+import { createSceneSet, type ConsequenceWithForeshadowedNewsProvingAgency, type ForeShadowing } from "./choiceConsequenceClosure";
 import { isButtonPushed } from "./iPlot";
 import { createScene, type Scene } from "./scene";
 import { story } from "./story";
@@ -22,18 +21,21 @@ export function createNewsItem(attempt: Attempt): News {
   return newsItem;
 }
 
-export function runNewsCycle(newss: News[], sceneJustFinished: Scene) {
-  for (const news of newss)
-    for (const character of story.characters)
-      if (character != news.actor)
+export function reactionsToNews(news: News, scene: Scene): ConsequenceWithForeshadowedNewsProvingAgency[] {
+  const consequences: ConsequenceWithForeshadowedNewsProvingAgency[] = [];
+  for (const character of story.characters)
+    if (character != news.actor)
+      if (!news.onlyKnownBy || news.onlyKnownBy.includes(character))
         for (const belief of character.beliefs)
           if (isButtonPushed(news, belief)) {
-            console_log("((But", character.name, " didn't like ", stringifyAttempt(news), ".))");
+            const foreshadowThis: ForeShadowing = { character, belief, news };
             const sceneAction = createAttempt<News, ShouldBe>(character, GettingBadNews, news, belief, undefined);
             const reactionScene = createScene(character, sceneAction);
-            //scheduleScene(reactionScene);
-            createSceneSet({ scene: sceneJustFinished, foreshadow: {}, choice: "ally" }, { scene: reactionScene, foreshadow: {} });
+            const consequence: ConsequenceWithForeshadowedNewsProvingAgency = { scene: reactionScene, foreshadow: foreshadowThis };
+            consequences.push(consequence);
           }
+  createSceneSet({ scene, /*foreshadow: foreshadowThis,*/ choice: "ally" }, consequences);
+  return consequences;
 }
 
 export function resetNewsCycle(): void {

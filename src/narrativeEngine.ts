@@ -36,6 +36,9 @@ export function main(characters: Character[], actionset: ActionDefinition<any, a
   // sanitize setup
   for (let character of characters) for (let goal of character.goals) if (goal.actor == author) goal.actor = character;
 
+  // debug
+  produceParagraphs(characters);
+
   // init
   const initialScenes: Scene[] = characters
     .map(character => ({ character, action: whatTheyAreTryingToDoNow(character) }))
@@ -48,7 +51,4 @@ export function main(characters: Character[], actionset: ActionDefinition<any, a
 
   // GO
   playStory(initialScene, characters, actionset);
-
-  // debug
-  produceParagraphs(characters);
 }

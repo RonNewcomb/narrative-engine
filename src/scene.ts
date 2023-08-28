@@ -2,7 +2,6 @@ import { doThingAsAScene, type Attempt } from "./attempts";
 import { type Character } from "./character";
 import { console_error, console_log, stringifyAttempt } from "./debug";
 import { type Resource } from "./iPlot";
-import { type News } from "./news";
 import { type RuleOutcome } from "./rulebooks";
 import { story } from "./story";
 
@@ -50,8 +49,8 @@ export function createScene(actor: Character, pulse: Attempt<Resource, Resource>
 export function getNextScene(): Scene | undefined {
   const startScenes = story.sceneStack.filter(s => !s.choice.scene.isFinished);
   if (startScenes.length) return startScenes[0].choice.scene;
-  const midScenes = story.sceneStack.filter(s => s.consequence && !s.consequence.scene.isFinished);
-  if (midScenes.length) return midScenes[0].consequence!.scene;
+  const midScenes = story.sceneStack.filter(s => s.consequences && s.consequences.length && !s.consequences[0].scene.isFinished);
+  if (midScenes.length) return midScenes[0].consequences![0].scene; // TODO loop through consequences
   const endScenes = story.sceneStack.filter(s => !s.closure.scene.isFinished);
   if (endScenes.length) return endScenes.reverse()[0].closure.scene;
   console_log("END STORY", story.sceneStack);
@@ -59,12 +58,12 @@ export function getNextScene(): Scene | undefined {
 }
 
 /** outputs: scene success/failure/complication and news of what happened */
-export function playScene(scene: Scene): News[] {
+export function playScene(scene: Scene): RuleOutcome {
   const character = scene.actor;
   const sceneAction = scene.pulse; // whatTheyAreTryingToDoNow(character);
   console_log("BEGIN", scene.pulse.verb, "SCENE:", character.name, stringifyAttempt(sceneAction));
   if (!sceneAction) console_error("no action -- run AI to pick a scene-action that does/un-does the news? adjusts for it?");
-  if (sceneAction) scene.result = doThingAsAScene(sceneAction, character);
+  if (sceneAction) scene.result = doThingAsAScene(sceneAction, scene);
   scene.isFinished = true;
-  return story.currentTurnsNews;
+  return scene.result;
 }

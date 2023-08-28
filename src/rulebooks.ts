@@ -1,6 +1,5 @@
 import type { Attempt } from "./attempts";
 import { moveDesireable } from "./beliefs";
-import { createNewsItem } from "./news";
 
 export type RuleWithOutcome<N, SN> = ((attempt: Attempt<N, SN>) => RuleOutcome) & { name?: string };
 export type Rule<N, SN> = ((attempt: Attempt<N, SN>) => void) & { name?: string };
@@ -33,7 +32,7 @@ export function executeRulebook(attempt: Attempt): RuleOutcome {
     const shouldBeStatements = rulebooks.moveDesireables(attempt);
     for (const statement of shouldBeStatements) moveDesireable(...statement);
   }
-  for (const rule of rulebooks.news?.rules || [createNewsItem]) {
+  for (const rule of rulebooks.news?.rules || []) {
     const ruleResult = rule(attempt);
   }
   return outcome;

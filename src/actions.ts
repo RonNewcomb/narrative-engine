@@ -1,6 +1,6 @@
 import type { Attempt } from "./attempts";
 import type { ShouldBe, ShouldBeStatement } from "./beliefs";
-import { console_log, printAttempt } from "./debug";
+import { console_log, stringifyAttempt } from "./debug";
 import { type Desireable, type Resource } from "./iPlot";
 import { createNewsItem, type News } from "./news";
 import { weCouldTry } from "./planningTree";
@@ -40,7 +40,7 @@ export const GettingBadNews: AbstractActionDefinition<News, ShouldBe> = {
           const belief = attempt.secondNoun;
           if (!news) throw "missing News for GettingBadNews";
           if (!belief) throw "missing Belief for GettingBadNews";
-          console_log('"', printAttempt(news), ' is bad news."');
+          console_log('"', stringifyAttempt(news), ' is bad news."');
 
           const actions = findActions(news, belief);
           for (const action of actions) weCouldTry<any, any>(attempt.actor, action, news.noun, news.secondNoun, attempt);

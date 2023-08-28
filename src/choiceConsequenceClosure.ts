@@ -1,9 +1,9 @@
 import { ReflectUpon } from "./actions";
-import { Attempt, createAttempt } from "./attempts";
-import { ShouldBe } from "./beliefs";
-import { Character } from "./character";
+import { createAttempt, type Attempt } from "./attempts";
+import type { ShouldBe } from "./beliefs";
+import type { Character } from "./character";
 import { createScene, type Scene } from "./scene";
-import { story } from "./story";
+import type { Story } from "./story";
 
 export interface ForeShadowing {
   character: Character;
@@ -33,6 +33,7 @@ export interface ChoiceConsequenceClosure {
 }
 
 export function createSceneSet(
+  story: Story,
   choice: Choi6eWithForeshadowing,
   consequences?: ConsequenceWithForeshadowedNewsProvingAgency[],
   closure?: ClosureFromInteriorReflection

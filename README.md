@@ -30,13 +30,13 @@ Running a character action involves executing the action definition's rulebook: 
 
 weCouldTry - attaches new child node to passed-in parent node... or to character.goals; doesn't return child node
 
-createNewsItem - pushes to story.currentTurnsNews
+createNewsItem - mutates story.currentTurnsNews
 
-createSceneSet - pushes to story.sceneStack
+createSceneSet - mutates story.sceneStack
 
-reactionsToNews - calls above, also pushes to story.sceneStack consequences
+reactionsToNews - mutates story.sceneStack
 
-resetNewsCycle - pushes to story.history, story.currentTurnsNews
+resetNewsCycle - mutates story.history, story.currentTurnsNews
 
 doThing - mutates attempt.status
 

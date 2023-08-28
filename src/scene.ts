@@ -3,7 +3,7 @@ import { type Character } from "./character";
 import { type Resource } from "./iPlot";
 import { console_error, console_log, stringifyAttempt } from "./produceParagraphs";
 import { type RuleOutcome } from "./rulebooks";
-import { story } from "./story";
+import { type Story } from "./story";
 
 /**
  * scene beginning
@@ -46,7 +46,7 @@ export function createScene(actor: Character, pulse: Attempt<Resource, Resource>
   return scene;
 }
 
-export function getNextScene(): Scene | undefined {
+export function getNextScene(story: Story): Scene | undefined {
   const startScenes = story.sceneStack.filter(s => !s.choice.scene.isFinished);
   if (startScenes.length) return startScenes[0].choice.scene;
   const midScenes = story.sceneStack.filter(s => s.consequences && s.consequences.length && !s.consequences[0].scene.isFinished);
@@ -58,12 +58,12 @@ export function getNextScene(): Scene | undefined {
 }
 
 /** outputs: scene success/failure/complication and news of what happened */
-export function playScene(scene: Scene): RuleOutcome {
+export function playScene(scene: Scene, story: Story): RuleOutcome {
   const character = scene.actor;
   const sceneAction = scene.pulse; // whatTheyAreTryingToDoNow(character);
   console_log("BEGIN", scene.pulse.verb, "SCENE:", character.name, stringifyAttempt(sceneAction));
   if (!sceneAction) console_error("no action -- run AI to pick a scene-action that does/un-does the news? adjusts for it?");
-  if (sceneAction) scene.result = doThingAsAScene(sceneAction, scene);
+  if (sceneAction) scene.result = doThingAsAScene(sceneAction, scene, story);
   scene.isFinished = true;
   return scene.result;
 }

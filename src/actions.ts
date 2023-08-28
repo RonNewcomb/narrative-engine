@@ -1,22 +1,18 @@
 import type { Attempt } from "./attempts";
-import type { ShouldBe, ShouldBeStatement } from "./beliefs";
+import type { ShouldBe } from "./beliefs";
 import { type Desireable, type Resource } from "./iPlot";
 import { createNewsItem, type News } from "./news";
 import { weCouldTry } from "./planningTree";
 import { console_log, stringifyAttempt } from "./produceParagraphs";
-import { type Rulebook, type RulebookWithOutcome } from "./rulebooks";
-import { story } from "./story";
+import type { Rulebooks } from "./rulebooks";
+import type { Story } from "./story";
 
 export type Verb = string;
 export type Noun = Desireable;
 
 export interface AbstractActionDefinition<N = Resource, SN = Resource> {
   verb: Verb;
-  rulebooks?: {
-    check?: RulebookWithOutcome<N, SN>;
-    moveDesireables?: (attempt: Attempt<N, SN>) => ShouldBeStatement[];
-    news?: Rulebook<N, SN>;
-  };
+  rulebooks?: Rulebooks<N, SN>;
 }
 
 export interface ActionDefinition<N = Noun, SN = Noun> extends AbstractActionDefinition<Noun, Noun> {}
@@ -35,14 +31,14 @@ export const ReceivingImportantNews: AbstractActionDefinition<News, ShouldBe> = 
   rulebooks: {
     check: {
       rules: [
-        attempt => {
+        (attempt, story) => {
           const news = attempt.noun;
           const belief = attempt.secondNoun;
           if (!news) throw "missing News for ReceivingImportantNews";
           if (!belief) throw "missing Belief for ReceivingImportantNews";
           console_log('"', stringifyAttempt(news), ' is bad news."');
 
-          const actions = findActions(news, belief);
+          const actions = findActions(news, belief, story);
           for (const action of actions) weCouldTry<any, any>(attempt.actor, action, news.noun, news.secondNoun, attempt);
 
           return "failed";
@@ -52,7 +48,7 @@ export const ReceivingImportantNews: AbstractActionDefinition<News, ShouldBe> = 
   },
 };
 
-function findActions(badNews: Attempt<any, any>, shouldBe: ShouldBe): ActionDefinition<any, any>[] {
+function findActions(badNews: Attempt<any, any>, shouldBe: ShouldBe, story: Story): ActionDefinition<any, any>[] {
   const retval: ActionDefinition<any, any>[] = [];
   for (const action of story.actionset) {
     const effects = action.rulebooks?.moveDesireables?.(badNews) || [];

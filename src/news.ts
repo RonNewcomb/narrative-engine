@@ -5,7 +5,7 @@ import { type Character } from "./character";
 import { createSceneSet, type ConsequenceWithForeshadowedNewsProvingAgency, type ForeShadowing } from "./choiceConsequenceClosure";
 import { isButtonPushed } from "./iPlot";
 import { createScene, type Scene } from "./scene";
-import { story } from "./story";
+import { type Story } from "./story";
 
 export type NewsSensitivity = "suggested" | Omit<Attempt["status"], "untried">;
 
@@ -14,15 +14,15 @@ export interface News extends Attempt {
   onlyKnownBy?: Character[];
 }
 
-export function createNewsItem(attempt: Attempt): News {
+export function createNewsItem(attempt: Attempt, story: Story): News {
   const newsItem: News = { ...attempt, level: attempt.status == "untried" ? "suggested" : attempt.status };
   story.currentTurnsNews.push(newsItem);
   //console_log("NEWS", newsItem);
   return newsItem;
 }
 
-export function reactionsToNews(news: News, scene: Scene): ConsequenceWithForeshadowedNewsProvingAgency[] {
-  const ccc = story.sceneStack.find(ccc => ccc.choice.scene == scene) || createSceneSet({ scene, choice: "ally" });
+export function reactionsToNews(news: News, scene: Scene, story: Story): ConsequenceWithForeshadowedNewsProvingAgency[] {
+  const ccc = story.sceneStack.find(ccc => ccc.choice.scene == scene) || createSceneSet(story, { scene, choice: "ally" });
   const newConsequences: ConsequenceWithForeshadowedNewsProvingAgency[] = [];
   for (const character of story.characters)
     if (character != news.actor)
@@ -39,7 +39,7 @@ export function reactionsToNews(news: News, scene: Scene): ConsequenceWithForesh
   return newConsequences;
 }
 
-export function resetNewsCycle(): void {
+export function resetNewsCycle(story: Story): void {
   story.history.push(...story.currentTurnsNews);
   story.currentTurnsNews = [];
 }

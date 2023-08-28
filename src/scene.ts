@@ -1,10 +1,10 @@
-import { AbstractActionDefinition, ActionDefinition, Attempt, RuleOutcome, doThingAsAScene } from "./actions";
-import { ShouldBe } from "./beliefs";
+import { doThingAsAScene } from "./actions";
+import { Attempt } from "./attempts";
 import { Character } from "./character";
-import { console_error, console_log, printAttempt, stringifyAttempt } from "./debug";
+import { console_error, console_log, stringifyAttempt } from "./debug";
 import { Resource } from "./iPlot";
-import { News, createNewsItem } from "./news";
-import { weCouldTry } from "./planningTree";
+import { News } from "./news";
+import { RuleOutcome } from "./rulebooks";
 import { story } from "./story";
 
 /**
@@ -69,45 +69,3 @@ export function playScene(scene: Scene): News[] {
   scene.isFinished = true;
   return story.currentTurnsNews;
 }
-
-export const ReflectUpon: AbstractActionDefinition<Attempt> = {
-  verb: "reflecting upon _",
-  rulebooks: {
-    news: {
-      rules: [attempt => console_log(attempt.actor, "reflected."), createNewsItem],
-    },
-  },
-};
-
-export const GettingBadNews: AbstractActionDefinition<News, ShouldBe> = {
-  verb: "getting bad _ news violating _ belief",
-  rulebooks: {
-    check: {
-      rules: [
-        attempt => {
-          const news = attempt.noun;
-          const belief = attempt.secondNoun;
-          if (!news) throw "missing News for GettingBadNews";
-          if (!belief) throw "missing Belief for GettingBadNews";
-          console_log('"', printAttempt(news), ' is bad news."');
-
-          function findActions(badNews: Attempt<any, any>, shouldBe: ShouldBe): ActionDefinition<any, any>[] {
-            const retval: ActionDefinition<any, any>[] = [];
-            for (const action of story.actionset) {
-              const effects = action.rulebooks?.moveDesireables?.(badNews) || [];
-              for (const e of effects)
-                if (shouldBe.property == e[0] && shouldBe.ofDesireable == e[1] && shouldBe.shouldBe == e[2] && shouldBe.toValue == e[3])
-                  retval.push(action);
-            }
-            return retval;
-          }
-
-          const actions = findActions(news, belief);
-          for (const action of actions) weCouldTry<any, any>(attempt.actor, action, news.noun, news.secondNoun, attempt);
-
-          return "failed";
-        },
-      ],
-    },
-  },
-};

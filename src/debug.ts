@@ -1,4 +1,4 @@
-import type { Attempt } from "./actions";
+import type { Attempt } from "./attempts";
 
 export let console_log: (...data: any[]) => void = console.log;
 export let console_error: (...data: any[]) => void = console.error;

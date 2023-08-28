@@ -1,5 +1,6 @@
-import { createAttempt } from "./actions";
-import { ReflectUpon, createScene, type Scene } from "./scene";
+import { ReflectUpon } from "./actions";
+import { createAttempt } from "./attempts";
+import { createScene, type Scene } from "./scene";
 import { story } from "./story";
 
 export interface ForeShadowing {}

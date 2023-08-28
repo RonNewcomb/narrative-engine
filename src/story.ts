@@ -2,9 +2,9 @@ import type { ActionDefinition } from "./actions";
 import type { Character } from "./character";
 import { createSceneSet, type ChoiceConsequenceClosure } from "./choiceConsequenceClosure";
 import { console_log } from "./debug";
-import { News, runNewsCycle } from "./news";
+import { News, resetNewsCycle, runNewsCycle } from "./news";
 import { produceParagraphs } from "./produceParagraphs";
-import { Scene, getNextScene, playScene } from "./scene";
+import { getNextScene, playScene, type Scene } from "./scene";
 
 export let story: {
   characters: Character[];
@@ -28,6 +28,7 @@ export function playStory(firstScene: Scene | undefined, characters: Character[]
     const news = playScene(currentScene);
     // react to news // creates scene types of Reaction
     runNewsCycle(news, currentScene);
+    resetNewsCycle();
 
     if (turn > 7) break;
   }

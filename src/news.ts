@@ -1,10 +1,11 @@
-import { createAttempt, type Attempt } from "./actions";
+import { GettingBadNews } from "./actions";
+import { createAttempt, type Attempt } from "./attempts";
 import { type ShouldBe } from "./beliefs";
 import { type Character } from "./character";
 import { createSceneSet } from "./choiceConsequenceClosure";
 import { console_log, stringifyAttempt } from "./debug";
 import { isButtonPushed } from "./iPlot";
-import { GettingBadNews, createScene, type Scene } from "./scene";
+import { createScene, type Scene } from "./scene";
 import { story } from "./story";
 
 export type NewsSensitivity = "suggested" | Omit<Attempt["status"], "untried">;
@@ -33,8 +34,9 @@ export function runNewsCycle(newss: News[], sceneJustFinished: Scene) {
             //scheduleScene(reactionScene);
             createSceneSet({ scene: sceneJustFinished, foreshadow: {}, choice: "ally" }, { scene: reactionScene, foreshadow: {} });
           }
+}
 
-  // reset news
+export function resetNewsCycle(): void {
   story.history.push(...story.currentTurnsNews);
   story.currentTurnsNews = [];
 }

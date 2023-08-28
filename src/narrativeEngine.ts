@@ -1,14 +1,15 @@
-import { AbstractActionDefinition, ActionDefinition, Attempt, Noun } from "./actions";
-import { ShouldBe } from "./beliefs";
-import { Character, author } from "./character";
+import type { AbstractActionDefinition, ActionDefinition, Noun } from "./actions";
+import type { Attempt } from "./attempts";
+import { createMyBelief, type ShouldBe } from "./beliefs";
+import { author, type Character } from "./character";
 import { console_log } from "./debug";
 import type { Desireable } from "./iPlot";
 import { weCouldTry, whatTheyAreTryingToDoNow } from "./planningTree";
 import { produceParagraphs } from "./produceParagraphs";
-import { Scene, createScene } from "./scene";
+import { createScene, type Scene } from "./scene";
 import { playStory } from "./story";
 
-export { ActionDefinition, Character, Desireable, weCouldTry };
+export { createMyBelief, weCouldTry, type ActionDefinition, type Character, type Desireable, type ShouldBe };
 
 export function createMyGoal<N extends Noun, SN extends Noun>(
   definition: AbstractActionDefinition<N, SN>,
@@ -27,17 +28,6 @@ export function createMyGoal<N extends Noun, SN extends Noun>(
     fullfilledBy: [],
   };
   return circumvention;
-}
-
-export function createMyBelief(
-  property: ShouldBe["property"],
-  ofDesireable: ShouldBe["ofDesireable"],
-  shouldBe: ShouldBe["shouldBe"],
-  toValue: ShouldBe["toValue"],
-  sensitivity?: ShouldBe["sensitivity"]
-): ShouldBe {
-  const belief: ShouldBe = { property, ofDesireable, shouldBe, toValue, sensitivity };
-  return belief;
 }
 
 ///////////

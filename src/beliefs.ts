@@ -31,3 +31,14 @@ export function moveDesireable(
       throw "Unknown operation on desireable resource " + shouldBe;
   }
 }
+
+export function createMyBelief(
+  property: ShouldBe["property"],
+  ofDesireable: ShouldBe["ofDesireable"],
+  shouldBe: ShouldBe["shouldBe"],
+  toValue: ShouldBe["toValue"],
+  sensitivity?: ShouldBe["sensitivity"]
+): ShouldBe {
+  const belief: ShouldBe = { property, ofDesireable, shouldBe, toValue, sensitivity };
+  return belief;
+}

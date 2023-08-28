@@ -1,4 +1,5 @@
-import { createAttempt, type AbstractActionDefinition, type Attempt } from "./actions";
+import type { AbstractActionDefinition } from "./actions";
+import { createAttempt, type Attempt } from "./attempts";
 import type { Character } from "./character";
 import { console_log, stringifyAttempt } from "./debug";
 import type { Resource } from "./iPlot";

@@ -1,5 +1,5 @@
-import { Attempt } from "./actions";
-import { ShouldBe } from "./beliefs";
+import type { Attempt } from "./attempts";
+import type { ShouldBe } from "./beliefs";
 
 export interface Character {
   name: string;

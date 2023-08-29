@@ -5,19 +5,20 @@ import type { Story } from "./story";
 export type RuleWithOutcome<N, SN> = ((attempt: Attempt<N, SN>, story: Story) => RuleOutcome) & { name?: string };
 export type Rule<N, SN> = ((attempt: Attempt<N, SN>, story: Story) => void) & { name?: string };
 
-export type RuleOutcome = "success" | "failed" | undefined;
+export type RuleOutcome = "success" | "failed" | undefined | false | Attempt | Attempt[];
 export const makeNoDecision: RuleOutcome = undefined;
+export const noDecision: RuleOutcome = false;
 export const pretendItWorked: RuleOutcome = "success";
 
 export interface Rulebook<N, SN> {
   rules: Rule<N, SN>[];
 }
-export interface RulebookWithOutcome<N, SN> {
+export interface CouldRulebook<N, SN> {
   rules: RuleWithOutcome<N, SN>[];
 }
 
 export interface Rulebooks<N, SN> {
-  check?: RulebookWithOutcome<N, SN>;
+  check?: CouldRulebook<N, SN>;
   moveDesireables?: (attempt: Attempt<N, SN>) => ShouldBeStatement[];
   news?: Rulebook<N, SN>;
 }
@@ -33,10 +34,15 @@ export function executeRulebook(attempt: Attempt, story: Story): RuleOutcome {
         outcome = ruleResult;
         break;
       }
+      // array, attempts
+      if (typeof ruleResult == "object") {
+        outcome = "failed";
+        break;
+      }
     }
   if (rulebooks.moveDesireables && outcome != "failed") {
     const shouldBeStatements = rulebooks.moveDesireables(attempt);
-    for (const statement of shouldBeStatements) moveDesireable(...statement);
+    for (const statement of shouldBeStatements) moveDesireable(story, ...statement);
   }
   for (const rule of rulebooks.news?.rules || []) {
     const ruleResult = rule(attempt, story);

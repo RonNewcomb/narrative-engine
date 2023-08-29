@@ -4,7 +4,7 @@ import type { News } from "./news";
 
 export interface Resource {}
 
-export interface Desireable extends Record<string, any>, Resource {
+export interface Desireable extends Record<string | symbol, any>, Resource {
   name: string;
   number?: number;
   owner?: Character;

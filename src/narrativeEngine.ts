@@ -1,6 +1,6 @@
 import type { AbstractActionDefinition, ActionDefinition, Noun } from "./actions";
 import type { Attempt } from "./attempts";
-import { createMyBelief, type ShouldBe } from "./beliefs";
+import { createMyBelief, initializeDesireables, type ShouldBe } from "./beliefs";
 import { author, type Character } from "./character";
 import type { Desireable } from "./iPlot";
 import { weCouldTry, whatTheyAreTryingToDoNow } from "./planningTree";
@@ -28,10 +28,11 @@ export function createMyGoal<N extends Noun, SN extends Noun>(
   return circumvention;
 }
 
-export function main(characters: Character[], actionset: ActionDefinition<any, any>[]) {
+export function main(characters: Character[], actionset: ActionDefinition<any, any>[], desireables: Desireable[]) {
   // sanitize setup
   for (const character of characters) if (!character.goals) character.goals = [];
   for (const character of characters) for (const goal of character.goals) if (!goal.actor || goal.actor == author) goal.actor = character;
+  const desireablesRecord = initializeDesireables(desireables);
 
   // debug
   produceParagraphs(characters);
@@ -47,5 +48,5 @@ export function main(characters: Character[], actionset: ActionDefinition<any, a
   const initialScene: Scene = initialScenes[0];
 
   // GO
-  playStory(initialScene, characters, actionset);
+  playStory(characters, actionset, desireablesRecord, initialScene);
 }

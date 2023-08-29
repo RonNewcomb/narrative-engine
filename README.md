@@ -26,6 +26,8 @@ During a scene, run the character's action as a planning tree / Planner AI. Does
 
 Running a character action involves executing the action definition's rulebook: check rules to see if failed, then rules to make the changes in desireables. After the action was deemed successful, failed, or partly, create a `news` item and run through all the other characters and their beliefs to see if there are any consequences to the action. If so, ChoiceConsequenceClosure attaches a consequence object to the scene.
 
+All desireables, attempts, and beliefs are _resources_.
+
 # Impure functions
 
 weCouldTry - attaches new child node to passed-in parent node... or to character.goals; doesn't return child node

@@ -114,4 +114,4 @@ const Zafra: Character = {
 //   div.innerText = msg;
 // };
 
-main([Rose, Zafra], [Waiting, Exiting, Taking, Dropping, Locking, Unlocking, Opening, Closing, AskingFor]);
+main([Rose, Zafra], [Waiting, Exiting, Taking, Dropping, Locking, Unlocking, Opening, Closing, AskingFor], desireables);

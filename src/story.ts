@@ -1,6 +1,7 @@
 import type { ActionDefinition } from "./actions";
 import type { Character } from "./character";
 import { createSceneSet, type ChoiceConsequenceClosure } from "./choiceConsequenceClosure";
+import { Desireable } from "./iPlot";
 import { News } from "./news";
 import { console_log, produceParagraphs } from "./produceParagraphs";
 import { getNextScene, playScene, type Scene } from "./scene";
@@ -8,14 +9,20 @@ import { getNextScene, playScene, type Scene } from "./scene";
 export interface Story {
   characters: Character[];
   readonly actionset: ActionDefinition<any, any>[];
+  desireables: Record<symbol, Desireable>;
   sceneStack: ChoiceConsequenceClosure[];
   history: News[];
   currentTurnsNews: News[];
 }
 
-export function playStory(firstScene: Scene | undefined, characters: Character[], actionset: ActionDefinition<any, any>[]): void {
+export function playStory(
+  characters: Character[],
+  actionset: ActionDefinition<any, any>[],
+  desireables: Record<symbol, Desireable>,
+  firstScene?: Scene
+): void {
   // initialize story
-  const story: Story = { characters, actionset, sceneStack: [], history: [], currentTurnsNews: [] };
+  const story: Story = { characters, actionset, desireables, sceneStack: [], history: [], currentTurnsNews: [] };
   if (firstScene) createSceneSet(story, { choice: "ally", scene: firstScene });
 
   let turn = 0;

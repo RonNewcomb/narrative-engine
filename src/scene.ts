@@ -46,6 +46,16 @@ export function createScene(actor: Character, pulse: Attempt<Resource, Resource>
   return scene;
 }
 
+export function playScene(scene: Scene, story: Story): RuleOutcome {
+  const character = scene.actor;
+  const sceneAction = scene.pulse; // whatTheyAreTryingToDoNow(character);
+  console_log("BEGIN", scene.pulse.verb, "SCENE:", character.name, stringifyAttempt(sceneAction));
+  if (!sceneAction) console_error("no action -- run AI to pick a scene-action that does/un-does the news? adjusts for it?");
+  if (sceneAction) scene.result = doThingAsAScene(sceneAction, scene, story);
+  scene.isFinished = true;
+  return scene.result;
+}
+
 export function getNextScene(story: Story): Scene | undefined {
   const startScenes = story.sceneStack.filter(s => !s.choice.scene.isFinished);
   if (startScenes.length) return startScenes[0].choice.scene;
@@ -55,15 +65,4 @@ export function getNextScene(story: Story): Scene | undefined {
   if (endScenes.length) return endScenes.reverse()[0].closure.scene;
   console_log("END STORY", story.sceneStack);
   return undefined;
-}
-
-/** outputs: scene success/failure/complication and news of what happened */
-export function playScene(scene: Scene, story: Story): RuleOutcome {
-  const character = scene.actor;
-  const sceneAction = scene.pulse; // whatTheyAreTryingToDoNow(character);
-  console_log("BEGIN", scene.pulse.verb, "SCENE:", character.name, stringifyAttempt(sceneAction));
-  if (!sceneAction) console_error("no action -- run AI to pick a scene-action that does/un-does the news? adjusts for it?");
-  if (sceneAction) scene.result = doThingAsAScene(sceneAction, scene, story);
-  scene.isFinished = true;
-  return scene.result;
 }

@@ -12,12 +12,12 @@ export function weCouldTry<N extends Resource, SN extends Resource>(
   secondNoun: SN | undefined,
   /** parent action */
   failingAction: Attempt<any, any> | undefined
-): "failed" {
+): Attempt {
   const circumvention = createAttempt(actor, definition, noun, secondNoun, failingAction);
   console_log(actor.name, "could try", stringifyAction(circumvention), "before", stringifyAttempt(failingAction));
   if (failingAction) failingAction.fullfilledBy.push(circumvention);
   else actor.goals.push(circumvention);
-  return "failed";
+  return circumvention;
 }
 
 const inTheFuture = (it: Attempt): boolean => it.status == "untried" && (!it.fulfills || inTheFuture(it.fulfills));

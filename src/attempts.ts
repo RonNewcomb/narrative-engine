@@ -1,7 +1,7 @@
 import { StuckForSolutions, type AbstractActionDefinition, type Verb } from "./actions";
 import type { Character } from "./characters";
 import { createNewsItem, reactionsToNews, resetNewsCycle } from "./news";
-import { console_log, stringifyAction, stringifyAttempt } from "./paragraphs";
+import { console_log, publish, stringifyAction, stringifyAttempt } from "./paragraphs";
 import { weCouldTry, whatTheyAreTryingToDoNowRegarding } from "./planningTree";
 import type { Resource } from "./resources";
 import { executeRulebook, type RuleOutcome } from "./rulebooks";
@@ -76,7 +76,7 @@ function doThing(thisAttempt: Attempt, currentScene: Scene, story: Story): Attem
 
   for (const consequence of consequences) {
     const foreshadow = consequence.foreshadow!;
-    console_log("((But", foreshadow.character.name, " didn't like ", stringifyAction(foreshadow.news), ".))");
+    publish("((But", foreshadow.character.name, " won't like ", stringifyAction(foreshadow.news), ".))");
   }
 
   return thisAttempt.status;

@@ -51,3 +51,13 @@ produceParagraphs - whole file is I/O
 executeRulebook - calls moveDesireable
 
 playScene - mutates scene.result, .isFinished; calls doThingAsAScene
+
+## TODOs
+
+- can fully run speculatively
+
+- examples of using the foreshadowing feature
+
+- can give it a parser fn that returns the Action a player wants to do
+
+- publish() and diff()

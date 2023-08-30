@@ -6,8 +6,11 @@
     //"outFile": "build.js",  // use rollup, or use all ambient files. tsc flatly refuses to outFile + esmodules
     "outDir": "build",
     "strict": true,
-    "allowJs": false,
-    "importHelpers": true
+    "allowJs": false
+    // "importHelpers": true,
+    // "paths": {
+    //   "tslib": ["path/to/node_modules/tslib/tslib.d.ts"]
+    // }
   },
   "include": ["src/*.ts"]
 }

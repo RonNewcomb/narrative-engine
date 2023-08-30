@@ -8,7 +8,7 @@ export function produceParagraphs(information: Information): string {
   return paragraph;
 }
 
-export let console_log: (...data: any[]) => void = console.log;
+export let console_log: (...data: any[]) => void = publish; //console.log;
 export let console_error: (...data: any[]) => void = console.error;
 
 export function stringify(obj: any): string {
@@ -50,4 +50,13 @@ export function stringifyAction(act: Attempt | undefined): string {
 export function stringifyAttempt(attempt: Attempt | undefined): string {
   if (!attempt) return "[no attempt]";
   return stringifyAction(attempt) + " (" + attempt.status + ")";
+}
+
+export function publish(...texts: any[]): void {
+  const published = document.getElementById("published")!;
+  const div = document.createElement("div");
+  const text = texts.join(" ");
+  div.append(text);
+  published.appendChild(div);
+  console.log(text);
 }

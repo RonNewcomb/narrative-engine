@@ -1,7 +1,21 @@
 <body style="background-color: darkblue; color:white;">
-    <pre id="current"></pre>
-    <pre>
-        build.js:23 [
+    <style>
+        body {
+            line-height: 20px
+        }
+
+        .old {
+            opacity: 0.5;
+        }
+
+        .flexrow {
+            display: flex;
+        }
+    </style>
+    <div class="flexrow">
+        <pre id="published"></pre>
+        <pre class="old">
+[
     {
         "name": "Rose",
         "beliefs": [],
@@ -30,24 +44,23 @@
         "goals": []
     }
 ]
-build.js:434 1 initial scenes
-build.js:116 -- new scene set
-build.js:387 TURN 1
-build.js:97 BEGIN exit SCENE: Rose Rose exit   (untried)
-build.js:327 Rose could try Rose unlock door with  before Rose exit   (untried)
-build.js:307 DONE: Rose exit   (partly successful)
-build.js:309 failed.  Could be fulfilled by: ['Rose unlock door with  (untried)']
-build.js:363   Q: What is Rose trying to do now?
-build.js:364   A: Rose unlock door with  (untried)
-build.js:291 same scene, now Rose unlock door with  (untried)
-build.js:307 DONE: Rose unlock door with  (successful)
-build.js:317 ((But Zafra  didn't like  Rose unlock door with  .))
-build.js:363   Q: What is Rose trying to do now?
-build.js:364   A: Rose exit   (partly successful)
-build.js:291 same scene, now Rose exit   (partly successful)
-build.js:307 DONE: Rose exit   (successful)
-build.js:390 END TURN 1
-build.js:23 [
+1 initial scenes 
+TURN 1
+BEGIN exit SCENE: Rose Rose exit   (untried)
+Rose could try Rose unlock door with  before Rose exit   (untried)
+DONE: Rose exit   (partly successful)
+failed.  Could be fulfilled by: ['Rose unlock door with  (untried)']
+  Q: What is Rose trying to do now?
+  A: Rose unlock door with  (untried)
+same scene, now Rose unlock door with  (untried)
+DONE: Rose unlock door with  (successful)
+((But Zafra  won't like  Rose unlock door with  .))
+  Q: What is Rose trying to do now?
+  A: Rose exit   (partly successful)
+same scene, now Rose exit   (partly successful)
+DONE: Rose exit   (successful)
+END TURN 1
+[
     {
         "name": "Rose",
         "beliefs": [],
@@ -88,8 +101,8 @@ build.js:23 [
         "goals": []
     }
 ]
-build.js:387 TURN 2
-build.js:97 BEGIN receiving news _ violating belief _ SCENE: Zafra Zafra receiving news {
+TURN 2
+BEGIN receiving news _ violating belief _ SCENE: Zafra Zafra receiving news {
     "verb": "unlock _ with",
     "actor": "\\\\Rose",
     "noun": {
@@ -109,8 +122,8 @@ build.js:97 BEGIN receiving news _ violating belief _ SCENE: Zafra Zafra receivi
     "shouldBe": "=",
     "toValue": true
 } (untried)
-build.js:214 " Rose unlock door with  (successful)  is bad news."
-build.js:327 Zafra could try Zafra lock door with  before Zafra receiving news {
+" Rose unlock door with  (successful)  is bad news."
+Zafra could try Zafra lock door with  before Zafra receiving news {
     "verb": "unlock _ with",
     "actor": "\\\\Rose",
     "noun": {
@@ -130,7 +143,7 @@ build.js:327 Zafra could try Zafra lock door with  before Zafra receiving news {
     "shouldBe": "=",
     "toValue": true
 } (untried)
-build.js:307 DONE: Zafra receiving news {
+DONE: Zafra receiving news {
     "verb": "unlock _ with",
     "actor": "\\\\Rose",
     "noun": {
@@ -150,15 +163,15 @@ build.js:307 DONE: Zafra receiving news {
     "shouldBe": "=",
     "toValue": true
 } (partly successful)
-build.js:309 failed.  Could be fulfilled by: ['Zafra lock door with  (untried)']
-build.js:363   Q: What is Zafra trying to do now?
-build.js:364   A: Zafra lock door with  (untried)
-build.js:291 same scene, now Zafra lock door with  (untried)
-build.js:307 DONE: Zafra lock door with  (failed)
-build.js:363   Q: What is Zafra trying to do now?
-build.js:364   A: nothing
-build.js:291 same scene, now [no attempt]
-build.js:295 STUCK: Zafra receiving news {
+failed.  Could be fulfilled by: ['Zafra lock door with  (untried)']
+  Q: What is Zafra trying to do now?
+  A: Zafra lock door with  (untried)
+same scene, now Zafra lock door with  (untried)
+DONE: Zafra lock door with  (failed)
+  Q: What is Zafra trying to do now?
+  A: nothing
+same scene, now [no attempt]
+STUCK: Zafra receiving news {
     "verb": "unlock _ with",
     "actor": "\\\\Rose",
     "noun": {
@@ -178,7 +191,7 @@ build.js:295 STUCK: Zafra receiving news {
     "shouldBe": "=",
     "toValue": true
 } (partly successful)
-build.js:327 Zafra could try Zafra searching for solutions to {
+Zafra could try Zafra searching for solutions to {
     "verb": "receiving news _ violating belief _",
     "actor": "\\\\Zafra",
     "noun": {
@@ -217,8 +230,8 @@ build.js:327 Zafra could try Zafra searching for solutions to {
         }
     ]
 }  before [no attempt]
-build.js:390 END TURN 2
-build.js:23 [
+END TURN 2
+[
     {
         "name": "Rose",
         "beliefs": [],
@@ -305,8 +318,8 @@ build.js:23 [
         ]
     }
 ]
-build.js:387 TURN 3
-build.js:97 BEGIN reflecting upon attempt _ SCENE: Rose Rose reflecting upon attempt {
+TURN 3
+BEGIN reflecting upon attempt _ SCENE: Rose Rose reflecting upon attempt {
     "verb": "exit",
     "actor": "\\\\Rose",
     "status": "successful",
@@ -324,8 +337,8 @@ build.js:97 BEGIN reflecting upon attempt _ SCENE: Rose Rose reflecting upon att
         }
     ]
 }  (untried)
-build.js:198 Rose reflected.
-build.js:307 DONE: Rose reflecting upon attempt {
+Rose reflected.
+DONE: Rose reflecting upon attempt {
     "verb": "exit",
     "actor": "\\\\Rose",
     "status": "successful",
@@ -343,8 +356,8 @@ build.js:307 DONE: Rose reflecting upon attempt {
         }
     ]
 }  (successful)
-build.js:390 END TURN 3
-build.js:23 [
+END TURN 3
+[
     {
         "name": "Rose",
         "beliefs": [],
@@ -431,8 +444,9 @@ build.js:23 [
         ]
     }
 ]
-build.js:90 END STORY [{…}]
+END STORY [{…}]
 </pre>
-
+        <pre id="diff"></pre>
+    </div>
     <script src="./build.js"></script>
 </body>

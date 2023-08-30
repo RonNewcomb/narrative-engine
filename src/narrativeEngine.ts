@@ -6,9 +6,9 @@ import { console_log, produceParagraphs } from "./paragraphs";
 import { weCouldTry, whatTheyAreTryingToDoNow } from "./planningTree";
 import type { Desireable } from "./resources";
 import { createScene, type Scene } from "./scenes";
-import { playStory } from "./story";
+import { playStory, type Story } from "./story";
 
-export { createMyBelief, weCouldTry, type ActionDefinition, type Character, type Desireable, type ShouldBe };
+export { createMyBelief, weCouldTry, type ActionDefinition, type Attempt, type Character, type Desireable, type ShouldBe, type Story };
 
 export function createMyGoal<N extends Noun, SN extends Noun>(
   definition: AbstractActionDefinition<N, SN>,
@@ -28,7 +28,12 @@ export function createMyGoal<N extends Noun, SN extends Noun>(
   return circumvention;
 }
 
-export function main(characters: Character[], actionset: ActionDefinition<any, any>[], desireables: Desireable[]) {
+export async function main(
+  characters: Character[],
+  actionset: ActionDefinition<any, any>[],
+  desireables: Desireable[],
+  getPlayerInput: (story: Story, viewpointCharacter: Character) => Promise<Attempt | undefined>
+) {
   // sanitize setup
   for (const character of characters) if (!character.goals) character.goals = [];
   for (const character of characters) for (const goal of character.goals) if (!goal.actor || goal.actor == author) goal.actor = character;
@@ -48,5 +53,7 @@ export function main(characters: Character[], actionset: ActionDefinition<any, a
   const initialScene: Scene = initialScenes[0];
 
   // GO
-  playStory(characters, actionset, desireablesRecord, initialScene);
+  const theEnd = await playStory(characters, actionset, desireablesRecord, getPlayerInput, initialScene);
+
+  return theEnd;
 }

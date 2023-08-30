@@ -1,5 +1,5 @@
-import type { Desireable, Resource } from "./iPlot";
 import type { NewsSensitivity } from "./news";
+import type { Desireable, Resource } from "./resources";
 import type { Story } from "./story";
 
 export interface ShouldBe extends Resource {

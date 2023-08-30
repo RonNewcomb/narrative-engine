@@ -1,9 +1,9 @@
 import type { Attempt } from "./attempts";
 import type { ShouldBe } from "./beliefs";
-import { type Desireable, type Resource } from "./iPlot";
 import { createNewsItem, type News } from "./news";
+import { console_log, stringifyAttempt } from "./paragraphs";
 import { weCouldTry } from "./planningTree";
-import { console_log, stringifyAttempt } from "./produceParagraphs";
+import { type Desireable, type Resource } from "./resources";
 import type { Rulebooks } from "./rulebooks";
 import type { Story } from "./story";
 

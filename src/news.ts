@@ -1,10 +1,9 @@
 import { ReceivingImportantNews } from "./actions";
 import { createAttempt, type Attempt } from "./attempts";
 import { type ShouldBe } from "./beliefs";
-import { type Character } from "./character";
-import { createSceneSet, type ConsequenceWithForeshadowedNewsProvingAgency, type ForeShadowing } from "./choiceConsequenceClosure";
-import { isButtonPushed } from "./iPlot";
-import { createScene, type Scene } from "./scene";
+import { type Character } from "./characters";
+import { createSceneSet, isButtonPushed, type ConsequenceWithForeshadowedNewsProvingAgency, type ForeShadowing } from "./consequences";
+import { createScene, type Scene } from "./scenes";
 import { type Story } from "./story";
 
 export type NewsSensitivity = "suggested" | Omit<Attempt["status"], "untried">;

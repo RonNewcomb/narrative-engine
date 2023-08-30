@@ -1,7 +1,7 @@
 import { doThingAsAScene, type Attempt } from "./attempts";
-import { type Character } from "./character";
-import { type Resource } from "./iPlot";
-import { console_error, console_log, stringifyAttempt } from "./produceParagraphs";
+import { type Character } from "./characters";
+import { console_error, console_log, stringifyAttempt } from "./paragraphs";
+import { type Resource } from "./resources";
 import { type RuleOutcome } from "./rulebooks";
 import { type Story } from "./story";
 

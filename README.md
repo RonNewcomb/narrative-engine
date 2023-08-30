@@ -4,7 +4,7 @@ Implementing ideas from https://www.gamedeveloper.com/author/ron-newcomb with he
 
 ## Install and Run
 
-With typescript and rollup both installed globally `npm i rollup --global` issue the commands:
+With typescript and rollup both installed globally `npm i rollup --global` and `npm install tslib --global` issue the commands:
 
 `tsc && rollup --file build.js build/g1.js`
 

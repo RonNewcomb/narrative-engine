@@ -1,10 +1,10 @@
 import type { ActionDefinition } from "./actions";
-import type { Character } from "./character";
-import { createSceneSet, type ChoiceConsequenceClosure } from "./choiceConsequenceClosure";
-import { Desireable } from "./iPlot";
+import type { Character } from "./characters";
+import { createSceneSet, type ChoiceConsequenceClosure } from "./consequences";
 import { News } from "./news";
-import { console_log, produceParagraphs } from "./produceParagraphs";
-import { getNextScene, playScene, type Scene } from "./scene";
+import { console_log, produceParagraphs } from "./paragraphs";
+import { Desireable } from "./resources";
+import { getNextScene, playScene, type Scene } from "./scenes";
 
 export interface Story {
   characters: Character[];

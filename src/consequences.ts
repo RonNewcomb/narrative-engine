@@ -1,8 +1,9 @@
 import { ReflectUpon } from "./actions";
 import { createAttempt, type Attempt } from "./attempts";
 import type { ShouldBe } from "./beliefs";
-import type { Character } from "./character";
-import { createScene, type Scene } from "./scene";
+import type { Character } from "./characters";
+import { News } from "./news";
+import { createScene, type Scene } from "./scenes";
 import type { Story } from "./story";
 
 export interface ForeShadowing {
@@ -57,4 +58,17 @@ export function createSceneSet(
   };
   story.sceneStack.push(ccc);
   return ccc;
+}
+
+export function isButtonPushed(news: News, belief: ShouldBe): boolean {
+  const changeStatements = news.definition.rulebooks?.moveDesireables?.(news) || [];
+  if (!changeStatements || !changeStatements.length) return false;
+  for (const statement of changeStatements) {
+    if (statement[0] != belief.property && (statement[0] || belief.property)) continue; // they differ and either/both are a truthy value
+    if (statement[1] != belief.ofDesireable) continue;
+    // if (statement[2] != belief.toValue) return true;
+    // if (statement[3] != belief.toValue) return true;
+    return true;
+  }
+  return false;
 }

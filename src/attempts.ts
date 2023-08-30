@@ -1,11 +1,11 @@
 import { StuckForSolutions, type AbstractActionDefinition, type Verb } from "./actions";
-import type { Character } from "./character";
-import type { Resource } from "./iPlot";
+import type { Character } from "./characters";
 import { createNewsItem, reactionsToNews, resetNewsCycle } from "./news";
+import { console_log, stringifyAction, stringifyAttempt } from "./paragraphs";
 import { weCouldTry, whatTheyAreTryingToDoNowRegarding } from "./planningTree";
-import { console_log, stringifyAction, stringifyAttempt } from "./produceParagraphs";
+import type { Resource } from "./resources";
 import { executeRulebook, type RuleOutcome } from "./rulebooks";
-import type { Scene } from "./scene";
+import type { Scene } from "./scenes";
 import type { Story } from "./story";
 
 /** An action which has failed.  Attempts record which Check rule prevented the action and whether the action could or should be re-attempted later.

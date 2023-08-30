@@ -1,8 +1,8 @@
 import type { AbstractActionDefinition } from "./actions";
 import { createAttempt, type Attempt } from "./attempts";
-import type { Character } from "./character";
-import type { Resource } from "./iPlot";
-import { console_log, stringifyAction, stringifyAttempt } from "./produceParagraphs";
+import type { Character } from "./characters";
+import { console_log, stringifyAction, stringifyAttempt } from "./paragraphs";
+import type { Resource } from "./resources";
 
 /** attaches a suggestion to the tree */
 export function weCouldTry<N extends Resource, SN extends Resource>(

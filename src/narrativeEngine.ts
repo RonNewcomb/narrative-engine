@@ -1,11 +1,11 @@
 import type { AbstractActionDefinition, ActionDefinition, Noun } from "./actions";
 import type { Attempt } from "./attempts";
 import { createMyBelief, initializeDesireables, type ShouldBe } from "./beliefs";
-import { author, type Character } from "./character";
-import type { Desireable } from "./iPlot";
+import { author, type Character } from "./characters";
+import { console_log, produceParagraphs } from "./paragraphs";
 import { weCouldTry, whatTheyAreTryingToDoNow } from "./planningTree";
-import { console_log, produceParagraphs } from "./produceParagraphs";
-import { createScene, type Scene } from "./scene";
+import type { Desireable } from "./resources";
+import { createScene, type Scene } from "./scenes";
 import { playStory } from "./story";
 
 export { createMyBelief, weCouldTry, type ActionDefinition, type Character, type Desireable, type ShouldBe };

@@ -4,7 +4,7 @@ export let console_log: (...data: any[]) => void = (...texts: any[]): void => {
   console.log(...texts);
   const published = document.getElementById("published")!;
   const div = document.createElement("div");
-  div.style.display = "none";
+  div.className = "debug";
   const text = texts.join(" ");
   div.append(text);
   published.appendChild(div);

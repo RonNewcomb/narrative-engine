@@ -41,6 +41,6 @@ export async function playStory(
     if (turn > 7) break;
   }
   publish("THE END");
-  console_log(story.sceneStack);
+  console_log(stringify(story.sceneStack));
   return story;
 }

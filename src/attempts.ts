@@ -1,7 +1,7 @@
 import { StuckForSolutions, type AbstractActionDefinition, type Verb } from "./actions";
 import type { Character } from "./characters";
 import { createNewsItem, reactionsToNews, resetNewsCycle } from "./news";
-import { console_log, publish, stringifyAction, stringifyAttempt } from "./paragraphs";
+import { publish, stringifyAction, stringifyAttempt } from "./paragraphs";
 import { weCouldTry, whatTheyAreTryingToDoNowRegarding } from "./planningTree";
 import type { Resource } from "./resources";
 import { executeRulebook, type RuleOutcome } from "./rulebooks";
@@ -47,10 +47,10 @@ export function doThingAsAScene(thisAttempt: Attempt, currentScene: Scene, story
 
   while (thisAttempt.status == "partly successful") {
     let subAttempt = whatTheyAreTryingToDoNowRegarding(thisAttempt.actor, thisAttempt);
-    console_log("same scene, now", stringifyAttempt(subAttempt));
+    publish("same scene, now", stringifyAttempt(subAttempt));
     if (subAttempt) doThing(subAttempt, currentScene, story);
     else {
-      console_log("STUCK:", stringifyAttempt(thisAttempt));
+      publish("STUCK:", stringifyAttempt(thisAttempt));
       if (thisAttempt.actor.goals.includes(thisAttempt)) thisAttempt.actor.goals = thisAttempt.actor.goals.filter(g => g != thisAttempt);
       return weCouldTry(thisAttempt.actor, StuckForSolutions, thisAttempt, undefined, undefined);
     }
@@ -64,10 +64,10 @@ function doThing(thisAttempt: Attempt, currentScene: Scene, story: Story): Attem
   const outcome = executeRulebook(thisAttempt, story);
   thisAttempt.status = outcome != "failed" ? "successful" : thisAttempt.fullfilledBy.length > 0 ? "partly successful" : "failed";
 
-  console_log("DONE:", stringifyAttempt(thisAttempt));
+  publish("DONE:", stringifyAttempt(thisAttempt));
 
   if (thisAttempt.status == "partly successful")
-    console_log((outcome || "seems to succeed") + ".  Could be fulfilled by:", thisAttempt.fullfilledBy.map(stringifyAttempt));
+    publish((outcome || "seems to succeed") + ".  Could be fulfilled by:", thisAttempt.fullfilledBy.map(stringifyAttempt));
 
   // react to news // creates scene types of Reaction
   const news = createNewsItem(thisAttempt, story);

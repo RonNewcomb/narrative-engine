@@ -1,32 +1,27 @@
 import type { Attempt } from "./attempts";
 
-export interface Information {}
+export let console_log: (...data: any[]) => void = (...texts: any[]): void => {
+  console.log(...texts);
+  const published = document.getElementById("published")!;
+  const div = document.createElement("div");
+  div.style.display = "none";
+  const text = texts.join(" ");
+  div.append(text);
+  published.appendChild(div);
+};
 
-export function produceParagraphs(information: Information): string {
-  const paragraph = stringify(information);
-  console_log(paragraph);
-  return paragraph;
-}
-
-export let console_log: (...data: any[]) => void = publish; //console.log;
 export let console_error: (...data: any[]) => void = console.error;
 
 export function stringify(obj: any): string {
   return JSON.stringify(
     obj,
     (key, value) =>
-      key == "actor" && !!value
-        ? `\\\\${value.name}`
-        : key == "fulfills" && !!value
-        ? "\\\\<backlink>"
-        : key == "definition"
-        ? undefined
-        : value,
+      key == "actor" && !!value ? `\\\\${value.name}` : key == "fulfills" && !!value ? "\\\\.." : key == "definition" ? undefined : value,
     4
   );
 }
 
-export function stringifyAction(act: Attempt | undefined): string {
+export function stringifyAction(act: Attempt | undefined, omitActor: boolean = false): string {
   if (!act) return "[no act]";
   const nounName: string = !act.noun
     ? ""
@@ -44,7 +39,7 @@ export function stringifyAction(act: Attempt | undefined): string {
     : stringify(act.secondNoun);
   const rearrange: boolean = act.verb.includes("_");
   const predicate: string = rearrange ? act.verb.replace("_", nounName || "") : act.verb;
-  return (act.actor?.name || "") + " " + predicate + " " + (noun2Name || "") + (rearrange ? "" : " " + (nounName || ""));
+  return (omitActor ? "" : (act.actor?.name || "") + " ") + predicate + " " + (noun2Name || "") + (rearrange ? "" : " " + (nounName || ""));
 }
 
 export function stringifyAttempt(attempt: Attempt | undefined): string {
@@ -53,10 +48,10 @@ export function stringifyAttempt(attempt: Attempt | undefined): string {
 }
 
 export function publish(...texts: any[]): void {
+  console.log(...texts);
   const published = document.getElementById("published")!;
   const div = document.createElement("div");
   const text = texts.join(" ");
   div.append(text);
   published.appendChild(div);
-  console.log(text);
 }

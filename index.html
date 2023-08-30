@@ -15,251 +15,198 @@
     <div class="flexrow">
         <pre id="published"></pre>
         <pre class="old">
-[
-    {
-        "name": "Rose",
-        "beliefs": [],
-        "goals": [
+            [
             {
-                "verb": "exit",
-                "actor": "\\\\Rose",
-                "status": "untried",
-                "fullfilledBy": []
-            }
-        ]
-    },
-    {
-        "name": "Zafra",
-        "beliefs": [
-            {
-                "property": "isLocked",
-                "ofDesireable": {
-                    "name": "door",
-                    "isLocked": true
-                },
-                "shouldBe": "=",
-                "toValue": true
-            }
-        ],
-        "goals": []
-    }
-]
-1 initial scenes 
-TURN 1
-BEGIN exit SCENE: Rose Rose exit   (untried)
-Rose could try Rose unlock door with  before Rose exit   (untried)
-DONE: Rose exit   (partly successful)
-failed.  Could be fulfilled by: ['Rose unlock door with  (untried)']
-  Q: What is Rose trying to do now?
-  A: Rose unlock door with  (untried)
-same scene, now Rose unlock door with  (untried)
-DONE: Rose unlock door with  (successful)
-((But Zafra  won't like  Rose unlock door with  .))
-  Q: What is Rose trying to do now?
-  A: Rose exit   (partly successful)
-same scene, now Rose exit   (partly successful)
-DONE: Rose exit   (successful)
-END TURN 1
-[
-    {
-        "name": "Rose",
-        "beliefs": [],
-        "goals": [
-            {
-                "verb": "exit",
-                "actor": "\\\\Rose",
-                "status": "successful",
-                "fullfilledBy": [
+                "name": "Rose",
+                "beliefs": [],
+                "goals": [
                     {
-                        "verb": "unlock _ with",
+                        "verb": "exit",
                         "actor": "\\\\Rose",
-                        "noun": {
-                            "name": "door",
-                            "isLocked": false
-                        },
-                        "status": "successful",
-                        "fulfills": "\\\\<backlink>",
+                        "status": "untried",
                         "fullfilledBy": []
                     }
                 ]
+            },
+            {
+                "name": "Zafra",
+                "beliefs": [
+                    {
+                        "property": "isLocked",
+                        "ofDesireable": {
+                            "name": "door",
+                            "isLocked": true
+                        },
+                        "shouldBe": "=",
+                        "toValue": true
+                    }
+                ],
+                "goals": []
             }
         ]
-    },
-    {
-        "name": "Zafra",
-        "beliefs": [
+        1 initial scenes
+        TURN 1
+        BEGIN exit SCENE: Rose Rose exit   (untried)
+        Rose could try Rose unlock door with  before Rose exit   (untried)
+        DONE: Rose exit   (partly successful)
+        failed.  Could be fulfilled by: Rose unlock door with  (untried)
+          Q: What is Rose trying to do now?
+          A: Rose unlock door with  (untried)
+        same scene, now Rose unlock door with  (untried)
+        DONE: Rose unlock door with  (successful)
+        ((But Zafra  won't like  Rose unlock door with  .))
+          Q: What is Rose trying to do now?
+          A: Rose exit   (partly successful)
+        same scene, now Rose exit   (partly successful)
+        DONE: Rose exit   (successful)
+        END TURN 1
+        [
             {
-                "property": "isLocked",
-                "ofDesireable": {
-                    "name": "door",
-                    "isLocked": false
-                },
-                "shouldBe": "=",
-                "toValue": true
+                "name": "Rose",
+                "beliefs": [],
+                "goals": [
+                    {
+                        "verb": "exit",
+                        "actor": "\\\\Rose",
+                        "status": "successful",
+                        "fullfilledBy": [
+                            {
+                                "verb": "unlock _ with",
+                                "actor": "\\\\Rose",
+                                "noun": {
+                                    "name": "door",
+                                    "isLocked": false
+                                },
+                                "status": "successful",
+                                "fulfills": "\\\\..",
+                                "fullfilledBy": []
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "Zafra",
+                "beliefs": [
+                    {
+                        "property": "isLocked",
+                        "ofDesireable": {
+                            "name": "door",
+                            "isLocked": false
+                        },
+                        "shouldBe": "=",
+                        "toValue": true
+                    }
+                ],
+                "goals": []
             }
-        ],
-        "goals": []
-    }
-]
-TURN 2
-BEGIN receiving news _ violating belief _ SCENE: Zafra Zafra receiving news {
-    "verb": "unlock _ with",
-    "actor": "\\\\Rose",
-    "noun": {
-        "name": "door",
-        "isLocked": false
-    },
-    "status": "successful",
-    "fulfills": "\\\\<backlink>",
-    "fullfilledBy": [],
-    "level": "successful"
-} violating belief _ {
-    "property": "isLocked",
-    "ofDesireable": {
-        "name": "door",
-        "isLocked": false
-    },
-    "shouldBe": "=",
-    "toValue": true
-} (untried)
-" Rose unlock door with  (successful)  is bad news."
-Zafra could try Zafra lock door with  before Zafra receiving news {
-    "verb": "unlock _ with",
-    "actor": "\\\\Rose",
-    "noun": {
-        "name": "door",
-        "isLocked": false
-    },
-    "status": "successful",
-    "fulfills": "\\\\<backlink>",
-    "fullfilledBy": [],
-    "level": "successful"
-} violating belief _ {
-    "property": "isLocked",
-    "ofDesireable": {
-        "name": "door",
-        "isLocked": false
-    },
-    "shouldBe": "=",
-    "toValue": true
-} (untried)
-DONE: Zafra receiving news {
-    "verb": "unlock _ with",
-    "actor": "\\\\Rose",
-    "noun": {
-        "name": "door",
-        "isLocked": false
-    },
-    "status": "successful",
-    "fulfills": "\\\\<backlink>",
-    "fullfilledBy": [],
-    "level": "successful"
-} violating belief _ {
-    "property": "isLocked",
-    "ofDesireable": {
-        "name": "door",
-        "isLocked": false
-    },
-    "shouldBe": "=",
-    "toValue": true
-} (partly successful)
-failed.  Could be fulfilled by: ['Zafra lock door with  (untried)']
-  Q: What is Zafra trying to do now?
-  A: Zafra lock door with  (untried)
-same scene, now Zafra lock door with  (untried)
-DONE: Zafra lock door with  (failed)
-  Q: What is Zafra trying to do now?
-  A: nothing
-same scene, now [no attempt]
-STUCK: Zafra receiving news {
-    "verb": "unlock _ with",
-    "actor": "\\\\Rose",
-    "noun": {
-        "name": "door",
-        "isLocked": false
-    },
-    "status": "successful",
-    "fulfills": "\\\\<backlink>",
-    "fullfilledBy": [],
-    "level": "successful"
-} violating belief _ {
-    "property": "isLocked",
-    "ofDesireable": {
-        "name": "door",
-        "isLocked": false
-    },
-    "shouldBe": "=",
-    "toValue": true
-} (partly successful)
-Zafra could try Zafra searching for solutions to {
-    "verb": "receiving news _ violating belief _",
-    "actor": "\\\\Zafra",
-    "noun": {
-        "verb": "unlock _ with",
-        "actor": "\\\\Rose",
-        "noun": {
-            "name": "door",
-            "isLocked": false
-        },
-        "status": "successful",
-        "fulfills": "\\\\<backlink>",
-        "fullfilledBy": [],
-        "level": "successful"
-    },
-    "secondNoun": {
-        "property": "isLocked",
-        "ofDesireable": {
-            "name": "door",
-            "isLocked": false
-        },
-        "shouldBe": "=",
-        "toValue": true
-    },
-    "status": "partly successful",
-    "fullfilledBy": [
-        {
-            "verb": "lock _ with",
+        ]
+        TURN 2
+        BEGIN receiving news _ violating belief _ SCENE: Zafra Zafra receiving news {
+            "verb": "unlock _ with",
+            "actor": "\\\\Rose",
+            "noun": {
+                "name": "door",
+                "isLocked": false
+            },
+            "status": "successful",
+            "fulfills": "\\\\..",
+            "fullfilledBy": [],
+            "level": "successful"
+        } violating belief _ {
+            "property": "isLocked",
+            "ofDesireable": {
+                "name": "door",
+                "isLocked": false
+            },
+            "shouldBe": "=",
+            "toValue": true
+        } (untried)
+        " Rose unlock door with  (successful)  is bad news."
+        Zafra could try Zafra lock door with  before Zafra receiving news {
+            "verb": "unlock _ with",
+            "actor": "\\\\Rose",
+            "noun": {
+                "name": "door",
+                "isLocked": false
+            },
+            "status": "successful",
+            "fulfills": "\\\\..",
+            "fullfilledBy": [],
+            "level": "successful"
+        } violating belief _ {
+            "property": "isLocked",
+            "ofDesireable": {
+                "name": "door",
+                "isLocked": false
+            },
+            "shouldBe": "=",
+            "toValue": true
+        } (untried)
+        DONE: Zafra receiving news {
+            "verb": "unlock _ with",
+            "actor": "\\\\Rose",
+            "noun": {
+                "name": "door",
+                "isLocked": false
+            },
+            "status": "successful",
+            "fulfills": "\\\\..",
+            "fullfilledBy": [],
+            "level": "successful"
+        } violating belief _ {
+            "property": "isLocked",
+            "ofDesireable": {
+                "name": "door",
+                "isLocked": false
+            },
+            "shouldBe": "=",
+            "toValue": true
+        } (partly successful)
+        failed.  Could be fulfilled by: Zafra lock door with  (untried)
+          Q: What is Zafra trying to do now?
+          A: Zafra lock door with  (untried)
+        same scene, now Zafra lock door with  (untried)
+        DONE: Zafra lock door with  (failed)
+          Q: What is Zafra trying to do now?
+          A: nothing
+        same scene, now [no attempt]
+        STUCK: Zafra receiving news {
+            "verb": "unlock _ with",
+            "actor": "\\\\Rose",
+            "noun": {
+                "name": "door",
+                "isLocked": false
+            },
+            "status": "successful",
+            "fulfills": "\\\\..",
+            "fullfilledBy": [],
+            "level": "successful"
+        } violating belief _ {
+            "property": "isLocked",
+            "ofDesireable": {
+                "name": "door",
+                "isLocked": false
+            },
+            "shouldBe": "=",
+            "toValue": true
+        } (partly successful)
+        Zafra could try Zafra searching for solutions to {
+            "verb": "receiving news _ violating belief _",
             "actor": "\\\\Zafra",
             "noun": {
-                "name": "door",
-                "isLocked": false
-            },
-            "status": "failed",
-            "fulfills": "\\\\<backlink>",
-            "fullfilledBy": []
-        }
-    ]
-}  before [no attempt]
-END TURN 2
-[
-    {
-        "name": "Rose",
-        "beliefs": [],
-        "goals": [
-            {
-                "verb": "exit",
+                "verb": "unlock _ with",
                 "actor": "\\\\Rose",
+                "noun": {
+                    "name": "door",
+                    "isLocked": false
+                },
                 "status": "successful",
-                "fullfilledBy": [
-                    {
-                        "verb": "unlock _ with",
-                        "actor": "\\\\Rose",
-                        "noun": {
-                            "name": "door",
-                            "isLocked": false
-                        },
-                        "status": "successful",
-                        "fulfills": "\\\\<backlink>",
-                        "fullfilledBy": []
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "name": "Zafra",
-        "beliefs": [
-            {
+                "fulfills": "\\\\..",
+                "fullfilledBy": [],
+                "level": "successful"
+            },
+            "secondNoun": {
                 "property": "isLocked",
                 "ofDesireable": {
                     "name": "door",
@@ -267,28 +214,52 @@ END TURN 2
                 },
                 "shouldBe": "=",
                 "toValue": true
-            }
-        ],
-        "goals": [
-            {
-                "verb": "searching for solutions to _",
-                "actor": "\\\\Zafra",
-                "noun": {
-                    "verb": "receiving news _ violating belief _",
+            },
+            "status": "partly successful",
+            "fullfilledBy": [
+                {
+                    "verb": "lock _ with",
                     "actor": "\\\\Zafra",
                     "noun": {
-                        "verb": "unlock _ with",
-                        "actor": "\\\\Rose",
-                        "noun": {
-                            "name": "door",
-                            "isLocked": false
-                        },
-                        "status": "successful",
-                        "fulfills": "\\\\<backlink>",
-                        "fullfilledBy": [],
-                        "level": "successful"
+                        "name": "door",
+                        "isLocked": false
                     },
-                    "secondNoun": {
+                    "status": "failed",
+                    "fulfills": "\\\\..",
+                    "fullfilledBy": []
+                }
+            ]
+        }  before [no attempt]
+        END TURN 2
+        [
+            {
+                "name": "Rose",
+                "beliefs": [],
+                "goals": [
+                    {
+                        "verb": "exit",
+                        "actor": "\\\\Rose",
+                        "status": "successful",
+                        "fullfilledBy": [
+                            {
+                                "verb": "unlock _ with",
+                                "actor": "\\\\Rose",
+                                "noun": {
+                                    "name": "door",
+                                    "isLocked": false
+                                },
+                                "status": "successful",
+                                "fulfills": "\\\\..",
+                                "fullfilledBy": []
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "Zafra",
+                "beliefs": [
+                    {
                         "property": "isLocked",
                         "ofDesireable": {
                             "name": "door",
@@ -296,125 +267,125 @@ END TURN 2
                         },
                         "shouldBe": "=",
                         "toValue": true
-                    },
-                    "status": "partly successful",
-                    "fullfilledBy": [
-                        {
-                            "verb": "lock _ with",
+                    }
+                ],
+                "goals": [
+                    {
+                        "verb": "searching for solutions to _",
+                        "actor": "\\\\Zafra",
+                        "noun": {
+                            "verb": "receiving news _ violating belief _",
                             "actor": "\\\\Zafra",
                             "noun": {
-                                "name": "door",
-                                "isLocked": false
+                                "verb": "unlock _ with",
+                                "actor": "\\\\Rose",
+                                "noun": {
+                                    "name": "door",
+                                    "isLocked": false
+                                },
+                                "status": "successful",
+                                "fulfills": "\\\\..",
+                                "fullfilledBy": [],
+                                "level": "successful"
                             },
-                            "status": "failed",
-                            "fulfills": "\\\\<backlink>",
-                            "fullfilledBy": []
-                        }
-                    ]
-                },
-                "status": "untried",
-                "fullfilledBy": []
-            }
-        ]
-    }
-]
-TURN 3
-BEGIN reflecting upon attempt _ SCENE: Rose Rose reflecting upon attempt {
-    "verb": "exit",
-    "actor": "\\\\Rose",
-    "status": "successful",
-    "fullfilledBy": [
-        {
-            "verb": "unlock _ with",
-            "actor": "\\\\Rose",
-            "noun": {
-                "name": "door",
-                "isLocked": false
-            },
-            "status": "successful",
-            "fulfills": "\\\\<backlink>",
-            "fullfilledBy": []
-        }
-    ]
-}  (untried)
-Rose reflected.
-DONE: Rose reflecting upon attempt {
-    "verb": "exit",
-    "actor": "\\\\Rose",
-    "status": "successful",
-    "fullfilledBy": [
-        {
-            "verb": "unlock _ with",
-            "actor": "\\\\Rose",
-            "noun": {
-                "name": "door",
-                "isLocked": false
-            },
-            "status": "successful",
-            "fulfills": "\\\\<backlink>",
-            "fullfilledBy": []
-        }
-    ]
-}  (successful)
-END TURN 3
-[
-    {
-        "name": "Rose",
-        "beliefs": [],
-        "goals": [
-            {
-                "verb": "exit",
-                "actor": "\\\\Rose",
-                "status": "successful",
-                "fullfilledBy": [
-                    {
-                        "verb": "unlock _ with",
-                        "actor": "\\\\Rose",
-                        "noun": {
-                            "name": "door",
-                            "isLocked": false
+                            "secondNoun": {
+                                "property": "isLocked",
+                                "ofDesireable": {
+                                    "name": "door",
+                                    "isLocked": false
+                                },
+                                "shouldBe": "=",
+                                "toValue": true
+                            },
+                            "status": "partly successful",
+                            "fullfilledBy": [
+                                {
+                                    "verb": "lock _ with",
+                                    "actor": "\\\\Zafra",
+                                    "noun": {
+                                        "name": "door",
+                                        "isLocked": false
+                                    },
+                                    "status": "failed",
+                                    "fulfills": "\\\\..",
+                                    "fullfilledBy": []
+                                }
+                            ]
                         },
-                        "status": "successful",
-                        "fulfills": "\\\\<backlink>",
+                        "status": "untried",
                         "fullfilledBy": []
                     }
                 ]
             }
         ]
-    },
-    {
-        "name": "Zafra",
-        "beliefs": [
-            {
-                "property": "isLocked",
-                "ofDesireable": {
-                    "name": "door",
-                    "isLocked": false
-                },
-                "shouldBe": "=",
-                "toValue": true
-            }
-        ],
-        "goals": [
-            {
-                "verb": "searching for solutions to _",
-                "actor": "\\\\Zafra",
-                "noun": {
-                    "verb": "receiving news _ violating belief _",
-                    "actor": "\\\\Zafra",
+        TURN 3
+        BEGIN reflecting upon attempt _ SCENE: Rose Rose reflecting upon attempt {
+            "verb": "exit",
+            "actor": "\\\\Rose",
+            "status": "successful",
+            "fullfilledBy": [
+                {
+                    "verb": "unlock _ with",
+                    "actor": "\\\\Rose",
                     "noun": {
-                        "verb": "unlock _ with",
-                        "actor": "\\\\Rose",
-                        "noun": {
-                            "name": "door",
-                            "isLocked": false
-                        },
-                        "status": "successful",
-                        "fulfills": "\\\\<backlink>",
-                        "fullfilledBy": [],
-                        "level": "successful"
+                        "name": "door",
+                        "isLocked": false
                     },
-                    "secondNoun": {
+                    "status": "successful",
+                    "fulfills": "\\\\..",
+                    "fullfilledBy": []
+                }
+            ]
+        }  (untried)
+        Rose reflected.
+        DONE: Rose reflecting upon attempt {
+            "verb": "exit",
+            "actor": "\\\\Rose",
+            "status": "successful",
+            "fullfilledBy": [
+                {
+                    "verb": "unlock _ with",
+                    "actor": "\\\\Rose",
+                    "noun": {
+                        "name": "door",
+                        "isLocked": false
+                    },
+                    "status": "successful",
+                    "fulfills": "\\\\..",
+                    "fullfilledBy": []
+                }
+            ]
+        }  (successful)
+        END TURN 3
+        [
+            {
+                "name": "Rose",
+                "beliefs": [],
+                "goals": [
+                    {
+                        "verb": "exit",
+                        "actor": "\\\\Rose",
+                        "status": "successful",
+                        "fullfilledBy": [
+                            {
+                                "verb": "unlock _ with",
+                                "actor": "\\\\Rose",
+                                "noun": {
+                                    "name": "door",
+                                    "isLocked": false
+                                },
+                                "status": "successful",
+                                "fulfills": "\\\\..",
+                                "fullfilledBy": []
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "Zafra",
+                "beliefs": [
+                    {
                         "property": "isLocked",
                         "ofDesireable": {
                             "name": "door",
@@ -422,29 +393,58 @@ END TURN 3
                         },
                         "shouldBe": "=",
                         "toValue": true
-                    },
-                    "status": "partly successful",
-                    "fullfilledBy": [
-                        {
-                            "verb": "lock _ with",
+                    }
+                ],
+                "goals": [
+                    {
+                        "verb": "searching for solutions to _",
+                        "actor": "\\\\Zafra",
+                        "noun": {
+                            "verb": "receiving news _ violating belief _",
                             "actor": "\\\\Zafra",
                             "noun": {
-                                "name": "door",
-                                "isLocked": false
+                                "verb": "unlock _ with",
+                                "actor": "\\\\Rose",
+                                "noun": {
+                                    "name": "door",
+                                    "isLocked": false
+                                },
+                                "status": "successful",
+                                "fulfills": "\\\\..",
+                                "fullfilledBy": [],
+                                "level": "successful"
                             },
-                            "status": "failed",
-                            "fulfills": "\\\\<backlink>",
-                            "fullfilledBy": []
-                        }
-                    ]
-                },
-                "status": "untried",
-                "fullfilledBy": []
+                            "secondNoun": {
+                                "property": "isLocked",
+                                "ofDesireable": {
+                                    "name": "door",
+                                    "isLocked": false
+                                },
+                                "shouldBe": "=",
+                                "toValue": true
+                            },
+                            "status": "partly successful",
+                            "fullfilledBy": [
+                                {
+                                    "verb": "lock _ with",
+                                    "actor": "\\\\Zafra",
+                                    "noun": {
+                                        "name": "door",
+                                        "isLocked": false
+                                    },
+                                    "status": "failed",
+                                    "fulfills": "\\\\..",
+                                    "fullfilledBy": []
+                                }
+                            ]
+                        },
+                        "status": "untried",
+                        "fullfilledBy": []
+                    }
+                ]
             }
         ]
-    }
-]
-END STORY [{…}]
+        END STORY [object Object]
 </pre>
         <pre id="diff"></pre>
     </div>

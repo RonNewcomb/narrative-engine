@@ -46,6 +46,7 @@ playerChoicesCSS.innerHTML = `
 document.body.appendChild(playerChoicesCSS);
 
 /** set the CSS to use; use the class .playerChoices { .... } */
-export function setPlayerInputCSS(css: string): void {
+export async function setPlayerInputCSS(css: string) {
   document.getElementById("playerChoicesCSS")!.innerHTML = css;
+  return new Promise(r => setTimeout(r, 1));
 }

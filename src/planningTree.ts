@@ -1,7 +1,7 @@
 import type { AbstractActionDefinition } from "./actions";
 import { createAttempt, type Attempt } from "./attempts";
 import type { Character } from "./characters";
-import { console_log, stringifyAction, stringifyAttempt } from "./paragraphs";
+import { publish, stringifyAction, stringifyAttempt } from "./paragraphs";
 import type { Resource } from "./resources";
 
 /** attaches a suggestion to the tree */
@@ -14,7 +14,7 @@ export function weCouldTry<N extends Resource, SN extends Resource>(
   failingAction: Attempt<any, any> | undefined
 ): Attempt {
   const circumvention = createAttempt(actor, definition, noun, secondNoun, failingAction);
-  console_log(actor.name, "could try", stringifyAction(circumvention), "before", stringifyAttempt(failingAction));
+  publish(actor.name, "could try", stringifyAction(circumvention), "before", stringifyAttempt(failingAction));
   if (failingAction) failingAction.fullfilledBy.push(circumvention);
   else actor.goals.push(circumvention);
   return circumvention;
@@ -74,13 +74,13 @@ let confusedAboutTiming: boolean;
 export const howTheyCan = (actor: Character, act: Attempt): Attempt[] => {
   //[	return list of not in past attempts which fulfill act.]
   const options = act.fullfilledBy.filter(a => !inThePast(a));
-  console_log("  Q: How can", actor.name, stringifyAttempt(act));
-  console_log("  A:", options.map(stringifyAttempt));
+  publish("  Q: How can", actor.name, stringifyAttempt(act));
+  publish("  A:", options.map(stringifyAttempt));
   return options;
   // let choices = [] as Attempt[];
   // const list = attempts().filter(at => !inThePast(at) && at.fulfills == act); // not in past attempts which fulfill act
   // for (const item of list) choices.push(item);
-  // console_log("  choices are", choices.map(stringifyAttempt));
+  // publish("  choices are", choices.map(stringifyAttempt));
   // return choices;
 };
 
@@ -114,8 +114,8 @@ export const whatTheyAreTryingToDoNowRegarding = (actor: Character, act: Attempt
   thisAct = previous.fullfilledBy.find(at => at.status == "successful")
     ? previous
     : previous.fullfilledBy.find(at => at.status == "untried");
-  console_log("  Q: What is", actor.name, "trying to do now?");
-  console_log("  A: " + (thisAct ? stringifyAttempt(thisAct) : "nothing"));
+  publish("  Q: What is", actor.name, "trying to do now?");
+  publish("  A: " + (thisAct ? stringifyAttempt(thisAct) : "nothing"));
   return thisAct; // [the most finely detailed, and hindered,]
 };
 
@@ -129,8 +129,8 @@ export const whatTheyWillDoNext = (actor: Character): Attempt | undefined => {
   const current = whatTheyAreTryingToDoNow(actor);
   const untried = !current ? undefined : howTheyCan(actor, current).find(item => item.status == "untried");
   //actor.goals.action = Waiting;
-  console_log("  Q: What will", actor.name, "do next?");
-  console_log("  A: ", untried ? stringifyAttempt(untried) : "No options.");
+  publish("  Q: What will", actor.name, "do next?");
+  publish("  A: ", untried ? stringifyAttempt(untried) : "No options.");
   return untried; //actor.goals; // of actor. ["I don't know"]
 };
 

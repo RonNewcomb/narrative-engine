@@ -2,7 +2,7 @@ import type { AbstractActionDefinition, ActionDefinition, Noun } from "./actions
 import type { Attempt } from "./attempts";
 import { createMyBelief, initializeDesireables, type ShouldBe } from "./beliefs";
 import { author, type Character } from "./characters";
-import { console_log, produceParagraphs } from "./paragraphs";
+import { console_log, stringify } from "./paragraphs";
 import { weCouldTry, whatTheyAreTryingToDoNow } from "./planningTree";
 import type { Desireable } from "./resources";
 import { createScene, type Scene } from "./scenes";
@@ -28,7 +28,7 @@ export function createMyGoal<N extends Noun, SN extends Noun>(
   return circumvention;
 }
 
-export async function main(
+export async function narrativeEngine(
   characters: Character[],
   actionset: ActionDefinition<any, any>[],
   desireables: Desireable[],
@@ -40,7 +40,7 @@ export async function main(
   const desireablesRecord = initializeDesireables(desireables);
 
   // debug
-  produceParagraphs(characters);
+  console_log(stringify(characters));
 
   // init
   const initialScenes: Scene[] = characters

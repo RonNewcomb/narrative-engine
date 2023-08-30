@@ -1,6 +1,6 @@
 import { doThingAsAScene, type Attempt } from "./attempts";
 import { type Character } from "./characters";
-import { console_error, console_log, stringifyAttempt } from "./paragraphs";
+import { console_error, publish, stringifyAction } from "./paragraphs";
 import { type Resource } from "./resources";
 import { type RuleOutcome } from "./rulebooks";
 import { type Story } from "./story";
@@ -47,22 +47,23 @@ export function createScene(actor: Character, pulse: Attempt<Resource, Resource>
 }
 
 export function playScene(scene: Scene, story: Story): RuleOutcome {
-  const character = scene.actor;
-  const sceneAction = scene.pulse; // whatTheyAreTryingToDoNow(character);
-  console_log("BEGIN", scene.pulse.verb, "SCENE:", character.name, stringifyAttempt(sceneAction));
+  const sceneAction = scene.pulse;
+  publish(scene.actor.name, "arrives to", stringifyAction(sceneAction, true) + ".");
   if (!sceneAction) console_error("no action -- run AI to pick a scene-action that does/un-does the news? adjusts for it?");
   if (sceneAction) scene.result = doThingAsAScene(sceneAction, scene, story);
   scene.isFinished = true;
+  publish(SCENEBREAK);
   return scene.result;
 }
 
 export function getNextScene(story: Story): Scene | undefined {
   const startScenes = story.sceneStack.filter(s => !s.choice.scene.isFinished);
   if (startScenes.length) return startScenes[0].choice.scene;
-  const midScenes = story.sceneStack.filter(s => s.consequences && s.consequences.length && !s.consequences[0].scene.isFinished);
-  if (midScenes.length) return midScenes[0].consequences![0].scene; // TODO loop through consequences
+  const midScenes = story.sceneStack.filter(s => s.consequences && s.consequences.length && s.consequences.some(c => !c.scene.isFinished));
+  if (midScenes.length) return midScenes[0].consequences.find(c => !c.scene.isFinished)!.scene;
   const endScenes = story.sceneStack.filter(s => !s.closure.scene.isFinished);
   if (endScenes.length) return endScenes.reverse()[0].closure.scene;
-  console_log("END STORY", story.sceneStack);
   return undefined;
 }
+
+const SCENEBREAK = "\n   * * *    \n\n";

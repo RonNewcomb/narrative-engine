@@ -1,4 +1,4 @@
-import { ActionDefinition, Character, Desireable, createMyBelief, createMyGoal, main, weCouldTry } from "./narrativeEngine";
+import { ActionDefinition, Character, Desireable, createMyBelief, createMyGoal, narrativeEngine, weCouldTry } from "./narrativeEngine";
 import { getPlayerChoices } from "./playerInputStyle0";
 
 const doorkey: Desireable = { name: "door key", isKey: true };
@@ -109,4 +109,9 @@ const Zafra: Character = {
 
 ////////////
 
-main([Rose, Zafra], [Waiting, Exiting, Taking, Dropping, Locking, Unlocking, Opening, Closing, AskingFor], desireables, getPlayerChoices);
+narrativeEngine(
+  [Rose, Zafra],
+  [Waiting, Exiting, Taking, Dropping, Locking, Unlocking, Opening, Closing, AskingFor],
+  desireables,
+  getPlayerChoices
+);

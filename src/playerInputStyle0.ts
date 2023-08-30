@@ -4,4 +4,4 @@ export async function getPlayerChoices(story: Story, viewpointCharacter: Charact
   return undefined;
 }
 
-export function setPlayerInputCSS(css: string): void {}
+export async function setPlayerInputCSS(css: string) {}

@@ -58,6 +58,6 @@ playScene - mutates scene.result, .isFinished; calls doThingAsAScene
 
 - examples of using the foreshadowing feature
 
-- can give it a parser fn that returns the Action a player wants to do
+- can give it a parser fn that returns the Action a player wants to do -- thread it all the way through
 
-- publish() and diff()
+- diff()

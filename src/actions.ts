@@ -1,7 +1,7 @@
 import type { Attempt } from "./attempts";
 import type { ShouldBe } from "./beliefs";
 import { createNewsItem, type News } from "./news";
-import { console_log, stringifyAttempt } from "./paragraphs";
+import { publish, stringifyAttempt } from "./paragraphs";
 import { weCouldTry } from "./planningTree";
 import { type Desireable, type Resource } from "./resources";
 import type { Rulebooks } from "./rulebooks";
@@ -21,7 +21,7 @@ export const ReflectUpon: AbstractActionDefinition<Attempt> = {
   verb: "reflecting upon attempt _",
   rulebooks: {
     news: {
-      rules: [attempt => console_log(attempt.actor.name, "reflected."), createNewsItem],
+      rules: [attempt => publish(attempt.actor.name, "reflected."), createNewsItem],
     },
   },
 };
@@ -36,7 +36,7 @@ export const ReceivingImportantNews: AbstractActionDefinition<News, ShouldBe> = 
           const belief = attempt.secondNoun;
           if (!news) throw "missing News for ReceivingImportantNews";
           if (!belief) throw "missing Belief for ReceivingImportantNews";
-          console_log('"', stringifyAttempt(news), ' is bad news."');
+          publish('"', stringifyAttempt(news), ' is bad news."');
 
           const actions = findActions(news, belief, story);
           for (const action of actions) weCouldTry<any, any>(attempt.actor, action, news.noun, news.secondNoun, attempt);

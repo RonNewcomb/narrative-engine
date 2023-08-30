@@ -1,4 +1,13 @@
-import { ActionDefinition, Character, Desireable, createMyBelief, createMyGoal, narrativeEngine, weCouldTry } from "./narrativeEngine";
+import {
+  ActionDefinition,
+  Character,
+  Desireable,
+  SceneRulebook,
+  createMyBelief,
+  createMyGoal,
+  narrativeEngine,
+  weCouldTry,
+} from "./narrativeEngine";
 import { getPlayerChoices } from "./playerInputStyle0";
 
 const doorkey: Desireable = { name: "door key", isKey: true };
@@ -109,9 +118,18 @@ const Zafra: Character = {
 
 ////////////
 
+const storyStart: SceneRulebook = {
+  viewpoint: Rose,
+  action: a => a.verb == Exiting.verb,
+  beginning: (viewpoint, attempt) => "Rose wanted to escape the confines of her birth.",
+};
+
+////////////
+
 narrativeEngine(
   [Rose, Zafra],
   [Waiting, Exiting, Taking, Dropping, Locking, Unlocking, Opening, Closing, AskingFor],
   desireables,
+  [storyStart],
   getPlayerChoices
 );

@@ -14,7 +14,13 @@ export function weCouldTry<N extends Resource, SN extends Resource>(
   failingAction: Attempt<any, any> | undefined
 ): Attempt {
   const circumvention = createAttempt(actor, definition, noun, secondNoun, failingAction);
-  publish(actor.name, "could try", stringifyAction(circumvention), "before", stringifyAttempt(failingAction));
+  publish(
+    actor.name,
+    "could try",
+    stringifyAction(circumvention, { omitActor: true, ing: true }),
+    "before",
+    stringifyAction(failingAction, { omitActor: true, ing: true, withStatus: true }) + "."
+  );
   if (failingAction) failingAction.fullfilledBy.push(circumvention);
   else actor.goals.push(circumvention);
   return circumvention;
@@ -75,7 +81,10 @@ export const howTheyCan = (actor: Character, act: Attempt): Attempt[] => {
   //[	return list of not in past attempts which fulfill act.]
   const options = act.fullfilledBy.filter(a => !inThePast(a));
   publish("  Q: How can", actor.name, stringifyAttempt(act));
-  publish("  A:", options.map(stringifyAttempt));
+  publish(
+    "  A:",
+    options.map(o => stringifyAttempt(o))
+  );
   return options;
   // let choices = [] as Attempt[];
   // const list = attempts().filter(at => !inThePast(at) && at.fulfills == act); // not in past attempts which fulfill act

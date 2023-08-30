@@ -18,7 +18,7 @@ export interface AbstractActionDefinition<N = Resource, SN = Resource> {
 export interface ActionDefinition<N = Noun, SN = Noun> extends AbstractActionDefinition<Noun, Noun> {}
 
 export const ReflectUpon: AbstractActionDefinition<Attempt> = {
-  verb: "reflecting upon attempt _",
+  verb: "reflect upon attempting _",
   rulebooks: {
     news: {
       rules: [attempt => publish(attempt.actor.name, "reflected."), createNewsItem],
@@ -27,7 +27,7 @@ export const ReflectUpon: AbstractActionDefinition<Attempt> = {
 };
 
 export const ReceivingImportantNews: AbstractActionDefinition<News, ShouldBe> = {
-  verb: "receiving news _ violating belief _",
+  verb: "receive news of _, but _",
   rulebooks: {
     check: {
       rules: [
@@ -60,5 +60,5 @@ function findActions(badNews: Attempt<any, any>, shouldBe: ShouldBe, story: Stor
 }
 
 export const StuckForSolutions: AbstractActionDefinition<Attempt> = {
-  verb: "searching for solutions to _",
+  verb: "search for solutions to _",
 };

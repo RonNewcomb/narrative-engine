@@ -5,13 +5,15 @@ import { createSceneSet, type ChoiceConsequenceClosure } from "./consequences";
 import { News } from "./news";
 import { console_log, publish, stringify } from "./paragraphs";
 import { Desireable } from "./resources";
-import { getNextScene, playScene, type Scene } from "./scenes";
+import { SceneRulebook, getNextScene, playScene, type Scene } from "./scenes";
 
 export interface Story {
   characters: Character[];
   readonly actionset: ActionDefinition<any, any>[];
   desireables: Record<symbol, Desireable>;
   getPlayerInput: (story: Story, viewpointCharacter: Character) => Promise<Attempt | undefined>;
+  notableScenes: SceneRulebook[];
+
   sceneStack: ChoiceConsequenceClosure[];
   history: News[];
   currentTurnsNews: News[];
@@ -21,11 +23,21 @@ export async function playStory(
   characters: Character[],
   actionset: ActionDefinition<any, any>[],
   desireables: Record<symbol, Desireable>,
+  notableScenes: SceneRulebook[],
   getPlayerInput: (story: Story, viewpointCharacter: Character) => Promise<Attempt | undefined>,
   firstScene?: Scene
 ) {
   // initialize story
-  const story: Story = { characters, actionset, desireables, getPlayerInput, sceneStack: [], history: [], currentTurnsNews: [] };
+  const story: Story = {
+    characters,
+    actionset,
+    desireables,
+    getPlayerInput,
+    notableScenes,
+    sceneStack: [],
+    history: [],
+    currentTurnsNews: [],
+  };
   if (firstScene) createSceneSet(story, { choice: "ally", scene: firstScene });
 
   let turn = 0;

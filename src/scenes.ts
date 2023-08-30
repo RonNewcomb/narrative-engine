@@ -22,6 +22,13 @@ import { type Story } from "./story";
  * - might foreshadow later scenes
  *
  */
+export interface SceneRulebook {
+  viewpoint?: Character;
+  action?: (attempt: Attempt) => boolean;
+  beginning?: (viewpoint: Character, attempt: Attempt) => any;
+  middle?: (viewpoint: Character, attempt: Attempt) => any;
+  end?: (viewpoint: Character, attempt: Attempt) => any;
+}
 
 /////////
 
@@ -48,10 +55,14 @@ export function createScene(actor: Character, pulse: Attempt<Resource, Resource>
 
 export function playScene(scene: Scene, story: Story): RuleOutcome {
   const sceneAction = scene.pulse;
-  publish(scene.actor.name, "arrives to", stringifyAction(sceneAction, true) + ".");
+  const rulebook = story.notableScenes.find(s => (!s.viewpoint || s.viewpoint == scene.actor) && (!s.action || s.action(sceneAction)));
+  if (rulebook && rulebook.beginning) publish(rulebook.beginning(scene.actor, scene.pulse));
+  else publish(scene.actor.name, "arrives to", stringifyAction(sceneAction, { omitActor: true }) + ".");
   if (!sceneAction) console_error("no action -- run AI to pick a scene-action that does/un-does the news? adjusts for it?");
   if (sceneAction) scene.result = doThingAsAScene(sceneAction, scene, story);
   scene.isFinished = true;
+  if (rulebook && rulebook.end) rulebook.end(scene.actor, scene.pulse);
+  //else publish(scene.actor.name, "leaves.");
   publish(SCENEBREAK);
   return scene.result;
 }

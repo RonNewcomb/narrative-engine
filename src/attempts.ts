@@ -64,10 +64,14 @@ function doThing(thisAttempt: Attempt, currentScene: Scene, story: Story): Attem
   const outcome = executeRulebook(thisAttempt, story);
   thisAttempt.status = outcome != "failed" ? "successful" : thisAttempt.fullfilledBy.length > 0 ? "partly successful" : "failed";
 
-  publish("DONE:", stringifyAttempt(thisAttempt));
+  publish("DONE:", stringifyAttempt(thisAttempt) + ".");
 
   if (thisAttempt.status == "partly successful")
-    publish((outcome || "seems to succeed") + ".  Could be fulfilled by:", thisAttempt.fullfilledBy.map(stringifyAttempt));
+    publish(
+      thisAttempt.actor.name,
+      "could try",
+      thisAttempt.fullfilledBy.map(x => stringifyAction(x, { ing: true, omitActor: true }))
+    );
 
   // react to news // creates scene types of Reaction
   const news = createNewsItem(thisAttempt, story);

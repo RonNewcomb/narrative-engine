@@ -4,7 +4,14 @@
             line-height: 20px
         }
 
+        #published {
+            max-width: 40em;
+            text-wrap: wrap;
+        }
+
         .old {
+            max-width: 40em;
+            text-wrap: wrap;
             opacity: 0.5;
         }
 
@@ -27,11 +34,11 @@
             const showdebug = document.querySelectorAll(".showdebug");
             debug.forEach(el => el.className = 'showdebug');
             showdebug.forEach(el => el.className = 'debug');
-            scrollIntoView(e.target);
+            e.target.scrollIntoViewIfNeeded();
         }
     </script>
     <div class="flexrow">
-        <pre id="published" onclick="toggleDebug()">
+        <pre id="published" onclick="toggleDebug(event)">
         </pre>
         <pre class="old">
              <div class="debug">[

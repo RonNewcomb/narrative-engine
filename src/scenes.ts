@@ -23,12 +23,27 @@ import { type Story } from "./story";
  *
  */
 export interface SceneRulebook {
-  viewpoint?: Character;
-  action?: (attempt: Attempt) => boolean;
-  beginning?: (viewpoint: Character, attempt: Attempt) => any;
-  middle?: (viewpoint: Character, attempt: Attempt) => any;
-  end?: (viewpoint: Character, attempt: Attempt) => any;
+  match: (attempt: Attempt, story: Story) => boolean;
+  beginning?: (attempt: Attempt, story: Story, scene: Scene) => string | void;
+  middle?: (attempt: Attempt, story: Story, scene: Scene) => RuleOutcome;
+  end?: (attempt: Attempt, story: Story, scene: Scene) => Scene | void | undefined;
 }
+
+const SCENEBREAK = "\n   * * *    \n\n";
+
+export const defaultSceneRulebook: SceneRulebook = {
+  match: () => true,
+  beginning: attempt => attempt.actor.name + " arrives to " + stringifyAction(attempt, { omitActor: true }) + ".",
+  middle: (attempt, story, scene) => {
+    if (attempt) return doThingAsAScene(attempt, scene, story);
+    console_error("no action -- run AI to pick a scene-action that does/un-does the news? adjusts for it?");
+    return "success";
+  },
+  end: attempt => {
+    publish(attempt.actor.name, "leaves.");
+    publish(SCENEBREAK);
+  },
+};
 
 /////////
 
@@ -36,7 +51,7 @@ export interface Scene {
   pulse: Attempt<Resource, Resource>;
   isFinished?: boolean;
   result?: RuleOutcome;
-  actor: Character;
+  viewpoint: Character;
 }
 // interface ReflectiveScene extends BaseScene {
 //   type: "reflective";
@@ -48,26 +63,25 @@ export interface Scene {
 // SuspenseScene -- scene with a lot of tension
 // DramaticScene -- scene with strong emotion
 
-export function createScene(actor: Character, pulse: Attempt<Resource, Resource>): Scene {
-  const scene: Scene = { pulse, actor };
+export function createScene(pulse: Attempt<Resource, Resource>, viewpoint?: Character): Scene {
+  const scene: Scene = { pulse, viewpoint: viewpoint || pulse.actor };
   return scene;
 }
 
-export function playScene(scene: Scene, story: Story): RuleOutcome {
+export function playScene(scene: Scene, story: Story): Scene | undefined {
   const sceneAction = scene.pulse;
-  const rulebook = story.notableScenes.find(s => (!s.viewpoint || s.viewpoint == scene.actor) && (!s.action || s.action(sceneAction)));
-  if (rulebook && rulebook.beginning) publish(rulebook.beginning(scene.actor, scene.pulse));
-  else publish(scene.actor.name, "arrives to", stringifyAction(sceneAction, { omitActor: true }) + ".");
-  if (!sceneAction) console_error("no action -- run AI to pick a scene-action that does/un-does the news? adjusts for it?");
-  if (sceneAction) scene.result = doThingAsAScene(sceneAction, scene, story);
+  const rulebook = story.notableScenes.find(sceneRulebook => sceneRulebook.match(sceneAction, story));
+  const beginning = rulebook?.beginning ?? defaultSceneRulebook.beginning;
+  if (beginning) publish(beginning(scene.pulse, story, scene));
+  const middle = rulebook?.middle ?? defaultSceneRulebook.middle;
+  scene.result = middle?.(sceneAction, story, scene);
   scene.isFinished = true;
-  if (rulebook && rulebook.end) rulebook.end(scene.actor, scene.pulse);
-  //else publish(scene.actor.name, "leaves.");
-  publish(SCENEBREAK);
-  return scene.result;
+  const ending = rulebook?.end ?? defaultSceneRulebook.end;
+  return ending?.(scene.pulse, story, scene) || undefined;
 }
 
-export function getNextScene(story: Story): Scene | undefined {
+export function getNextScene(story: Story, suggestedNextScene?: Scene): Scene | undefined {
+  if (suggestedNextScene) return suggestedNextScene; // TODO sometimes we want a Meanwhile or other interstitial
   const startScenes = story.sceneStack.filter(s => !s.choice.scene.isFinished);
   if (startScenes.length) return startScenes[0].choice.scene;
   const midScenes = story.sceneStack.filter(s => s.consequences && s.consequences.length && s.consequences.some(c => !c.scene.isFinished));
@@ -76,5 +90,3 @@ export function getNextScene(story: Story): Scene | undefined {
   if (endScenes.length) return endScenes.reverse()[0].closure.scene;
   return undefined;
 }
-
-const SCENEBREAK = "\n   * * *    \n\n";

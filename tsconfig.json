@@ -3,7 +3,6 @@
     "lib": ["ES2016", "dom"],
     "module": "es2015",
     "target": "ES2016",
-    //"outFile": "build.js",  // use rollup, or use all ambient files. tsc flatly refuses to outFile + esmodules
     "outDir": "build",
     "strict": true,
     "allowJs": false

@@ -30,7 +30,7 @@ export function reactionsToNews(news: News, scene: Scene, story: Story): Consequ
           if (isButtonPushed(news, belief)) {
             const foreshadowThis: ForeShadowing = { character, belief, news };
             const sceneAction = createAttempt<News, ShouldBe>(character, ReceivingImportantNews, news, belief, undefined);
-            const reactionScene = createScene(character, sceneAction);
+            const reactionScene = createScene(sceneAction);
             const consequence: ConsequenceWithForeshadowedNewsProvingAgency = { scene: reactionScene, foreshadow: foreshadowThis };
             newConsequences.push(consequence);
           }

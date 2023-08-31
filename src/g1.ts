@@ -119,9 +119,8 @@ const Zafra: Character = {
 ////////////
 
 const storyStart: SceneRulebook = {
-  viewpoint: Rose,
-  action: a => a.verb == Exiting.verb,
-  beginning: (viewpoint, attempt) => "Rose wanted to escape the confines of her birth.",
+  match: ({ actor, verb }, story) => verb == Exiting.verb && actor == Rose,
+  beginning: () => "Rose wanted to escape the confines of her birth.",
 };
 
 ////////////

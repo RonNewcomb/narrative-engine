@@ -46,15 +46,13 @@ export function createSceneSet(
   alreadyKnown = story.sceneStack.find(ccc => ccc.consequences?.find(c => c.scene == choice.scene));
   if (alreadyKnown) return alreadyKnown;
   console.log("-- new scene set");
-  const actor = choice.scene.actor;
+  const actor = choice.scene.viewpoint;
   const news = choice.scene.pulse;
   const reflect = createAttempt(actor, ReflectUpon, news, undefined, news);
   const ccc: ChoiceConsequenceClosure = {
     choice,
     consequences: consequences || [],
-    closure: closure || {
-      scene: createScene(choice.scene.actor, reflect),
-    },
+    closure: closure || { scene: createScene(reflect) },
   };
   story.sceneStack.push(ccc);
   return ccc;

@@ -6,12 +6,12 @@
 
         #published {
             max-width: 40em;
-            text-wrap: wrap;
+            white-space: pre-wrap;
         }
 
         .old {
             max-width: 40em;
-            text-wrap: wrap;
+            white-space: pre-wrap;
             opacity: 0.5;
         }
 
@@ -28,22 +28,11 @@
             opacity: 0.5;
         }
     </style>
-    <script>
-        function toggleDebug(e) {
-            const debug = document.querySelectorAll(".debug");
-            if (debug.length > 0) {
-                debug.forEach(el => el.className = 'showdebug');
-            } else {
-                const showdebug = document.querySelectorAll(".showdebug");
-                showdebug.forEach(el => el.className = 'debug');
-            }
-            e.target.scrollIntoViewIfNeeded();
-        }
-    </script>
     <div class="flexrow">
         <pre id="published" onclick="toggleDebug(event)">
         </pre>
-        <pre class="old"><div class="showdebug">[
+        <pre class="old"><div class="showdebug">
+        [
             {
                 "name": "Rose",
                 "beliefs": [],
@@ -533,5 +522,19 @@
 </pre>
         <pre id="diff"></pre>
     </div>
+    <script>
+        let debugMode = false;
+        function toggleDebug(e) {
+            if (debugMode)
+                document.querySelectorAll(".debug").forEach(el => el.className = 'showdebug');
+            else
+                document.querySelectorAll(".showdebug").forEach(el => el.className = 'debug');
+            debugMode = !debugMode;
+            e.target.scrollIntoViewIfNeeded();
+        }
+        toggleDebug();
+        toggleDebug();
+    </script>
     <script src="./build.js"></script>
+
 </body>

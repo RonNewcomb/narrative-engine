@@ -42,15 +42,16 @@ export async function playStory(
 
   let turn = 0;
 
-  // debug
-  const turn0 = await getPlayerInput(story, firstScene!.actor);
-  publish(stringify(turn0));
+  // debugging input
+  // const turn0 = await getPlayerInput(story, firstScene!.actor);
+  // publish(stringify(turn0));
 
-  for (let currentScene = firstScene; currentScene; currentScene = getNextScene(story)) {
+  let suggestedNextScene: Scene | undefined;
+  for (let currentScene = firstScene; currentScene; currentScene = getNextScene(story, suggestedNextScene)) {
     console_log("TURN", ++turn);
 
     // characters act // creates scene types of Action
-    const outcome = playScene(currentScene, story);
+    suggestedNextScene = playScene(currentScene, story);
 
     console_log("END TURN", turn);
     console_log(stringify(characters));

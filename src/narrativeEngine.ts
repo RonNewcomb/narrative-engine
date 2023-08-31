@@ -57,7 +57,7 @@ export async function narrativeEngine(
   const initialScenes: Scene[] = characters
     .map(character => ({ character, action: whatTheyAreTryingToDoNow(character) }))
     .filter(todo => !!todo.action)
-    .map(todo => createScene(todo.character, todo.action!));
+    .map(todo => createScene(todo.action!));
 
   //if (!initialScenes.length) throw "cannot find first character and action. No one has a Goal.";
   console_log(initialScenes.length + " initial scenes");

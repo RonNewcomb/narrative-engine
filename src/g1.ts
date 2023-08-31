@@ -8,7 +8,7 @@ import {
   narrativeEngine,
   weCouldTry,
 } from "./narrativeEngine";
-import { getPlayerChoices } from "./playerInputStyle0";
+import { getPlayerChoices } from "./playerInputStyle1";
 
 const doorkey: Desireable = { name: "door key", isKey: true };
 const door: Desireable = { name: "door", isLocked: true };
@@ -35,26 +35,26 @@ const Exiting: ActionDefinition = {
 const Waiting: ActionDefinition = { verb: "wait" };
 
 const Taking: ActionDefinition = {
-  verb: "take",
+  verb: "take _",
   rulebooks: {
     moveDesireables: attempt => [["owned", attempt.noun!, "=", true]],
   },
 };
 
 const Dropping: ActionDefinition = {
-  verb: "drop",
+  verb: "drop _",
   rulebooks: {
     moveDesireables: attempt => [["owned", attempt.noun!, "=", false]],
   },
 };
 
 const Opening: ActionDefinition = {
-  verb: "open",
+  verb: "open _",
   rulebooks: {
     check: {
       rules: [
         // attempt => (attempt.noun ? "successful" : weCouldTry(attempt.actor, Unlocking, attempt.noun, undefined, attempt)),
-        attempt => (attempt.noun?.isLocked ? weCouldTry(attempt.actor, Unlocking, attempt.noun, undefined, attempt) : "success"),
+        attempt => ((attempt.noun as any)?.isLocked ? weCouldTry(attempt.actor, Unlocking, attempt.noun, undefined, attempt) : "success"),
       ],
     },
     moveDesireables: attempt => [["isOpen", attempt.noun!, "=", true]],
@@ -62,14 +62,14 @@ const Opening: ActionDefinition = {
 };
 
 const Closing: ActionDefinition = {
-  verb: "close",
+  verb: "close _",
   rulebooks: {
     moveDesireables: attempt => [["isOpen", attempt.noun!, "=", false]],
   },
 };
 
 const Unlocking: ActionDefinition = {
-  verb: "unlock _ with",
+  verb: "unlock _ with _",
   rulebooks: {
     check: {
       rules: [
@@ -81,7 +81,7 @@ const Unlocking: ActionDefinition = {
 };
 
 const Locking: ActionDefinition = {
-  verb: "lock _ with",
+  verb: "lock _ with _",
   rulebooks: {
     check: {
       rules: [
@@ -91,7 +91,7 @@ const Locking: ActionDefinition = {
         attempt =>
           !attempt.secondNoun
             ? "failed"
-            : attempt.secondNoun?.owner == attempt.actor
+            : (attempt.secondNoun as any)?.owner == attempt.actor
             ? "success"
             : weCouldTry(attempt.actor, Taking, attempt.secondNoun, undefined, attempt),
       ],
@@ -100,7 +100,7 @@ const Locking: ActionDefinition = {
   },
 };
 
-const AskingFor: ActionDefinition = { verb: "asking _ for" };
+const AskingFor: ActionDefinition = { verb: "asking _ for _" };
 
 /////////////////
 

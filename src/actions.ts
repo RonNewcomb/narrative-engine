@@ -1,5 +1,6 @@
 import type { Attempt } from "./attempts";
 import type { ShouldBe } from "./beliefs";
+import type { Character } from "./characters";
 import { createNewsItem, type News } from "./news";
 import { publish, stringifyAttempt } from "./paragraphs";
 import { weCouldTry } from "./planningTree";
@@ -8,7 +9,7 @@ import type { Rulebooks } from "./rulebooks";
 import type { Story } from "./story";
 
 export type Verb = string;
-export type Noun = Desireable;
+export type Noun = Desireable | Character; // Resource?
 
 export interface AbstractActionDefinition<N = Resource, SN = Resource> {
   verb: Verb;

@@ -41,7 +41,11 @@ export async function playStory(
   if (firstScene) createSceneSet(story, { choice: "ally", scene: firstScene });
 
   let turn = 0;
-  //await getPlayerInput(story, firstScene!.actor);
+
+  // debug
+  const turn0 = await getPlayerInput(story, firstScene!.actor);
+  publish(stringify(turn0));
+
   for (let currentScene = firstScene; currentScene; currentScene = getNextScene(story)) {
     console_log("TURN", ++turn);
 

@@ -6,7 +6,7 @@ import { spellcheck } from "./spellcheck";
 export let console_log: (...data: any[]) => void = (...texts: any[]): void => {
   console.log(...texts);
   const text = texts.join(" ");
-  const container = div([], { className: "debug", innerText: text });
+  const container = div([], { className: "hidedebug", innerText: text });
   document.getElementById("published")!.appendChild(container);
 };
 

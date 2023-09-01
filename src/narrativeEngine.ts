@@ -8,6 +8,7 @@ import type { Desireable, Resource } from "./resources";
 import { SceneType, createScene, type Scene } from "./scenes";
 import { spelling } from "./spellcheck";
 import { playStory, type SolicitPlayerInput, type Story } from "./story";
+import type { iFictionRecord } from "./treatyOfBabel";
 
 export {
   createAttempt,
@@ -23,6 +24,7 @@ export {
   type ShouldBe,
   type SolicitPlayerInput,
   type Story,
+  type iFictionRecord,
 };
 
 export function createGoal<N extends Noun, SN extends Noun>(

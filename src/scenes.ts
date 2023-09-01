@@ -41,7 +41,7 @@ export const defaultSceneType: SceneType = {
   middle: (attempt, story, scene) => {
     if (attempt) return doThingAsAScene(attempt, scene, story);
     console_error("no action -- run AI to pick a scene-action that does/un-does the news? adjusts for it?");
-    return "success"; // TODO i guess?
+    return "continue"; // TODO i guess?
   },
   end: attempt => {
     publish(attempt.actor.name, "leaves.");

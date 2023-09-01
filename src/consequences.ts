@@ -59,7 +59,7 @@ export function createSceneSet(
 }
 
 export function isButtonPushed(news: News, belief: ShouldBe): boolean {
-  const changeStatements = news.definition.rulebooks?.moveDesireables?.(news) || [];
+  const changeStatements = news.definition.rulebooks?.change?.(news) || [];
   if (!changeStatements || !changeStatements.length) return false;
   for (const statement of changeStatements) {
     if (statement[0] != belief.property && (statement[0] || belief.property)) continue; // they differ and either/both are a truthy value

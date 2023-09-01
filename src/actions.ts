@@ -32,7 +32,7 @@ export const SpreadNewsToOthers: ActionDefinition<News, Character[]> = {
 export const ReceivingImportantNews: ActionDefinition<News, ShouldBe> = {
   verb: "receive news of _, but _",
   rulebooks: {
-    check: {
+    cant: {
       rules: [
         (attempt, story) => {
           const news = attempt.noun;
@@ -44,7 +44,7 @@ export const ReceivingImportantNews: ActionDefinition<News, ShouldBe> = {
           const actions = findActions(news, belief, story);
           for (const action of actions) weCouldTry<any, any>(attempt.actor, action, news.noun, news.secondNoun, attempt);
 
-          return "failed";
+          return "stop";
         },
       ],
     },
@@ -54,7 +54,7 @@ export const ReceivingImportantNews: ActionDefinition<News, ShouldBe> = {
 function findActions(badNews: Attempt<any, any>, shouldBe: ShouldBe, story: Story): ActionDefinition<any, any>[] {
   const retval: ActionDefinition<any, any>[] = [];
   for (const action of story.actionset) {
-    const effects = action.rulebooks?.moveDesireables?.(badNews) || [];
+    const effects = action.rulebooks?.change?.(badNews) || [];
     for (const e of effects)
       if (shouldBe.property == e[0] && shouldBe.ofDesireable == e[1] && shouldBe.shouldBe == e[2] && shouldBe.toValue == e[3])
         retval.push(action);
@@ -65,7 +65,7 @@ function findActions(badNews: Attempt<any, any>, shouldBe: ShouldBe, story: Stor
 export const StuckForSolutions: ActionDefinition<Attempt> = {
   verb: "search for solutions to _",
   rulebooks: {
-    check: {
+    cant: {
       rules: [
         async (attempt, story) => {
           if (!attempt.actor.playersChoice) return makeNoDecision;

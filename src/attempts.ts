@@ -51,7 +51,7 @@ export async function doThingAsAScene(thisAttempt: Attempt, currentScene: Scene,
     if (subAttempt) await doThing(subAttempt, currentScene, story);
     else {
       publish("STUCK:", stringifyAttempt(thisAttempt));
-      if (thisAttempt.actor.goals.includes(thisAttempt)) thisAttempt.actor.goals = thisAttempt.actor.goals.filter(g => g != thisAttempt);
+      if (thisAttempt.actor.goals!.includes(thisAttempt)) thisAttempt.actor.goals = thisAttempt.actor.goals!.filter(g => g != thisAttempt);
       return weCouldTry(thisAttempt.actor, StuckForSolutions, thisAttempt, undefined, undefined);
     }
   }

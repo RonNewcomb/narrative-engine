@@ -2,9 +2,9 @@ import {
   ActionDefinition,
   Character,
   Desireable,
-  SceneRulebook,
-  createMyBelief,
-  createMyGoal,
+  SceneType,
+  createBelief,
+  createGoal,
   narrativeEngine,
   spelling,
   weCouldTry,
@@ -108,25 +108,24 @@ const AskingFor: ActionDefinition = { verb: "asking _ for _" };
 const Rose: Character = {
   name: "Rose",
   beliefs: [],
-  goals: [createMyGoal(Exiting)],
+  goals: [createGoal(Exiting)],
 };
 
 const Zafra: Character = {
   name: "Zafra",
-  beliefs: [createMyBelief("isLocked", door, "=", true)],
-  goals: [],
+  beliefs: [createBelief("isLocked", door, "=", true)],
 };
 
 ////////////
 
-const storyStart: SceneRulebook = {
+const storyStart: SceneType = {
   match: ({ actor, verb }, story) => verb == Exiting.verb && actor == Rose,
   beginning: () => "Rose wanted to escape the confines of her birth.",
 };
 
 ////////////
 
-spelling({ receiving: "receiveing" });
+spelling({ receiving: "receiveing", the: ["teh", "hte"] });
 
 ///////
 

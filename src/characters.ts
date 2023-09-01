@@ -6,7 +6,7 @@ import type { SolicitPlayerInput } from "./story";
 export interface Character extends Resource {
   name: string;
   beliefs: ShouldBe[];
-  goals: Attempt<any, any>[];
+  goals?: Attempt<Resource, Resource>[];
   playersChoice?: SolicitPlayerInput;
 }
 

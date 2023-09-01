@@ -1,5 +1,5 @@
 import type { Attempt } from "./attempts";
-import { ShouldBe } from "./beliefs";
+import type { ShouldBe } from "./beliefs";
 import { div } from "./layout";
 import { spellcheck } from "./spellcheck";
 

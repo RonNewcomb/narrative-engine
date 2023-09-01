@@ -1,8 +1,6 @@
-import { createAttempt } from "./attempts";
 import { div, element } from "./layout";
-import type { ActionDefinition, Attempt, Character, Story } from "./narrativeEngine";
+import { createAttempt, type ActionDefinition, type Attempt, type Character, type Resource, type Story } from "./narrativeEngine";
 import { stringifyNoun } from "./paragraphs";
-import type { Resource } from "./resources";
 
 export async function getPlayerChoices(story: Story, viewpointCharacter: Character): Promise<Attempt | undefined> {
   return new Promise(async resolve => {
@@ -40,7 +38,7 @@ export async function getPlayerChoices(story: Story, viewpointCharacter: Charact
     published.removeChild(playerChoices);
 
     // returns to the story
-    const attempt = createAttempt(viewpointCharacter, action, nouns[0] as any, nouns[1] as any, undefined);
+    const attempt = createAttempt<Resource, Resource>(viewpointCharacter, action, nouns[0], nouns[1], undefined);
     resolve(attempt);
   });
 }
@@ -65,7 +63,10 @@ export async function setPlayerInputCSS(css: string) {
   return new Promise(r => setTimeout(r, 1));
 }
 
-async function chooseVerb(container: HTMLDivElement, actions: ActionDefinition[]): Promise<ActionDefinition> {
+async function chooseVerb(
+  container: HTMLDivElement,
+  actions: ActionDefinition<Resource, Resource>[]
+): Promise<ActionDefinition<Resource, Resource>> {
   return new Promise(resolve => {
     // loop through whole palette
     for (const action of actions) {

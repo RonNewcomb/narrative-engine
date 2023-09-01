@@ -22,7 +22,7 @@ import { type Story } from "./story";
  * - might foreshadow later scenes
  *
  */
-export interface SceneRulebook {
+export interface SceneType {
   match: (attempt: Attempt, story: Story) => boolean;
   beginning?: (attempt: Attempt, story: Story, scene: Scene) => ResultOfBeginScene | Promise<ResultOfBeginScene>;
   middle?: (attempt: Attempt, story: Story, scene: Scene) => ResultOfMidScene | Promise<ResultOfMidScene>;
@@ -35,13 +35,13 @@ export type ResultOfEndScene = Scene | void | undefined;
 
 const SCENEBREAK = "\n   * * *    \n\n";
 
-export const defaultSceneRulebook: SceneRulebook = {
+export const defaultSceneType: SceneType = {
   match: () => true,
   beginning: attempt => attempt.actor.name + " arrives to " + stringifyAction(attempt, { omitActor: true }) + ".",
   middle: (attempt, story, scene) => {
     if (attempt) return doThingAsAScene(attempt, scene, story);
     console_error("no action -- run AI to pick a scene-action that does/un-does the news? adjusts for it?");
-    return "success";
+    return "success"; // TODO i guess?
   },
   end: attempt => {
     publish(attempt.actor.name, "leaves.");
@@ -76,13 +76,13 @@ export function createScene(pulse: Attempt<Resource, Resource>, viewpoint?: Char
 
 export async function playScene(scene: Scene, story: Story): Promise<Scene | undefined> {
   const sceneAction = scene.pulse;
-  const scenebook = story.notableScenes.find(sceneRulebook => sceneRulebook.match(sceneAction, story));
-  const beginning = scenebook?.beginning ?? defaultSceneRulebook.beginning;
+  const playbook = story.notableScenes.find(scenetype => scenetype.match(sceneAction, story));
+  const beginning = playbook?.beginning ?? defaultSceneType.beginning;
   if (beginning) publish(await ifLater(beginning(scene.pulse, story, scene)));
-  const middle = scenebook?.middle ?? defaultSceneRulebook.middle;
+  const middle = playbook?.middle ?? defaultSceneType.middle;
   scene.result = await ifLater(middle?.(sceneAction, story, scene));
   scene.isFinished = true;
-  const ending = scenebook?.end ?? defaultSceneRulebook.end;
+  const ending = playbook?.end ?? defaultSceneType.end;
   return (await ifLater(ending?.(scene.pulse, story, scene))) || undefined;
 }
 

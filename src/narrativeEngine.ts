@@ -1,29 +1,31 @@
 import type { ActionDefinition, Noun } from "./actions";
-import type { Attempt } from "./attempts";
-import { createMyBelief, initializeDesireables, type ShouldBe } from "./beliefs";
+import { createAttempt, type Attempt } from "./attempts";
+import { createBelief, initializeDesireables, type ShouldBe } from "./beliefs";
 import { author, type Character } from "./characters";
 import { console_log, stringify } from "./paragraphs";
 import { weCouldTry, whatTheyAreTryingToDoNow } from "./planningTree";
-import type { Desireable } from "./resources";
-import { SceneRulebook, createScene, type Scene } from "./scenes";
+import type { Desireable, Resource } from "./resources";
+import { SceneType, createScene, type Scene } from "./scenes";
 import { spelling } from "./spellcheck";
 import { playStory, type SolicitPlayerInput, type Story } from "./story";
 
 export {
-  createMyBelief,
+  createAttempt,
+  createBelief,
   spelling,
   weCouldTry,
   type ActionDefinition,
   type Attempt,
   type Character,
   type Desireable,
-  type SceneRulebook,
+  type Resource,
+  type SceneType,
   type ShouldBe,
   type SolicitPlayerInput,
   type Story,
 };
 
-export function createMyGoal<N extends Noun, SN extends Noun>(
+export function createGoal<N extends Noun, SN extends Noun>(
   definition: ActionDefinition<N, SN>,
   noun?: N,
   secondNoun?: SN
@@ -45,12 +47,12 @@ export async function narrativeEngine(
   characters: Character[],
   actionset: ActionDefinition<any, any>[],
   desireables: Desireable[],
-  notableScenes?: SceneRulebook[],
+  notableScenes?: SceneType[],
   getPlayerInput?: (story: Story, viewpointCharacter: Character) => Promise<Attempt | undefined>
 ) {
   // sanitize setup
   for (const character of characters) if (!character.goals) character.goals = [];
-  for (const character of characters) for (const goal of character.goals) if (!goal.actor || goal.actor == author) goal.actor = character;
+  for (const character of characters) for (const goal of character.goals!) if (!goal.actor || goal.actor == author) goal.actor = character;
   const desireablesRecord = initializeDesireables(desireables);
 
   // debug

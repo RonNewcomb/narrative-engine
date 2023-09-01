@@ -38,7 +38,7 @@ export function moveDesireable(
   }
 }
 
-export function createMyBelief(
+export function createBelief(
   property: ShouldBe["property"],
   ofDesireable: ShouldBe["ofDesireable"],
   shouldBe: ShouldBe["shouldBe"],

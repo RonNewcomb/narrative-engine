@@ -2,24 +2,24 @@ import type { ActionDefinition } from "./actions";
 import type { Attempt } from "./attempts";
 import type { Character } from "./characters";
 import { createSceneSet, type ChoiceConsequenceClosure } from "./consequences";
-import { News } from "./news";
+import { type News } from "./news";
 import { console_log, publish, stringify } from "./paragraphs";
-import { Desireable } from "./resources";
-import { SceneRulebook, getNextScene, playScene, type Scene } from "./scenes";
+import { type Desireable } from "./resources";
+import { getNextScene, playScene, type Scene, type SceneType } from "./scenes";
 
 export interface SolicitPlayerInput {
   (story: Story, viewpointCharacter: Character): Promise<Attempt | undefined>;
 }
 
 export interface Story {
-  characters: Character[];
+  readonly characters: Character[];
   readonly actionset: ActionDefinition<any, any>[];
-  desireables: Record<symbol, Desireable>;
-  getPlayerInput: SolicitPlayerInput;
-  notableScenes: SceneRulebook[];
+  readonly desireables: Record<symbol, Desireable>;
+  readonly getPlayerInput: SolicitPlayerInput;
+  readonly notableScenes: SceneType[];
 
-  sceneStack: ChoiceConsequenceClosure[];
-  history: News[];
+  readonly sceneStack: ChoiceConsequenceClosure[];
+  readonly history: News[];
   currentTurnsNews: News[];
 }
 
@@ -27,7 +27,7 @@ export async function playStory(
   characters: Character[],
   actionset: ActionDefinition<any, any>[],
   desireables: Record<symbol, Desireable>,
-  notableScenes: SceneRulebook[],
+  notableScenes: SceneType[],
   getPlayerInput: SolicitPlayerInput,
   firstScene?: Scene
 ) {

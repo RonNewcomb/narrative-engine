@@ -22,7 +22,7 @@ export function weCouldTry<N extends Resource, SN extends Resource>(
     stringifyAction(failingAction, { omitActor: true, ing: true, withStatus: true }) + "."
   );
   if (failingAction) failingAction.fullfilledBy.push(circumvention);
-  else actor.goals.push(circumvention);
+  else actor.goals!.push(circumvention);
   return circumvention;
 }
 
@@ -38,7 +38,7 @@ const inThePast = (it: Attempt) =>
 const couldveBeen = (it: Attempt) =>
   it.status == "untried" && it.fulfills && ["successful", "partly successful"].includes(it.fulfills.status);
 const isTopLevel = (it: Attempt) => !it.fulfills; // someone plans the cause of it  // it fulfills no higher goal
-const busy = (actor: Character) => actor.goals.filter(at => !inThePast(at)).length == 0; // all attempts which [could possibly] fulfill goals of actor are in past;
+const busy = (actor: Character) => actor.goals!.filter(at => !inThePast(at)).length == 0; // all attempts which [could possibly] fulfill goals of actor are in past;
 
 let confusedAboutTiming: boolean;
 
@@ -129,7 +129,7 @@ export const whatTheyAreTryingToDoNowRegarding = (actor: Character, act: Attempt
 };
 
 export const whatTheyAreTryingToDoNow = (actor: Character): Attempt | undefined => {
-  let thisAct = actor.goals.find(g => g.status == "partly successful") || actor.goals.find(g => g.status == "untried");
+  let thisAct = actor.goals?.find(g => g.status == "partly successful") || actor.goals?.find(g => g.status == "untried");
   if (!thisAct) return undefined;
   return whatTheyAreTryingToDoNowRegarding(actor, thisAct);
 };

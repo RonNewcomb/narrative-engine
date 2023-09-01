@@ -1,4 +1,4 @@
-import type { AbstractActionDefinition } from "./actions";
+import type { ActionDefinition } from "./actions";
 import { createAttempt, type Attempt } from "./attempts";
 import type { Character } from "./characters";
 import { publish, stringifyAction, stringifyAttempt } from "./paragraphs";
@@ -7,7 +7,7 @@ import type { Resource } from "./resources";
 /** attaches a suggestion to the tree */
 export function weCouldTry<N extends Resource, SN extends Resource>(
   actor: Character,
-  definition: AbstractActionDefinition<N, SN>,
+  definition: ActionDefinition<N, SN>,
   noun: N | undefined,
   secondNoun: SN | undefined,
   /** parent action */

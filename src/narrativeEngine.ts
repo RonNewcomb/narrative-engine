@@ -1,4 +1,4 @@
-import type { AbstractActionDefinition, ActionDefinition, Noun } from "./actions";
+import type { ActionDefinition, Noun } from "./actions";
 import type { Attempt } from "./attempts";
 import { createMyBelief, initializeDesireables, type ShouldBe } from "./beliefs";
 import { author, type Character } from "./characters";
@@ -6,10 +6,12 @@ import { console_log, stringify } from "./paragraphs";
 import { weCouldTry, whatTheyAreTryingToDoNow } from "./planningTree";
 import type { Desireable } from "./resources";
 import { SceneRulebook, createScene, type Scene } from "./scenes";
+import { spelling } from "./spellcheck";
 import { playStory, type Story } from "./story";
 
 export {
   createMyBelief,
+  spelling,
   weCouldTry,
   type ActionDefinition,
   type Attempt,
@@ -21,7 +23,7 @@ export {
 };
 
 export function createMyGoal<N extends Noun, SN extends Noun>(
-  definition: AbstractActionDefinition<N, SN>,
+  definition: ActionDefinition<N, SN>,
   noun?: N,
   secondNoun?: SN
 ): Attempt<N, SN> {

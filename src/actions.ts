@@ -11,14 +11,12 @@ import type { Story } from "./story";
 export type Verb = string;
 export type Noun = Desireable | Character; // Resource?
 
-export interface AbstractActionDefinition<N = Resource, SN = Resource> {
+export interface ActionDefinition<N extends Resource = Noun, SN extends Resource = Noun> {
   verb: Verb;
   rulebooks?: Rulebooks<N, SN>;
 }
 
-export interface ActionDefinition<N = Noun, SN = Noun> extends AbstractActionDefinition<Noun, Noun> {}
-
-export const ReflectUpon: AbstractActionDefinition<Attempt> = {
+export const ReflectUpon: ActionDefinition<Attempt> = {
   verb: "reflect upon attempting _",
   rulebooks: {
     news: {
@@ -27,7 +25,11 @@ export const ReflectUpon: AbstractActionDefinition<Attempt> = {
   },
 };
 
-export const ReceivingImportantNews: AbstractActionDefinition<News, ShouldBe> = {
+export const SpreadNewsToOthers: ActionDefinition<News, Character[]> = {
+  verb: "spread news of _ to _",
+};
+
+export const ReceivingImportantNews: ActionDefinition<News, ShouldBe> = {
   verb: "receive news of _, but _",
   rulebooks: {
     check: {
@@ -60,6 +62,6 @@ function findActions(badNews: Attempt<any, any>, shouldBe: ShouldBe, story: Stor
   return retval;
 }
 
-export const StuckForSolutions: AbstractActionDefinition<Attempt> = {
+export const StuckForSolutions: ActionDefinition<Attempt> = {
   verb: "search for solutions to _",
 };

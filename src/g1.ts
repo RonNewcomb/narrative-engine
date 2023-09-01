@@ -6,6 +6,7 @@ import {
   createMyBelief,
   createMyGoal,
   narrativeEngine,
+  spelling,
   weCouldTry,
 } from "./narrativeEngine";
 import { getPlayerChoices } from "./playerInputStyle1";
@@ -124,6 +125,10 @@ const storyStart: SceneRulebook = {
 };
 
 ////////////
+
+spelling({ receiving: "receiveing" });
+
+///////
 
 narrativeEngine(
   [Rose, Zafra],

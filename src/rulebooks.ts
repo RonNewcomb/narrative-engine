@@ -1,23 +1,26 @@
 import type { Attempt } from "./attempts";
 import { moveDesireable, type ShouldBeStatement } from "./beliefs";
+import { Resource } from "./resources";
 import type { Story } from "./story";
 
-export type RuleWithOutcome<N, SN> = ((attempt: Attempt<N, SN>, story: Story) => RuleOutcome) & { name?: string };
-export type Rule<N, SN> = ((attempt: Attempt<N, SN>, story: Story) => void) & { name?: string };
+export type RuleWithOutcome<N extends Resource, SN extends Resource> = ((attempt: Attempt<N, SN>, story: Story) => RuleOutcome) & {
+  name?: string;
+};
+export type Rule<N extends Resource, SN extends Resource> = ((attempt: Attempt<N, SN>, story: Story) => void) & { name?: string };
 
 export type RuleOutcome = "success" | "failed" | undefined | false | Attempt | Attempt[];
 export const makeNoDecision: RuleOutcome = undefined;
 export const noDecision: RuleOutcome = false;
 export const pretendItWorked: RuleOutcome = "success";
 
-export interface Rulebook<N, SN> {
+export interface Rulebook<N extends Resource, SN extends Resource> {
   rules: Rule<N, SN>[];
 }
-export interface CouldRulebook<N, SN> {
+export interface CouldRulebook<N extends Resource, SN extends Resource> {
   rules: RuleWithOutcome<N, SN>[];
 }
 
-export interface Rulebooks<N, SN> {
+export interface Rulebooks<N extends Resource, SN extends Resource> {
   check?: CouldRulebook<N, SN>;
   moveDesireables?: (attempt: Attempt<N, SN>) => ShouldBeStatement[];
   news?: Rulebook<N, SN>;

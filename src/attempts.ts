@@ -1,4 +1,4 @@
-import { StuckForSolutions, type AbstractActionDefinition, type Verb } from "./actions";
+import { StuckForSolutions, type ActionDefinition, type Verb } from "./actions";
 import type { Character } from "./characters";
 import { createNewsItem, reactionsToNews, resetNewsCycle } from "./news";
 import { publish, stringifyAction, stringifyAttempt } from "./paragraphs";
@@ -11,12 +11,12 @@ import type { Story } from "./story";
 /** An action which has failed.  Attempts record which Check rule prevented the action and whether the action could or should be re-attempted later.
  *  For a re-attempt to be successful, certain pre-requisites need to be 'fulfilled' (a relation) by other actions, so the same Check rule doesn't
  *  simply stop the action again. */
-export interface Attempt<N = Resource, SN = Resource> extends Resource {
+export interface Attempt<N extends Resource = Resource, SN extends Resource = Resource> extends Resource {
   verb: Verb;
   noun?: N;
   secondNoun?: SN;
   actor: Character;
-  definition: AbstractActionDefinition<N, SN>;
+  definition: ActionDefinition<N, SN>;
   status: "untried" | "failed" | "partly successful" | "successful";
   fulfills: Attempt<any, any> | undefined; // .parent
   fullfilledBy: Attempt<any, any>[]; // .children
@@ -24,7 +24,7 @@ export interface Attempt<N = Resource, SN = Resource> extends Resource {
 
 export function createAttempt<N extends Resource, SN extends Resource>(
   actor: Character,
-  definition: AbstractActionDefinition<N, SN>,
+  definition: ActionDefinition<N, SN>,
   noun: N | undefined,
   secondNoun: SN | undefined,
   parentAction: Attempt<any, any> | undefined

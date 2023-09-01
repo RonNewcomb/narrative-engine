@@ -11,5 +11,5 @@ export function spelling(misspellings: Record<string, string | string[]>): void 
 /** changes the text per the corrections list */
 export function spellcheck(text: string): string {
   const words = text.split(/\b/);
-  return words.map(word => correctionsList[word] || word).join(" ");
+  return words.map(word => correctionsList[word] || word).join("");
 }

@@ -1,14 +1,13 @@
 import type { Attempt } from "./attempts";
 import { ShouldBe } from "./beliefs";
+import { div } from "./layout";
+import { spellcheck } from "./spellcheck";
 
 export let console_log: (...data: any[]) => void = (...texts: any[]): void => {
   console.log(...texts);
-  const published = document.getElementById("published")!;
-  const div = document.createElement("div");
-  div.className = "debug";
   const text = texts.join(" ");
-  div.append(text);
-  published.appendChild(div);
+  const container = div([], { className: "debug", innerText: text });
+  document.getElementById("published")!.appendChild(container);
 };
 
 export let console_error: (...data: any[]) => void = console.error;
@@ -17,7 +16,15 @@ export function stringify(obj: any): string {
   return JSON.stringify(
     obj,
     (key, value) =>
-      key == "actor" && !!value ? `\\\\${value.name}` : key == "fulfills" && !!value ? "\\\\.." : key == "definition" ? undefined : value,
+      key == "viewpoint" && !!value
+        ? `\\\\${value.name}`
+        : key == "actor" && !!value
+        ? `\\\\${value.name}`
+        : key == "fulfills" && !!value
+        ? "\\\\.."
+        : key == "definition"
+        ? undefined
+        : value,
     4
   );
 }
@@ -71,9 +78,7 @@ export function stringifyAttempt(
 
 export function publish(...texts: any[]): void {
   console.log(...texts);
-  const published = document.getElementById("published")!;
-  const div = document.createElement("div");
-  const text = texts.join(" ");
-  div.append(text);
-  published.appendChild(div);
+  const text = spellcheck(texts.join(" "));
+  const container = div([], { innerText: text });
+  document.getElementById("published")!.appendChild(container);
 }

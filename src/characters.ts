@@ -1,11 +1,13 @@
 import type { Attempt } from "./attempts";
 import type { ShouldBe } from "./beliefs";
 import type { Resource } from "./resources";
+import type { SolicitPlayerInput } from "./story";
 
 export interface Character extends Resource {
   name: string;
   beliefs: ShouldBe[];
   goals: Attempt<any, any>[];
+  playersChoice?: SolicitPlayerInput;
 }
 
 export const author: Character = {

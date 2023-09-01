@@ -7,11 +7,15 @@ import { console_log, publish, stringify } from "./paragraphs";
 import { Desireable } from "./resources";
 import { SceneRulebook, getNextScene, playScene, type Scene } from "./scenes";
 
+export interface SolicitPlayerInput {
+  (story: Story, viewpointCharacter: Character): Promise<Attempt | undefined>;
+}
+
 export interface Story {
   characters: Character[];
   readonly actionset: ActionDefinition<any, any>[];
   desireables: Record<symbol, Desireable>;
-  getPlayerInput: (story: Story, viewpointCharacter: Character) => Promise<Attempt | undefined>;
+  getPlayerInput: SolicitPlayerInput;
   notableScenes: SceneRulebook[];
 
   sceneStack: ChoiceConsequenceClosure[];
@@ -24,7 +28,7 @@ export async function playStory(
   actionset: ActionDefinition<any, any>[],
   desireables: Record<symbol, Desireable>,
   notableScenes: SceneRulebook[],
-  getPlayerInput: (story: Story, viewpointCharacter: Character) => Promise<Attempt | undefined>,
+  getPlayerInput: SolicitPlayerInput,
   firstScene?: Scene
 ) {
   // initialize story
@@ -51,7 +55,7 @@ export async function playStory(
     console_log("TURN", ++turn);
 
     // characters act // creates scene types of Action
-    suggestedNextScene = playScene(currentScene, story);
+    suggestedNextScene = await playScene(currentScene, story);
 
     console_log("END TURN", turn);
     console_log(stringify(characters));

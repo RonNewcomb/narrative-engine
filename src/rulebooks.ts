@@ -1,11 +1,14 @@
 import type { Attempt } from "./attempts";
 import { moveDesireable, type ShouldBeStatement } from "./beliefs";
 import { Resource } from "./resources";
+import { ifLater } from "./scenes";
 import type { Story } from "./story";
 
-export type RuleWithOutcome<N extends Resource, SN extends Resource> = ((attempt: Attempt<N, SN>, story: Story) => RuleOutcome) & {
-  name?: string;
-};
+export type RuleWithOutcome<N extends Resource, SN extends Resource> = (
+  attempt: Attempt<N, SN>,
+  story: Story
+) => RuleOutcome | Promise<RuleOutcome>;
+
 export type Rule<N extends Resource, SN extends Resource> = ((attempt: Attempt<N, SN>, story: Story) => void) & { name?: string };
 
 export type RuleOutcome = "success" | "failed" | undefined | false | Attempt | Attempt[];
@@ -26,13 +29,13 @@ export interface Rulebooks<N extends Resource, SN extends Resource> {
   news?: Rulebook<N, SN>;
 }
 
-export function executeRulebook(attempt: Attempt, story: Story): RuleOutcome {
+export async function executeRulebook(attempt: Attempt, story: Story): Promise<RuleOutcome> {
   const rulebooks = attempt.definition.rulebooks;
   if (!rulebooks) return makeNoDecision;
   let outcome: RuleOutcome = makeNoDecision;
   if (rulebooks.check)
     for (const rule of rulebooks.check.rules || []) {
-      const ruleResult = rule(attempt, story);
+      const ruleResult = await ifLater(rule(attempt, story));
       if (ruleResult == "failed") {
         outcome = ruleResult;
         break;

@@ -42,13 +42,13 @@ export function createAttempt<N extends Resource, SN extends Resource>(
   return circumvention;
 }
 
-export function doThingAsAScene(thisAttempt: Attempt, currentScene: Scene, story: Story): RuleOutcome {
-  doThing(thisAttempt, currentScene, story);
+export async function doThingAsAScene(thisAttempt: Attempt, currentScene: Scene, story: Story): Promise<RuleOutcome> {
+  await doThing(thisAttempt, currentScene, story);
 
   while (thisAttempt.status == "partly successful") {
     let subAttempt = whatTheyAreTryingToDoNowRegarding(thisAttempt.actor, thisAttempt);
     publish("same scene, now", stringifyAttempt(subAttempt));
-    if (subAttempt) doThing(subAttempt, currentScene, story);
+    if (subAttempt) await doThing(subAttempt, currentScene, story);
     else {
       publish("STUCK:", stringifyAttempt(thisAttempt));
       if (thisAttempt.actor.goals.includes(thisAttempt)) thisAttempt.actor.goals = thisAttempt.actor.goals.filter(g => g != thisAttempt);
@@ -59,9 +59,9 @@ export function doThingAsAScene(thisAttempt: Attempt, currentScene: Scene, story
   return thisAttempt.status == "successful" ? "success" : thisAttempt.status == "failed" ? "failed" : "failed";
 }
 
-function doThing(thisAttempt: Attempt, currentScene: Scene, story: Story): Attempt["status"] {
+async function doThing(thisAttempt: Attempt, currentScene: Scene, story: Story): Promise<Attempt["status"]> {
   // DO the currentAction and get status
-  const outcome = executeRulebook(thisAttempt, story);
+  const outcome = await executeRulebook(thisAttempt, story);
   thisAttempt.status = outcome != "failed" ? "successful" : thisAttempt.fullfilledBy.length > 0 ? "partly successful" : "failed";
 
   publish("DONE:", stringifyAttempt(thisAttempt) + ".");

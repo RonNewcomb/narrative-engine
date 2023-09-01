@@ -1,7 +1,8 @@
 import { createAttempt } from "./attempts";
+import { div, element } from "./layout";
 import type { ActionDefinition, Attempt, Character, Story } from "./narrativeEngine";
 import { stringifyNoun } from "./paragraphs";
-import { Resource } from "./resources";
+import type { Resource } from "./resources";
 
 export async function getPlayerChoices(story: Story, viewpointCharacter: Character): Promise<Attempt | undefined> {
   return new Promise(async resolve => {
@@ -91,15 +92,4 @@ async function chooseNoun(container: HTMLDivElement, story: Story): Promise<Reso
       container.appendChild(line);
     }
   });
-}
-
-function div(children?: HTMLElement[], attrs?: Partial<HTMLDivElement>): HTMLDivElement {
-  return element("div", attrs, children) as HTMLDivElement;
-}
-
-function element(tagName: string, attrs?: Partial<HTMLElement>, children?: HTMLElement[]): HTMLElement {
-  const el = document.createElement(tagName);
-  if (attrs) Object.keys(attrs).forEach(attr => ((el as any)[attr] = (attrs as any)[attr]));
-  if (children) children.forEach(child => el.appendChild(child));
-  return el;
 }

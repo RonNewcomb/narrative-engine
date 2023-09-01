@@ -7,7 +7,7 @@ import { weCouldTry, whatTheyAreTryingToDoNow } from "./planningTree";
 import type { Desireable } from "./resources";
 import { SceneRulebook, createScene, type Scene } from "./scenes";
 import { spelling } from "./spellcheck";
-import { playStory, type Story } from "./story";
+import { playStory, type SolicitPlayerInput, type Story } from "./story";
 
 export {
   createMyBelief,
@@ -19,6 +19,7 @@ export {
   type Desireable,
   type SceneRulebook,
   type ShouldBe,
+  type SolicitPlayerInput,
   type Story,
 };
 

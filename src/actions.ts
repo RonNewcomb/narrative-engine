@@ -5,8 +5,8 @@ import { createNewsItem, type News } from "./news";
 import { publish, stringifyAttempt } from "./paragraphs";
 import { weCouldTry } from "./planningTree";
 import { type Desireable, type Resource } from "./resources";
-import type { Rulebooks } from "./rulebooks";
-import type { Story } from "./story";
+import { makeNoDecision, type Rulebooks } from "./rulebooks";
+import { type Story } from "./story";
 
 export type Verb = string;
 export type Noun = Desireable | Character; // Resource?
@@ -64,4 +64,17 @@ function findActions(badNews: Attempt<any, any>, shouldBe: ShouldBe, story: Stor
 
 export const StuckForSolutions: ActionDefinition<Attempt> = {
   verb: "search for solutions to _",
+  rulebooks: {
+    check: {
+      rules: [
+        async (attempt, story) => {
+          if (!attempt.actor.playersChoice) return makeNoDecision;
+          const playerChoice = await attempt.actor.playersChoice(story, attempt.actor);
+          if (playerChoice) {
+            return weCouldTry(playerChoice.actor, playerChoice.definition, playerChoice.noun, playerChoice.secondNoun, attempt);
+          }
+        },
+      ],
+    },
+  },
 };

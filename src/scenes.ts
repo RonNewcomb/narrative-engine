@@ -24,10 +24,14 @@ import { type Story } from "./story";
  */
 export interface SceneRulebook {
   match: (attempt: Attempt, story: Story) => boolean;
-  beginning?: (attempt: Attempt, story: Story, scene: Scene) => string | void;
-  middle?: (attempt: Attempt, story: Story, scene: Scene) => RuleOutcome;
-  end?: (attempt: Attempt, story: Story, scene: Scene) => Scene | void | undefined;
+  beginning?: (attempt: Attempt, story: Story, scene: Scene) => ResultOfBeginScene | Promise<ResultOfBeginScene>;
+  middle?: (attempt: Attempt, story: Story, scene: Scene) => ResultOfMidScene | Promise<ResultOfMidScene>;
+  end?: (attempt: Attempt, story: Story, scene: Scene) => ResultOfEndScene | Promise<ResultOfEndScene>;
 }
+
+export type ResultOfBeginScene = string | void;
+export type ResultOfMidScene = RuleOutcome;
+export type ResultOfEndScene = Scene | void | undefined;
 
 const SCENEBREAK = "\n   * * *    \n\n";
 
@@ -63,21 +67,23 @@ export interface Scene {
 // SuspenseScene -- scene with a lot of tension
 // DramaticScene -- scene with strong emotion
 
+export const ifLater = <T>(x: T | Promise<T>) => (x instanceof Promise ? x : Promise.resolve(x));
+
 export function createScene(pulse: Attempt<Resource, Resource>, viewpoint?: Character): Scene {
   const scene: Scene = { pulse, viewpoint: viewpoint || pulse.actor };
   return scene;
 }
 
-export function playScene(scene: Scene, story: Story): Scene | undefined {
+export async function playScene(scene: Scene, story: Story): Promise<Scene | undefined> {
   const sceneAction = scene.pulse;
-  const rulebook = story.notableScenes.find(sceneRulebook => sceneRulebook.match(sceneAction, story));
-  const beginning = rulebook?.beginning ?? defaultSceneRulebook.beginning;
-  if (beginning) publish(beginning(scene.pulse, story, scene));
-  const middle = rulebook?.middle ?? defaultSceneRulebook.middle;
-  scene.result = middle?.(sceneAction, story, scene);
+  const scenebook = story.notableScenes.find(sceneRulebook => sceneRulebook.match(sceneAction, story));
+  const beginning = scenebook?.beginning ?? defaultSceneRulebook.beginning;
+  if (beginning) publish(await ifLater(beginning(scene.pulse, story, scene)));
+  const middle = scenebook?.middle ?? defaultSceneRulebook.middle;
+  scene.result = await ifLater(middle?.(sceneAction, story, scene));
   scene.isFinished = true;
-  const ending = rulebook?.end ?? defaultSceneRulebook.end;
-  return ending?.(scene.pulse, story, scene) || undefined;
+  const ending = scenebook?.end ?? defaultSceneRulebook.end;
+  return (await ifLater(ending?.(scene.pulse, story, scene))) || undefined;
 }
 
 export function getNextScene(story: Story, suggestedNextScene?: Scene): Scene | undefined {

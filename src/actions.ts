@@ -5,7 +5,7 @@ import { createNewsItem, type News } from "./news";
 import { publish, stringifyAttempt } from "./paragraphs";
 import { weCouldTry } from "./planningTree";
 import { type Desireable, type Resource } from "./resources";
-import { makeNoDecision, type Rulebooks } from "./rulebooks";
+import { can, cant, type Rulebooks } from "./rulebooks";
 import { type Story } from "./story";
 
 export type Verb = string;
@@ -17,7 +17,7 @@ export interface ActionDefinition<N extends Resource = Noun, SN extends Resource
 
 export const ReflectUpon: ActionDefinition<Attempt> = {
   verb: "reflect upon attempting _",
-  news: [attempt => publish(attempt.actor.name, "reflected."), createNewsItem],
+  narrate: [attempt => publish(attempt.actor.name, "reflected."), createNewsItem],
 };
 
 export const SpreadNewsToOthers: ActionDefinition<News, Character[]> = {
@@ -27,7 +27,7 @@ export const SpreadNewsToOthers: ActionDefinition<News, Character[]> = {
 export const ReceivingImportantNews: ActionDefinition<News, ShouldBe> = {
   verb: "receive news of _, but _",
 
-  cant: [
+  can: [
     (attempt, story) => {
       const news = attempt.noun;
       const belief = attempt.secondNoun;
@@ -38,7 +38,7 @@ export const ReceivingImportantNews: ActionDefinition<News, ShouldBe> = {
       const actions = findActions(news, belief, story);
       for (const action of actions) weCouldTry<any, any>(attempt.actor, action, news.noun, news.secondNoun, attempt);
 
-      return "stop";
+      return cant;
     },
   ],
 };
@@ -47,8 +47,13 @@ function findActions(badNews: Attempt<any, any>, shouldBe: ShouldBe, story: Stor
   const retval: ActionDefinition<any, any>[] = [];
   for (const action of story.actionset) {
     const effects = action.change?.(badNews, story) || [];
-    for (const e of effects)
-      if (shouldBe.property == e[0] && shouldBe.ofDesireable == e[1] && shouldBe.shouldBe == e[2] && shouldBe.toValue == e[3])
+    for (const effect of effects)
+      if (
+        shouldBe.property == effect[0] &&
+        shouldBe.ofDesireable == effect[1] &&
+        shouldBe.shouldBe == effect[2] &&
+        shouldBe.toValue == effect[3]
+      )
         retval.push(action);
   }
   return retval;
@@ -56,14 +61,11 @@ function findActions(badNews: Attempt<any, any>, shouldBe: ShouldBe, story: Stor
 
 export const StuckForSolutions: ActionDefinition<Attempt> = {
   verb: "search for solutions to _",
-
-  cant: [
+  can: [
     async (attempt, story) => {
-      if (!attempt.actor.playersChoice) return makeNoDecision;
-      const playerChoice = await attempt.actor.playersChoice(story, attempt.actor);
-      if (playerChoice) {
-        return weCouldTry(playerChoice.actor, playerChoice.definition, playerChoice.noun, playerChoice.secondNoun, attempt);
-      }
+      if (!attempt.actor.playersChoice) return can;
+      const choice = await attempt.actor.playersChoice(story, attempt.actor);
+      if (choice) return weCouldTry(choice.actor, choice.definition, choice.noun, choice.secondNoun, attempt);
     },
   ],
 };

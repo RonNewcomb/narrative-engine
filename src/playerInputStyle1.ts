@@ -3,7 +3,7 @@ import { createAttempt, type ActionDefinition, type Attempt, type Character, typ
 import { stringifyNoun } from "./paragraphs";
 
 export async function getPlayerChoices(story: Story, viewpointCharacter: Character): Promise<Attempt | undefined> {
-  return new Promise(async resolve => {
+  return new Promise(async awaited => {
     // pre-existing wrapper
     const published = document.getElementById("published")!;
 
@@ -39,7 +39,7 @@ export async function getPlayerChoices(story: Story, viewpointCharacter: Charact
 
     // returns to the story
     const attempt = createAttempt<Resource, Resource>(viewpointCharacter, action, nouns[0], nouns[1], undefined);
-    resolve(attempt);
+    awaited(attempt);
   });
 }
 
@@ -60,17 +60,17 @@ document.body.appendChild(playerChoicesCSS);
 /** set the CSS to use; use the class .playerChoices { .... } */
 export async function setPlayerInputCSS(css: string) {
   document.getElementById("playerChoicesCSS")!.innerHTML = css;
-  return new Promise(r => setTimeout(r, 1));
+  return new Promise(awaited => setTimeout(awaited, 1));
 }
 
 async function chooseVerb(
   container: HTMLDivElement,
   actions: ActionDefinition<Resource, Resource>[]
 ): Promise<ActionDefinition<Resource, Resource>> {
-  return new Promise(resolve => {
+  return new Promise(awaited => {
     // loop through whole palette
     for (const action of actions) {
-      const button = element("button", { innerText: action.verb, onclick: () => resolve(action) });
+      const button = element("button", { innerText: action.verb, onclick: () => awaited(action) });
       const line = div([button]);
       container.appendChild(line);
     }
@@ -78,9 +78,9 @@ async function chooseVerb(
 }
 
 async function chooseNoun(container: HTMLDivElement, story: Story, action: ActionDefinition<Resource, Resource>): Promise<Resource> {
-  return new Promise(resolve => {
+  return new Promise(awaited => {
     for (const character of story.characters) {
-      const button = element("button", { innerText: character.name, onclick: () => resolve(character) });
+      const button = element("button", { innerText: character.name, onclick: () => awaited(character) });
       const line = div([button]);
       container.appendChild(line);
     }
@@ -88,7 +88,7 @@ async function chooseNoun(container: HTMLDivElement, story: Story, action: Actio
     for (const key of keys) {
       const desireable = story.desireables[key];
 
-      const button = element("button", { innerText: desireable.name, onclick: () => resolve(desireable) });
+      const button = element("button", { innerText: desireable.name, onclick: () => awaited(desireable) });
       const line = div([button]);
       container.appendChild(line);
     }

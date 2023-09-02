@@ -4,7 +4,7 @@ import { createNewsItem, reactionsToNews, resetNewsCycle } from "./news";
 import { publish, stringifyAction, stringifyAttempt } from "./paragraphs";
 import { weCouldTry, whatTheyAreTryingToDoNowRegarding } from "./planningTree";
 import type { Resource } from "./resources";
-import { executeRulebook, type RuleOutcome } from "./rulebooks";
+import { can, cant, executeRulebook, type RuleOutcome } from "./rulebooks";
 import type { Scene } from "./scenes";
 import type { Story } from "./story";
 
@@ -64,13 +64,13 @@ export async function doThingAsAScene(thisAttempt: Attempt, currentScene: Scene,
     }
   }
 
-  return thisAttempt.status == "successful" ? "continue" : thisAttempt.status == "failed" ? "stop" : "stop";
+  return thisAttempt.status == "successful" ? can : thisAttempt.status == "failed" ? cant : cant;
 }
 
 async function doThing(thisAttempt: Attempt, currentScene: Scene, story: Story): Promise<Attempt["status"]> {
   // DO the currentAction and get status
   const outcome = await executeRulebook(thisAttempt, story);
-  thisAttempt.status = outcome != "stop" ? "successful" : thisAttempt.fullfilledBy.length > 0 ? "partly successful" : "failed";
+  thisAttempt.status = outcome != cant ? "successful" : thisAttempt.fullfilledBy.length > 0 ? "partly successful" : "failed";
 
   publish("DONE:", stringifyAttempt(thisAttempt) + ".");
 

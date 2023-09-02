@@ -3,6 +3,8 @@ import {
   Character,
   Desireable,
   SceneType,
+  can,
+  cant,
   createBelief,
   createGoal,
   narrativeEngine,
@@ -11,22 +13,20 @@ import {
 } from "./narrativeEngine";
 import { getPlayerChoices } from "./playerInputStyle1";
 
+///////////////
+
 const doorkey: Desireable = { name: "door key", isKey: true };
 const door: Desireable = { name: "door", isLocked: true };
-
-const desireables: Desireable[] = [
-  { name: "Rose's inheritance" },
-  { name: "Legitimacy in the eyes of the court" },
-  { name: "to be at Harrenfall before the 12th" },
-  doorkey,
-  door,
-];
+const inheritance: Desireable = { name: "Rose's inheritance" };
+const legitimacy: Desireable = { name: "Legitimacy in the eyes of the court" };
+const appointment: Desireable = { name: "to be at Harrenfall before the 12th" };
 
 ////////////////
 
 const Exiting: ActionDefinition = {
   verb: "exit",
-  cant: [attempt => (!door.isLocked ? "continue" : weCouldTry(attempt.actor, Unlocking, door, undefined, attempt))],
+  can: [attempt => (!door.isLocked ? can : weCouldTry(attempt.actor, Unlocking, door, undefined, attempt))],
+  change: action => [["location", action.actor, "=", "out"]],
 };
 
 const Waiting: ActionDefinition = {
@@ -45,10 +45,7 @@ const Dropping: ActionDefinition = {
 
 const Opening: ActionDefinition = {
   verb: "open _",
-  cant: [
-    // attempt => (attempt.noun ? "successful" : weCouldTry(attempt.actor, Unlocking, attempt.noun, undefined, attempt)),
-    attempt => ((attempt.noun as any)?.isLocked ? weCouldTry(attempt.actor, Unlocking, attempt.noun, undefined, attempt) : "continue"),
-  ],
+  can: [attempt => ((attempt.noun as any)?.isLocked ? weCouldTry(attempt.actor, Unlocking, attempt.noun, undefined, attempt) : can)],
   change: attempt => [["isOpen", attempt.noun!, "=", true]],
 };
 
@@ -59,7 +56,7 @@ const Closing: ActionDefinition = {
 
 const Unlocking: ActionDefinition = {
   verb: "unlock _ with _",
-  cant: [
+  can: [
     // attempt => (attempt.secondNoun?.isKey ? "success" : weCouldTry(attempt.actor, Taking, attempt.secondNoun, undefined, attempt)),
   ],
   change: attempt => [["isLocked", attempt.noun!, "=", false]],
@@ -67,15 +64,15 @@ const Unlocking: ActionDefinition = {
 
 const Locking: ActionDefinition = {
   verb: "lock _ with _",
-  cant: [
+  can: [
     // // second noun must be key
     // attempt => (attempt.secondNoun?.isKey ? "success" : weCouldTry(attempt.actor, Realizing, doorkey, undefined, attempt)),
     // need to own key
     attempt =>
       !attempt.secondNoun
-        ? "stop"
+        ? cant
         : (attempt.secondNoun as any)?.owner == attempt.actor
-        ? "continue"
+        ? can
         : weCouldTry(attempt.actor, Taking, attempt.secondNoun, undefined, attempt),
   ],
   change: attempt => [["isLocked", attempt.noun!, "=", true]],
@@ -114,7 +111,7 @@ spelling({ receiving: "receiveing", the: ["teh", "hte"] });
 narrativeEngine(
   [Rose, Zafra],
   [Waiting, Exiting, Taking, Dropping, Locking, Unlocking, Opening, Closing, AskingFor],
-  desireables,
+  [inheritance, legitimacy, appointment, doorkey, door],
   [storyStart],
   getPlayerChoices
 );

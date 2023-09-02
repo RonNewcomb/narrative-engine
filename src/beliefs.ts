@@ -28,7 +28,7 @@ export function moveDesireable(
   toValue: ShouldBe["toValue"]
 ) {
   const propName: symbol = ofDesireable[hiddenPermanentName];
-  const desireable: Desireable = story.desireables[propName];
+  const desireable: Desireable = story.desireables[propName] || ofDesireable; // hack if you really need those symbols
   switch (shouldBe) {
     case "=":
       desireable[property] = toValue;

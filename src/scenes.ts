@@ -2,7 +2,7 @@ import { doThingAsAScene, type Attempt } from "./attempts";
 import { type Character } from "./characters";
 import { console_error, publish, stringifyAction } from "./paragraphs";
 import { type Resource } from "./resources";
-import { type RuleOutcome } from "./rulebooks";
+import { can, type RuleOutcome } from "./rulebooks";
 import { type Story } from "./story";
 
 /**
@@ -41,7 +41,7 @@ export const defaultSceneType: SceneType = {
   middle: (attempt, story, scene) => {
     if (attempt) return doThingAsAScene(attempt, scene, story);
     console_error("no action -- run AI to pick a scene-action that does/un-does the news? adjusts for it?");
-    return "continue"; // TODO i guess?
+    return can; // TODO i guess?
   },
   end: attempt => {
     publish(attempt.actor.name, "leaves.");

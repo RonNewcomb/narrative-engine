@@ -5,12 +5,15 @@ import { author, type Character } from "./characters";
 import { console_log, stringify } from "./paragraphs";
 import { weCouldTry, whatTheyAreTryingToDoNow } from "./planningTree";
 import type { Desireable, Resource } from "./resources";
+import { can, cant } from "./rulebooks";
 import { SceneType, createScene, type Scene } from "./scenes";
 import { spelling } from "./spellcheck";
 import { playStory, type SolicitPlayerInput, type Story } from "./story";
 import type { iFictionRecord } from "./treatyOfBabel";
 
 export {
+  can,
+  cant,
   createAttempt,
   createBelief,
   createGoal,

@@ -4,34 +4,33 @@ import type { Resource } from "./resources";
 import { ifLater } from "./scenes";
 import type { Story } from "./story";
 
-export type RuleOutcome = "continue" | "stop" | undefined | false | Attempt | Attempt[];
-export const makeNoDecision: RuleOutcome = undefined; // same as "continue"
-export const noDecision: RuleOutcome = false; // same as "continue"
-export const pretendItWorked: RuleOutcome = "continue";
+export const can = "can";
+export const cant = "cant";
+export type RuleOutcome = typeof can | typeof cant | undefined | false | Attempt | Attempt[];
 
 export interface Rulebooks<N extends Resource, SN extends Resource> {
-  cant?: ((attempt: Attempt<N, SN>, story: Story) => RuleOutcome | Promise<RuleOutcome>)[];
+  can?: ((attempt: Attempt<N, SN>, story: Story) => RuleOutcome | Promise<RuleOutcome>)[];
   change?: (attempt: Attempt<N, SN>, story: Story) => ShouldBeStatement[];
-  news?: ((attempt: Attempt<N, SN>, story: Story) => void)[];
+  narrate?: ((attempt: Attempt<N, SN>, story: Story) => void)[];
 }
 
 export async function executeRulebook(attempt: Attempt, story: Story): Promise<RuleOutcome> {
   const rulebooks = attempt.definition;
-  if (!rulebooks) return makeNoDecision;
-  let outcome: RuleOutcome = makeNoDecision;
-  if (rulebooks.cant)
-    for (const rule of rulebooks.cant || []) {
+  if (!rulebooks) return can;
+  let outcome: RuleOutcome = can;
+  if (rulebooks.can)
+    for (const rule of rulebooks.can || []) {
       const ruleResult = await ifLater(rule(attempt, story));
-      if (ruleResult == "stop" || typeof ruleResult == "object") {
-        outcome = "stop";
+      if (ruleResult == cant || typeof ruleResult == "object") {
+        outcome = cant;
         break;
       }
     }
-  if (rulebooks.change && outcome != "stop") {
+  if (rulebooks.change && outcome != cant) {
     const shouldBeStatements = rulebooks.change(attempt, story);
     for (const statement of shouldBeStatements) moveDesireable(story, ...statement);
   }
-  for (const rule of rulebooks.news || []) {
+  for (const rule of rulebooks.narrate || []) {
     const ruleResult = rule(attempt, story);
   }
   return outcome;

@@ -28,7 +28,7 @@ export async function getPlayerChoices(story: Story, viewpointCharacter: Charact
       panel = div([title]);
 
       playerChoices.appendChild(panel);
-      noun = await chooseNoun(panel, story);
+      noun = await chooseNoun(panel, story, action);
       playerChoices.removeChild(panel);
 
       nouns.push(noun);
@@ -77,7 +77,7 @@ async function chooseVerb(
   });
 }
 
-async function chooseNoun(container: HTMLDivElement, story: Story): Promise<Resource> {
+async function chooseNoun(container: HTMLDivElement, story: Story, action: ActionDefinition<Resource, Resource>): Promise<Resource> {
   return new Promise(resolve => {
     for (const character of story.characters) {
       const button = element("button", { innerText: character.name, onclick: () => resolve(character) });

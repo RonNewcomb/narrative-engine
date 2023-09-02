@@ -27,7 +27,7 @@ export function reactionsToNews(news: News, scene: Scene, story: Story): Consequ
     if (character != news.actor)
       if (!news.onlyKnownBy || news.onlyKnownBy.includes(character))
         for (const belief of character.beliefs)
-          if (isButtonPushed(news, belief)) {
+          if (isButtonPushed(news, belief, story)) {
             const foreshadowThis: ForeShadowing = { character, belief, news };
             const sceneAction = createAttempt<News, ShouldBe>(character, ReceivingImportantNews, news, belief, undefined);
             const reactionScene = createScene(sceneAction);

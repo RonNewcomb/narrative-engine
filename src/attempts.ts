@@ -1,5 +1,5 @@
 import { StuckForSolutions, type ActionDefinition, type Verb } from "./actions";
-import type { Character } from "./characters";
+import { author, type Character } from "./characters";
 import { createNewsItem, reactionsToNews, resetNewsCycle } from "./news";
 import { publish, stringifyAction, stringifyAttempt } from "./paragraphs";
 import { weCouldTry, whatTheyAreTryingToDoNowRegarding } from "./planningTree";
@@ -40,6 +40,14 @@ export function createAttempt<N extends Resource, SN extends Resource>(
     fullfilledBy: [],
   };
   return circumvention;
+}
+
+export function createGoal<N extends Resource, SN extends Resource>(
+  definition: ActionDefinition<N, SN>,
+  noun?: N,
+  secondNoun?: SN
+): Attempt<N, SN> {
+  return createAttempt(author, definition, noun, secondNoun, undefined);
 }
 
 export async function doThingAsAScene(thisAttempt: Attempt, currentScene: Scene, story: Story): Promise<RuleOutcome> {

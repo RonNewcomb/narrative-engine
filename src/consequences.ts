@@ -2,7 +2,7 @@ import { ReflectUpon } from "./actions";
 import { createAttempt, type Attempt } from "./attempts";
 import type { ShouldBe } from "./beliefs";
 import type { Character } from "./characters";
-import { News } from "./news";
+import type { News } from "./news";
 import { createScene, type Scene } from "./scenes";
 import type { Story } from "./story";
 
@@ -45,7 +45,7 @@ export function createSceneSet(
   if (alreadyKnown) return alreadyKnown;
   alreadyKnown = story.sceneStack.find(ccc => ccc.consequences?.find(c => c.scene == choice.scene));
   if (alreadyKnown) return alreadyKnown;
-  console.log("-- new scene set");
+  //console.log("-- new scene set");
   const actor = choice.scene.viewpoint;
   const news = choice.scene.pulse;
   const reflect = createAttempt(actor, ReflectUpon, news, undefined, news);
@@ -58,14 +58,13 @@ export function createSceneSet(
   return ccc;
 }
 
-export function isButtonPushed(news: News, belief: ShouldBe): boolean {
-  const changeStatements = news.definition.rulebooks?.change?.(news) || [];
+export function isButtonPushed(news: News, belief: ShouldBe, story: Story): boolean {
+  const changeStatements = news.definition.change?.(news, story) || [];
   if (!changeStatements || !changeStatements.length) return false;
   for (const statement of changeStatements) {
     if (statement[0] != belief.property && (statement[0] || belief.property)) continue; // they differ and either/both are a truthy value
     if (statement[1] != belief.ofDesireable) continue;
-    // if (statement[2] != belief.toValue) return true;
-    // if (statement[3] != belief.toValue) return true;
+    if (statement[2] == belief.toValue && statement[3] == belief.toValue) continue; // if the disposition agrees, no issue
     return true;
   }
   return false;

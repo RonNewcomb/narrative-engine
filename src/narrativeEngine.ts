@@ -1,5 +1,5 @@
-import type { ActionDefinition, Noun } from "./actions";
-import { createAttempt, type Attempt } from "./attempts";
+import type { ActionDefinition } from "./actions";
+import { createAttempt, createGoal, type Attempt } from "./attempts";
 import { createBelief, initializeDesireables, type ShouldBe } from "./beliefs";
 import { author, type Character } from "./characters";
 import { console_log, stringify } from "./paragraphs";
@@ -13,6 +13,7 @@ import type { iFictionRecord } from "./treatyOfBabel";
 export {
   createAttempt,
   createBelief,
+  createGoal,
   spelling,
   weCouldTry,
   type ActionDefinition,
@@ -26,24 +27,6 @@ export {
   type Story,
   type iFictionRecord,
 };
-
-export function createGoal<N extends Noun, SN extends Noun>(
-  definition: ActionDefinition<N, SN>,
-  noun?: N,
-  secondNoun?: SN
-): Attempt<N, SN> {
-  const circumvention: Attempt<N, SN> = {
-    verb: definition.verb,
-    actor: author,
-    definition,
-    noun,
-    secondNoun,
-    status: "untried",
-    fulfills: undefined,
-    fullfilledBy: [],
-  };
-  return circumvention;
-}
 
 export async function narrativeEngine(
   characters: Character[],

@@ -11,18 +11,13 @@ import { type Story } from "./story";
 export type Verb = string;
 export type Noun = Desireable | Character; // Resource?
 
-export interface ActionDefinition<N extends Resource = Noun, SN extends Resource = Noun> {
+export interface ActionDefinition<N extends Resource = Noun, SN extends Resource = Noun> extends Rulebooks<N, SN> {
   verb: Verb;
-  rulebooks?: Rulebooks<N, SN>;
 }
 
 export const ReflectUpon: ActionDefinition<Attempt> = {
   verb: "reflect upon attempting _",
-  rulebooks: {
-    news: {
-      rules: [attempt => publish(attempt.actor.name, "reflected."), createNewsItem],
-    },
-  },
+  news: [attempt => publish(attempt.actor.name, "reflected."), createNewsItem],
 };
 
 export const SpreadNewsToOthers: ActionDefinition<News, Character[]> = {
@@ -31,30 +26,27 @@ export const SpreadNewsToOthers: ActionDefinition<News, Character[]> = {
 
 export const ReceivingImportantNews: ActionDefinition<News, ShouldBe> = {
   verb: "receive news of _, but _",
-  rulebooks: {
-    cant: {
-      rules: [
-        (attempt, story) => {
-          const news = attempt.noun;
-          const belief = attempt.secondNoun;
-          if (!news) throw "missing News for ReceivingImportantNews";
-          if (!belief) throw "missing Belief for ReceivingImportantNews";
-          publish('"', stringifyAttempt(news), ' is bad news."');
 
-          const actions = findActions(news, belief, story);
-          for (const action of actions) weCouldTry<any, any>(attempt.actor, action, news.noun, news.secondNoun, attempt);
+  cant: [
+    (attempt, story) => {
+      const news = attempt.noun;
+      const belief = attempt.secondNoun;
+      if (!news) throw "missing News for ReceivingImportantNews";
+      if (!belief) throw "missing Belief for ReceivingImportantNews";
+      publish('"', stringifyAttempt(news), ' is bad news."');
 
-          return "stop";
-        },
-      ],
+      const actions = findActions(news, belief, story);
+      for (const action of actions) weCouldTry<any, any>(attempt.actor, action, news.noun, news.secondNoun, attempt);
+
+      return "stop";
     },
-  },
+  ],
 };
 
 function findActions(badNews: Attempt<any, any>, shouldBe: ShouldBe, story: Story): ActionDefinition<any, any>[] {
   const retval: ActionDefinition<any, any>[] = [];
   for (const action of story.actionset) {
-    const effects = action.rulebooks?.change?.(badNews) || [];
+    const effects = action.change?.(badNews, story) || [];
     for (const e of effects)
       if (shouldBe.property == e[0] && shouldBe.ofDesireable == e[1] && shouldBe.shouldBe == e[2] && shouldBe.toValue == e[3])
         retval.push(action);
@@ -64,17 +56,14 @@ function findActions(badNews: Attempt<any, any>, shouldBe: ShouldBe, story: Stor
 
 export const StuckForSolutions: ActionDefinition<Attempt> = {
   verb: "search for solutions to _",
-  rulebooks: {
-    cant: {
-      rules: [
-        async (attempt, story) => {
-          if (!attempt.actor.playersChoice) return makeNoDecision;
-          const playerChoice = await attempt.actor.playersChoice(story, attempt.actor);
-          if (playerChoice) {
-            return weCouldTry(playerChoice.actor, playerChoice.definition, playerChoice.noun, playerChoice.secondNoun, attempt);
-          }
-        },
-      ],
+
+  cant: [
+    async (attempt, story) => {
+      if (!attempt.actor.playersChoice) return makeNoDecision;
+      const playerChoice = await attempt.actor.playersChoice(story, attempt.actor);
+      if (playerChoice) {
+        return weCouldTry(playerChoice.actor, playerChoice.definition, playerChoice.noun, playerChoice.secondNoun, attempt);
+      }
     },
-  },
+  ],
 };

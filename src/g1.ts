@@ -26,82 +26,64 @@ const desireables: Desireable[] = [
 
 const Exiting: ActionDefinition = {
   verb: "exit",
-  rulebooks: {
-    cant: {
-      rules: [attempt => (!door.isLocked ? "continue" : weCouldTry(attempt.actor, Unlocking, door, undefined, attempt))],
-    },
-  },
+  cant: [attempt => (!door.isLocked ? "continue" : weCouldTry(attempt.actor, Unlocking, door, undefined, attempt))],
 };
 
-const Waiting: ActionDefinition = { verb: "wait" };
+const Waiting: ActionDefinition = {
+  verb: "wait",
+};
 
 const Taking: ActionDefinition = {
   verb: "take _",
-  rulebooks: {
-    change: attempt => [["owned", attempt.noun!, "=", true]],
-  },
+  change: attempt => [["owned", attempt.noun!, "=", true]],
 };
 
 const Dropping: ActionDefinition = {
   verb: "drop _",
-  rulebooks: {
-    change: attempt => [["owned", attempt.noun!, "=", false]],
-  },
+  change: attempt => [["owned", attempt.noun!, "=", false]],
 };
 
 const Opening: ActionDefinition = {
   verb: "open _",
-  rulebooks: {
-    cant: {
-      rules: [
-        // attempt => (attempt.noun ? "successful" : weCouldTry(attempt.actor, Unlocking, attempt.noun, undefined, attempt)),
-        attempt => ((attempt.noun as any)?.isLocked ? weCouldTry(attempt.actor, Unlocking, attempt.noun, undefined, attempt) : "continue"),
-      ],
-    },
-    change: attempt => [["isOpen", attempt.noun!, "=", true]],
-  },
+  cant: [
+    // attempt => (attempt.noun ? "successful" : weCouldTry(attempt.actor, Unlocking, attempt.noun, undefined, attempt)),
+    attempt => ((attempt.noun as any)?.isLocked ? weCouldTry(attempt.actor, Unlocking, attempt.noun, undefined, attempt) : "continue"),
+  ],
+  change: attempt => [["isOpen", attempt.noun!, "=", true]],
 };
 
 const Closing: ActionDefinition = {
   verb: "close _",
-  rulebooks: {
-    change: attempt => [["isOpen", attempt.noun!, "=", false]],
-  },
+  change: attempt => [["isOpen", attempt.noun!, "=", false]],
 };
 
 const Unlocking: ActionDefinition = {
   verb: "unlock _ with _",
-  rulebooks: {
-    cant: {
-      rules: [
-        // attempt => (attempt.secondNoun?.isKey ? "success" : weCouldTry(attempt.actor, Taking, attempt.secondNoun, undefined, attempt)),
-      ],
-    },
-    change: attempt => [["isLocked", attempt.noun!, "=", false]],
-  },
+  cant: [
+    // attempt => (attempt.secondNoun?.isKey ? "success" : weCouldTry(attempt.actor, Taking, attempt.secondNoun, undefined, attempt)),
+  ],
+  change: attempt => [["isLocked", attempt.noun!, "=", false]],
 };
 
 const Locking: ActionDefinition = {
   verb: "lock _ with _",
-  rulebooks: {
-    cant: {
-      rules: [
-        // // second noun must be key
-        // attempt => (attempt.secondNoun?.isKey ? "success" : weCouldTry(attempt.actor, Realizing, doorkey, undefined, attempt)),
-        // need to own key
-        attempt =>
-          !attempt.secondNoun
-            ? "stop"
-            : (attempt.secondNoun as any)?.owner == attempt.actor
-            ? "continue"
-            : weCouldTry(attempt.actor, Taking, attempt.secondNoun, undefined, attempt),
-      ],
-    },
-    change: attempt => [["isLocked", attempt.noun!, "=", true]],
-  },
+  cant: [
+    // // second noun must be key
+    // attempt => (attempt.secondNoun?.isKey ? "success" : weCouldTry(attempt.actor, Realizing, doorkey, undefined, attempt)),
+    // need to own key
+    attempt =>
+      !attempt.secondNoun
+        ? "stop"
+        : (attempt.secondNoun as any)?.owner == attempt.actor
+        ? "continue"
+        : weCouldTry(attempt.actor, Taking, attempt.secondNoun, undefined, attempt),
+  ],
+  change: attempt => [["isLocked", attempt.noun!, "=", true]],
 };
 
-const AskingFor: ActionDefinition = { verb: "asking _ for _" };
+const AskingFor: ActionDefinition = {
+  verb: "asking _ for _",
+};
 
 /////////////////
 

@@ -20,7 +20,6 @@ export interface Story {
 
   readonly sceneStack: ChoiceConsequenceClosure[];
   readonly history: News[];
-  currentTurnsNews: News[];
 }
 
 export async function playStory(
@@ -40,7 +39,6 @@ export async function playStory(
     notableScenes,
     sceneStack: [],
     history: [],
-    currentTurnsNews: [],
   };
   if (firstScene) createSceneSet(story, { choice: "ally", scene: firstScene });
 

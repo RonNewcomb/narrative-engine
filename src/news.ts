@@ -15,8 +15,6 @@ export interface News extends Attempt {
 
 export function createNewsItem(attempt: Attempt, story: Story): News {
   const newsItem: News = { ...attempt, level: attempt.status == "untried" ? "suggested" : attempt.status };
-  story.currentTurnsNews.push(newsItem);
-  //console_log("NEWS", newsItem);
   return newsItem;
 }
 
@@ -36,9 +34,4 @@ export function reactionsToNews(news: News, scene: Scene, story: Story): Consequ
           }
   ccc.consequences.push(...newConsequences);
   return newConsequences;
-}
-
-export function resetNewsCycle(story: Story): void {
-  story.history.push(...story.currentTurnsNews);
-  story.currentTurnsNews = [];
 }

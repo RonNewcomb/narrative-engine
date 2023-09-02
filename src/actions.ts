@@ -1,15 +1,15 @@
-import type { Attempt } from "./attempts";
+import { createAttempt, type Attempt } from "./attempts";
 import type { ShouldBe } from "./beliefs";
 import type { Character } from "./characters";
-import { type News } from "./news";
+import { createNewsItem, type News } from "./news";
 import { publish, stringifyAttempt } from "./paragraphs";
 import { weCouldTry } from "./planningTree";
-import { type Desireable, type Resource } from "./resources";
+import type { Desireable, Resource } from "./resources";
 import { can, cant, type Rulebooks } from "./rulebooks";
-import { type Story } from "./story";
+import type { Story } from "./story";
 
 export type Verb = string;
-export type Noun = Desireable | Character; // Resource?
+export type Noun = Desireable | Character; // Resource? ShouldBe? must have a .name
 
 export interface ActionDefinition<N extends Resource = Noun, SN extends Resource = Noun> extends Rulebooks<N, SN> {
   verb: Verb;
@@ -22,11 +22,32 @@ export const ReflectUpon: ActionDefinition<Attempt> = {
 
 export const SpreadNewsToOthers: ActionDefinition<News, Character[]> = {
   verb: "spread news of _ to _",
+  can: [
+    (attempt, story) => {
+      if (!attempt.noun || !attempt.secondNoun) return cant;
+      const news = createNewsItem(attempt.noun, story);
+      for (const character of attempt.secondNoun || []) {
+        const newGoal = createAttempt(character, ReceivingImportantNews, news, undefined, undefined);
+        character.goals!.push(newGoal);
+      }
+      return can;
+    },
+  ],
+};
+
+export const StuckForSolutions: ActionDefinition<Attempt> = {
+  verb: "search for solutions to _",
+  can: [
+    async (attempt, story) => {
+      if (!attempt.actor.playersChoice) return can;
+      const choice = await attempt.actor.playersChoice(story, attempt.actor);
+      if (choice) return weCouldTry(choice.actor, choice.definition, choice.noun, choice.secondNoun, attempt);
+    },
+  ],
 };
 
 export const ReceivingImportantNews: ActionDefinition<News, ShouldBe> = {
   verb: "receive news of _, but _",
-
   can: [
     (attempt, story) => {
       const news = attempt.noun;
@@ -58,14 +79,3 @@ function findActions(badNews: Attempt<any, any>, shouldBe: ShouldBe, story: Stor
   }
   return retval;
 }
-
-export const StuckForSolutions: ActionDefinition<Attempt> = {
-  verb: "search for solutions to _",
-  can: [
-    async (attempt, story) => {
-      if (!attempt.actor.playersChoice) return can;
-      const choice = await attempt.actor.playersChoice(story, attempt.actor);
-      if (choice) return weCouldTry(choice.actor, choice.definition, choice.noun, choice.secondNoun, attempt);
-    },
-  ],
-};

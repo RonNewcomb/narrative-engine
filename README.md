@@ -32,13 +32,9 @@ All desireables, attempts, and beliefs are _resources_.
 
 weCouldTry - attaches new child node to passed-in parent node... or to character.goals; doesn't return child node
 
-createNewsItem - mutates story.currentTurnsNews
-
 createSceneSet - mutates story.sceneStack
 
 reactionsToNews - mutates story.sceneStack
-
-resetNewsCycle - mutates story.history, story.currentTurnsNews
 
 doThing - mutates attempt.status
 

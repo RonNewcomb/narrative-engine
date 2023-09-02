@@ -26,7 +26,8 @@ const appointment: Desireable = { name: "to be at Harrenfall before the 12th" };
 const Exiting: ActionDefinition = {
   verb: "exit",
   can: [attempt => (!door.isLocked ? can : weCouldTry(attempt.actor, Unlocking, door, undefined, attempt))],
-  change: action => [["location", action.actor, "=", "out"]],
+  change: attempt => [["location", attempt.actor, "=", "out"]],
+  narrate: [attempt => (attempt.status == "successful" ? "Rose left, never to return." : `But her way was blocked by ${attempt.status}.`)],
 };
 
 const Waiting: ActionDefinition = {

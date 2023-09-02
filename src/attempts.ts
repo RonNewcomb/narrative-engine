@@ -1,7 +1,6 @@
 import { StuckForSolutions, type ActionDefinition, type Verb } from "./actions";
 import { author, type Character } from "./characters";
-import { createNewsItem, reactionsToNews, resetNewsCycle } from "./news";
-import { publish, stringifyAction, stringifyAttempt } from "./paragraphs";
+import { publish, stringifyAttempt } from "./paragraphs";
 import { weCouldTry, whatTheyAreTryingToDoNowRegarding } from "./planningTree";
 import type { Resource } from "./resources";
 import { can, cant, executeRulebook, type RuleOutcome } from "./rulebooks";
@@ -51,12 +50,12 @@ export function createGoal<N extends Resource, SN extends Resource>(
 }
 
 export async function doThingAsAScene(thisAttempt: Attempt, currentScene: Scene, story: Story): Promise<RuleOutcome> {
-  await doThing(thisAttempt, currentScene, story);
+  await executeRulebook(thisAttempt, currentScene, story);
 
   while (thisAttempt.status == "partly successful") {
     let subAttempt = whatTheyAreTryingToDoNowRegarding(thisAttempt.actor, thisAttempt);
     publish("same scene, now", stringifyAttempt(subAttempt));
-    if (subAttempt) await doThing(subAttempt, currentScene, story);
+    if (subAttempt) await executeRulebook(subAttempt, currentScene, story);
     else {
       publish("STUCK:", stringifyAttempt(thisAttempt));
       if (thisAttempt.actor.goals!.includes(thisAttempt)) thisAttempt.actor.goals = thisAttempt.actor.goals!.filter(g => g != thisAttempt);
@@ -64,32 +63,12 @@ export async function doThingAsAScene(thisAttempt: Attempt, currentScene: Scene,
     }
   }
 
-  return thisAttempt.status == "successful" ? can : thisAttempt.status == "failed" ? cant : cant;
-}
-
-async function doThing(thisAttempt: Attempt, currentScene: Scene, story: Story): Promise<Attempt["status"]> {
-  // DO the currentAction and get status
-  const outcome = await executeRulebook(thisAttempt, story);
-  thisAttempt.status = outcome != cant ? "successful" : thisAttempt.fullfilledBy.length > 0 ? "partly successful" : "failed";
-
-  publish("DONE:", stringifyAttempt(thisAttempt) + ".");
-
-  if (thisAttempt.status == "partly successful")
-    publish(
-      thisAttempt.actor.name,
-      "could try",
-      thisAttempt.fullfilledBy.map(x => stringifyAction(x, { ing: true, omitActor: true }))
-    );
-
-  // react to news // creates scene types of Reaction
-  const news = createNewsItem(thisAttempt, story);
-  const consequences = reactionsToNews(news, currentScene, story);
-  resetNewsCycle(story);
-
-  for (const consequence of consequences) {
-    const foreshadow = consequence.foreshadow!;
-    publish("((But", foreshadow.character.name, " won't like ", stringifyAction(foreshadow.news), ".))");
+  switch (thisAttempt.status) {
+    case "failed":
+      return cant;
+    case "successful":
+      return can;
+    case "untried":
+      return cant;
   }
-
-  return thisAttempt.status;
 }

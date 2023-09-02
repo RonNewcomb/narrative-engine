@@ -67,8 +67,6 @@ export interface Scene {
 // SuspenseScene -- scene with a lot of tension
 // DramaticScene -- scene with strong emotion
 
-export const ifLater = <T>(x: T | Promise<T>) => (x instanceof Promise ? x : Promise.resolve(x));
-
 export function createScene(pulse: Attempt<Resource, Resource>, viewpoint?: Character): Scene {
   const scene: Scene = { pulse, viewpoint: viewpoint || pulse.actor };
   return scene;
@@ -78,12 +76,12 @@ export async function playScene(scene: Scene, story: Story): Promise<Scene | und
   const sceneAction = scene.pulse;
   const playbook = story.notableScenes.find(scenetype => scenetype.match(sceneAction, story));
   const beginning = playbook?.beginning ?? defaultSceneType.beginning;
-  if (beginning) publish(await ifLater(beginning(scene.pulse, story, scene)));
+  if (beginning) publish(await Promise.resolve(beginning(scene.pulse, story, scene)));
   const middle = playbook?.middle ?? defaultSceneType.middle;
-  scene.result = await ifLater(middle?.(sceneAction, story, scene));
+  scene.result = await Promise.resolve(middle?.(sceneAction, story, scene));
   scene.isFinished = true;
   const ending = playbook?.end ?? defaultSceneType.end;
-  return (await ifLater(ending?.(scene.pulse, story, scene))) || undefined;
+  return (await Promise.resolve(ending?.(scene.pulse, story, scene))) || undefined;
 }
 
 export function getNextScene(story: Story, suggestedNextScene?: Scene): Scene | undefined {

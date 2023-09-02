@@ -1,7 +1,7 @@
 import type { Attempt } from "./attempts";
 import type { ShouldBe } from "./beliefs";
 import type { Character } from "./characters";
-import { createNewsItem, type News } from "./news";
+import { type News } from "./news";
 import { publish, stringifyAttempt } from "./paragraphs";
 import { weCouldTry } from "./planningTree";
 import { type Desireable, type Resource } from "./resources";
@@ -17,7 +17,7 @@ export interface ActionDefinition<N extends Resource = Noun, SN extends Resource
 
 export const ReflectUpon: ActionDefinition<Attempt> = {
   verb: "reflect upon attempting _",
-  narrate: [attempt => publish(attempt.actor.name, "reflected."), createNewsItem],
+  narrate: [attempt => attempt.actor.name + " reflected."],
 };
 
 export const SpreadNewsToOthers: ActionDefinition<News, Character[]> = {

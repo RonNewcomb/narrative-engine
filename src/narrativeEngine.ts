@@ -36,6 +36,7 @@ export async function narrativeEngine(
   characters: Character[],
   actions: ActionDefinition<any, any>[],
   desireables: Desireable[],
+  narration: any[][],
   notableScenes?: SceneType[],
   getPlayerInput?: SolicitPlayerInput
 ) {
@@ -47,6 +48,19 @@ export async function narrativeEngine(
   for (const scene of notableScenes) Object.freeze(scene);
   for (const action of actions) Object.freeze(action);
   for (const character of characters) Object.freeze(character);
+
+  const narrationRules: ((story: Story, viewpoint: Character, scene: Scene, scenePosition: "begin" | "mid" | "end") => string | false)[] =
+    narration.map(n => {
+      const text = n.pop();
+      return (story: Story, viewpoint: Character, scene: Scene, scenePosition: "begin" | "mid" | "end") => {
+        for (const condition of n) {
+          if (condition instanceof Character && viewpoint != condition) return false;
+          if (condition instanceof Scene && scene != condition) return false;
+          if (condition instanceof ActionDefinition && scene.pulse.definition != condition) return false;
+          if (typeof condition == "string" && scenePosition != condition) return false;
+        }
+      };
+    });
 
   // debug
   console_log(stringify(characters));

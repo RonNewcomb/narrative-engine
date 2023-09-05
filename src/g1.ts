@@ -109,10 +109,23 @@ spelling({ receiving: "receiveing", the: ["teh", "hte"] });
 
 ///////
 
+const narration = [
+  [
+    Rose,
+    Exiting,
+    `
+Lorem ipsum.
+`,
+  ],
+];
+
+//////////////
+
 narrativeEngine(
   [Rose, Zafra],
   [Waiting, Exiting, Taking, Dropping, Locking, Unlocking, Opening, Closing, AskingFor],
   [inheritance, legitimacy, appointment, doorkey, door],
+  narration,
   [storyStart],
   getPlayerChoices
 );

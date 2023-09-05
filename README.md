@@ -69,3 +69,13 @@ playScene - mutates scene.result, .isFinished; calls doThingAsAScene
 - diff()
 
 - need to separate the actions & reactions from the actual reporting to the user. Can't foreshadow a reaction unless the machinery runs to discover one.
+
+## HOW TOs
+
+Is there pleasure in having an effect on people? Maybe "actions" based on how it makes the character feel rather than the actual world effect of the action? Not because it's great writing, but because we want that to be the real meat of the gameplay. So, it will happen multiple times. Gratitude, thankfulness, or, rivalship. Not actions but... with diction, dialogue.
+
+Dialogue generator.. ok, most people's speech isn't that special or unique. At least everyday speech.
+
+Regarding 4 more tasks for the paragraph: NPC cooperation and gratitude is what? If it's so important...
+
+There's pleasure in making things happen. Most CYOAs have lots of non-choice stuff that could honestly be excised with no ill effect. Even asking someone to do or help with something would be better than being passive-with-buttons.

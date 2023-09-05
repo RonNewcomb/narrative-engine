@@ -10,11 +10,16 @@ import type { Story } from "./story";
 export const can = "can";
 export const cant = "cant";
 export type RuleOutcome = undefined | false | typeof can | typeof cant | Attempt | Attempt[];
+export type NarrateRule<N extends Resource, SN extends Resource> = (
+  attempt: Attempt<N, SN>,
+  consequences: ConsequenceWithForeshadowedNewsProvingAgency[],
+  story: Story
+) => void | string;
 
 export interface Rulebooks<N extends Resource, SN extends Resource> {
   can?: ((attempt: Attempt<N, SN>, story: Story) => RuleOutcome | Promise<RuleOutcome>)[];
   change?: (attempt: Attempt<N, SN>, story: Story) => ShouldBeStatement[];
-  narrate?: ((attempt: Attempt<N, SN>, consequences: ConsequenceWithForeshadowedNewsProvingAgency[], story: Story) => void | string)[];
+  narrate?: NarrateRule<N, SN>[];
 }
 
 export async function executeRulebook(attempt: Attempt, currentScene: Scene, story: Story): Promise<News> {

@@ -1,8 +1,16 @@
 import { div, element } from "./layout";
-import { createAttempt, type ActionDefinition, type Attempt, type Character, type Resource, type Story } from "./narrativeEngine";
+import {
+  createAttempt,
+  type ActionDefinition,
+  type Attempt,
+  type Character,
+  type Resource,
+  type Scene,
+  type Story,
+} from "./narrativeEngine";
 import { stringifyNoun } from "./paragraphs";
 
-export async function getPlayerChoices(story: Story, viewpointCharacter: Character): Promise<Attempt | undefined> {
+export async function getPlayerChoices(story: Story, viewpointCharacter: Character, scene: Scene): Promise<Attempt | undefined> {
   return new Promise(async awaited => {
     // pre-existing wrapper
     const published = document.getElementById("published")!;

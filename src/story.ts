@@ -8,7 +8,7 @@ import { type Desireable } from "./resources";
 import { getNextScene, playScene, type Scene, type SceneType } from "./scenes";
 
 export interface SolicitPlayerInput {
-  (story: Story, viewpointCharacter: Character): Promise<Attempt | undefined>;
+  (story: Story, viewpointCharacter: Character, currentScene: Scene): Promise<Attempt | undefined>;
 }
 
 export interface Story {

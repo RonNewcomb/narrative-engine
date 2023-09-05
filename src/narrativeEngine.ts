@@ -24,6 +24,7 @@ export {
   type Character,
   type Desireable,
   type Resource,
+  type Scene,
   type SceneType,
   type ShouldBe,
   type SolicitPlayerInput,
@@ -33,15 +34,19 @@ export {
 
 export async function narrativeEngine(
   characters: Character[],
-  actionset: ActionDefinition<any, any>[],
+  actions: ActionDefinition<any, any>[],
   desireables: Desireable[],
   notableScenes?: SceneType[],
-  getPlayerInput?: (story: Story, viewpointCharacter: Character) => Promise<Attempt | undefined>
+  getPlayerInput?: SolicitPlayerInput
 ) {
   // sanitize setup
   for (const character of characters) if (!character.goals) character.goals = [];
   for (const character of characters) for (const goal of character.goals!) if (!goal.actor || goal.actor == author) goal.actor = character;
   const desireablesRecord = initializeDesireables(desireables);
+  if (!notableScenes) notableScenes = [];
+  for (const scene of notableScenes) Object.freeze(scene);
+  for (const action of actions) Object.freeze(action);
+  for (const character of characters) Object.freeze(character);
 
   // debug
   console_log(stringify(characters));
@@ -59,9 +64,9 @@ export async function narrativeEngine(
   // GO
   const theEnd = await playStory(
     characters,
-    actionset,
+    actions,
     desireablesRecord,
-    notableScenes || [],
+    notableScenes,
     getPlayerInput || (async () => undefined),
     initialScene
   );

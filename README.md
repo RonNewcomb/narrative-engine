@@ -1,6 +1,20 @@
-# Narrative Engine
+# A Narrative Engine
 
-Implementing ideas from https://www.gamedeveloper.com/author/ron-newcomb with help of old-school "planner" AI I originally implemented for Inform 7: https://github.com/i7/extensions/blob/master/Ron%20Newcomb/Problem-Solving%20Characters.i7x
+Implementing ideas from https://www.gamedeveloper.com/author/ron-newcomb with help of old-school "planner" AI originally implemented for Inform 7: https://github.com/i7/extensions/blob/master/Ron%20Newcomb/Problem-Solving%20Characters.i7x
+
+## Purpose
+
+I tried to author an intfiction once. It didn't go well. Not because of the computerized aspect of it, I have a good handle on that, but because what I thought an intfiction was supposed to be didn't match up with what else was out there.
+
+The writing books I've since read have taught me a lot. For example, plot is just the series of characters reacting to the actions of other characters. Foreshadowing informs readers of the importance of the seemingly trivial. Scenes package smaller stories into composable chunks. Existing tools for creating intfiction didn't connect with let alone teach any of these concepts.
+
+Many of the existing tools for interactive fiction fall into two camps, the choose-your-own-adventure and the parser-based world simulation. CYOA intfiction I found so easy I rarely paid the reading of it close attention. Parser-based intfiction I still find difficult to actually progress through. But I always felt there was a false distinction here, and something in the middle was the right default.
+
+Some text-manipulation features that seemed vital didn't exist. Trying to convey gamestate means creating novel sentences. Expressing such sentences as dialogue would be extremely useful, though I can't even imagine how that would work. But even spellcheckers for player and author were missing.
+
+So I created a new system from scratch. I hope it helps me become a better writer. I hope it makes intfiction that focuses on doing interesting things with interesting characters.
+
+Is there pleasure in having an effect on people? Maybe "actions" based on how it makes the character feel rather than the actual world effect of the action? Not because it's great writing, but because we want that to be the real meat of the gameplay. So, it will happen multiple times. Gratitude, thankfulness, or, rivalship. Not actions but... with diction, dialogue.
 
 ## Install and Run
 
@@ -11,10 +25,6 @@ With typescript and rollup both installed globally `npm i rollup --global` and `
 Pull up index.html in the browser, view F12 console.
 
 Can also use `--watch` on both commands in 2 different windows.
-
-## notes
-
-- need to separate the actions & reactions from the actual reporting to the user. Can't foreshadow a reaction unless the machinery runs to discover one.
 
 ## Flow
 
@@ -57,3 +67,5 @@ playScene - mutates scene.result, .isFinished; calls doThingAsAScene
 - can give it a parser fn that returns the Action a player wants to do -- thread it all the way through
 
 - diff()
+
+- need to separate the actions & reactions from the actual reporting to the user. Can't foreshadow a reaction unless the machinery runs to discover one.

@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
-    "lib": ["ES2016", "dom"],
+    "lib": ["es2017", "dom"],
     "module": "es2015",
-    "target": "ES2016",
+    "target": "es2017",
     "outDir": "build",
     "strict": true,
     "allowJs": false
@@ -11,5 +11,5 @@
     //   "tslib": ["path/to/node_modules/tslib/tslib.d.ts"]
     // }
   },
-  "include": ["src/*.ts"]
+  "include": ["src/*.ts", "app/*.ts"]
 }

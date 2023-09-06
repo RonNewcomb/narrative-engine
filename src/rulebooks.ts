@@ -17,7 +17,7 @@ export type NarrateRule<N extends Resource, SN extends Resource> = (
 ) => void | string;
 
 export interface Rulebooks<N extends Resource, SN extends Resource> {
-  can?: ((attempt: Attempt<N, SN>, story: Story) => RuleOutcome | Promise<RuleOutcome>)[];
+  can?: ((attempt: Attempt<N, SN>, story: Story, scene?: Scene) => RuleOutcome | Promise<RuleOutcome>)[];
   change?: (attempt: Attempt<N, SN>, story: Story) => ShouldBeStatement[];
   narrate?: NarrateRule<N, SN>[];
 }

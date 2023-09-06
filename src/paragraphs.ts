@@ -82,3 +82,15 @@ export function publish(...texts: any[]): void {
   const container = div([], { innerText: text });
   document.getElementById("published")!.appendChild(container);
 }
+
+export function publishStyled(style: Partial<HTMLSpanElement["style"]>, ...texts: any[]): void {
+  console.log(...texts);
+  const text = spellcheck(texts.join(" "));
+  const container = div([], { innerText: text });
+  for (const [key, value] of Object.entries(style)) container.style[key as any] = value as any;
+  document.getElementById("published")!.appendChild(container);
+}
+
+export function publishHTML(element: HTMLElement): void {
+  document.getElementById("published")!.appendChild(element);
+}

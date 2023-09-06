@@ -2,8 +2,8 @@ export function div(children?: HTMLElement[], attrs?: Partial<HTMLDivElement>): 
   return element("div", attrs, children) as HTMLDivElement;
 }
 
-export function element(tagName: string, attrs?: Partial<HTMLElement>, children?: HTMLElement[]): HTMLElement {
-  const el = document.createElement(tagName);
+export function element<T extends HTMLElement>(tagName: string, attrs?: Partial<T>, children?: HTMLElement[]): T {
+  const el = document.createElement(tagName) as T;
   if (attrs) Object.keys(attrs).forEach(attr => ((el as any)[attr] = (attrs as any)[attr]));
   if (children) children.forEach(child => el.appendChild(child));
   return el;

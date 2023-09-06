@@ -20,7 +20,7 @@ Is there pleasure in having an effect on people? Maybe "actions" based on how it
 
 With typescript and rollup both installed globally `npm i rollup --global` and `npm install tslib --global` issue the commands:
 
-`tsc && rollup --file build.js build/g1.js`
+`tsc && rollup --file build.js build/app/story1.js `
 
 Pull up index.html in the browser, view F12 console.
 

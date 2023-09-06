@@ -10,13 +10,19 @@ import {
 } from "./narrativeEngine";
 import { stringifyNoun } from "./paragraphs";
 
-export async function getPlayerChoices(story: Story, viewpointCharacter: Character, scene: Scene): Promise<Attempt | undefined> {
+export async function getPlayerChoices(
+  story: Story,
+  viewpointCharacter: Character,
+  scene: Scene | undefined
+): Promise<Attempt | undefined> {
   return new Promise(async awaited => {
     // pre-existing wrapper
     const published = document.getElementById("published")!;
 
     // this box
     const playerChoices = div([], { className: "playerChoices" });
+    const title = div([], { innerText: viewpointCharacter.name + " will...", className: "title" });
+    playerChoices.appendChild(title);
 
     // append at the bottom of the published spot
     published.appendChild(playerChoices);
@@ -32,7 +38,10 @@ export async function getPlayerChoices(story: Story, viewpointCharacter: Charact
 
     // choose noun panel
     for (let actionName = action.verb; actionName.includes("_"); actionName = actionName.replace("_", stringifyNoun(noun))) {
-      const title = div([], { innerText: actionName });
+      let verb = action.verb;
+      for (let i = 0; i < nouns.length; i++) verb = verb.replace("_", stringifyNoun(nouns[i]));
+      verb = verb.replace(/_/g, "...");
+      title.innerText = viewpointCharacter.name + " will " + verb;
       panel = div([title]);
 
       playerChoices.appendChild(panel);
@@ -57,10 +66,30 @@ playerChoicesCSS.id = "playerChoicesCSS";
 playerChoicesCSS.innerHTML = `
 .playerChoices {
     position: fixed;
-    top: 0px;    
+    top: 1.1em;
+    left: 1.2em;
+    right: 1.2em;
     padding: 1em;
     background-color: wheat;
     z-index: 2;
+    border-radius: 5px;
+    box-shadow: wheat 0 0 8px 11px;
+}
+
+.playerChoices .title {
+  font-style: italic;
+}
+
+.playerChoices button, .playerChoiceButton {
+  line-height: 2em;
+  margin-top: 1em;
+  margin-right: 2em;
+  border: 0;
+  font-family: sans-serif;
+  background-color: cadetblue;
+  color: white;
+  padding: 0.3em 1.2em;
+  border-radius: 13px;
 }
 `;
 document.body.appendChild(playerChoicesCSS);
@@ -78,7 +107,9 @@ async function chooseVerb(
   return new Promise(awaited => {
     // loop through whole palette
     for (const action of actions) {
-      const button = element("button", { innerText: action.verb, onclick: () => awaited(action) });
+      // const verb = action.verb.charAt(0).toUpperCase() + action.verb.slice(1).replace(/_/g, "...");
+      const verb = action.verb.replace(/_/g, "...");
+      const button = element<HTMLButtonElement>("button", { type: "button", innerText: verb, onclick: () => awaited(action) });
       const line = div([button]);
       container.appendChild(line);
     }
@@ -94,9 +125,9 @@ async function chooseNoun(container: HTMLDivElement, story: Story, action: Actio
     }
     const keys = Object.getOwnPropertySymbols(story.desireables);
     for (const key of keys) {
-      const desireable = story.desireables[key];
+      const desire = story.desireables[key];
 
-      const button = element("button", { innerText: desireable.name, onclick: () => awaited(desireable) });
+      const button = element<HTMLButtonElement>("button", { type: "button", innerText: desire.name, onclick: () => awaited(desire) });
       const line = div([button]);
       container.appendChild(line);
     }

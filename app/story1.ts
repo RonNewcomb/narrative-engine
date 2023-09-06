@@ -10,8 +10,8 @@ import {
   narrativeEngine,
   spelling,
   weCouldTry,
-} from "./narrativeEngine";
-import { getPlayerChoices } from "./playerInputStyle1";
+} from "../src/narrativeEngine";
+import { getPlayerChoices } from "../src/playerInputStyle1";
 
 ///////////////
 
@@ -80,7 +80,7 @@ const Locking: ActionDefinition = {
 };
 
 const AskingFor: ActionDefinition = {
-  verb: "asking _ for _",
+  verb: "ask _ for _",
 };
 
 /////////////////

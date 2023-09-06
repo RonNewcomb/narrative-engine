@@ -3,12 +3,13 @@ import type { Attempt } from "./attempts";
 import type { Character } from "./characters";
 import { createSceneSet, type ChoiceConsequenceClosure } from "./consequences";
 import { type News } from "./news";
-import { console_log, publish, stringify } from "./paragraphs";
+import { console_log, publish, publishStyled, stringify, stringifyAction } from "./paragraphs";
 import { type Desireable } from "./resources";
 import { getNextScene, playScene, type Scene, type SceneType } from "./scenes";
+import { titleScreen } from "./treatyOfBabel";
 
 export interface SolicitPlayerInput {
-  (story: Story, viewpointCharacter: Character, currentScene: Scene): Promise<Attempt | undefined>;
+  (story: Story, viewpointCharacter: Character, currentScene: Scene | undefined): Promise<Attempt | undefined>;
 }
 
 export interface Story {
@@ -44,9 +45,7 @@ export async function playStory(
 
   let turn = 0;
 
-  // debugging input
-  // const turn0 = await getPlayerInput(story, firstScene!.actor);
-  // publish(stringify(turn0));
+  await titleScreen();
 
   let suggestedNextScene: Scene | undefined;
   for (let currentScene = firstScene; currentScene; currentScene = getNextScene(story, suggestedNextScene)) {
@@ -55,10 +54,16 @@ export async function playStory(
     // characters act // creates scene types of Action
     suggestedNextScene = await playScene(currentScene, story);
 
+    // debugging input
+    const turn0 = await getPlayerInput(story, firstScene!.viewpoint, firstScene);
+    publishStyled({ fontWeight: "bold" }, stringifyAction(turn0) + ".");
+    // ////
+
     console_log("END TURN", turn);
     console_log(stringify(characters));
     if (turn > 7) break;
   }
+
   publish("THE END");
   console_log(stringify(story.sceneStack));
   return story;

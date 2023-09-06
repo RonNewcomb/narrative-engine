@@ -38,9 +38,9 @@ export const SpreadNewsToOthers: ActionDefinition<News, Character[]> = {
 export const StuckForSolutions: ActionDefinition<Attempt> = {
   verb: "search for solutions to _",
   can: [
-    async (attempt, story) => {
+    async (attempt, story, scene) => {
       if (!attempt.actor.playersChoice) return can;
-      const choice = await attempt.actor.playersChoice(story, attempt.actor);
+      const choice = await attempt.actor.playersChoice(story, attempt.actor, scene);
       if (choice) return weCouldTry(choice.actor, choice.definition, choice.noun, choice.secondNoun, attempt);
     },
   ],

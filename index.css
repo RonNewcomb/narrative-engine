@@ -1,0 +1,67 @@
+@media (min-width: 320px) {
+  /* smartphones, iPhone, portrait 480x320 phones */
+  .old {
+    display: none;
+  }
+  .pre {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  }
+}
+
+@media (min-width: 481px) {
+  /* portrait e-readers (Nook/Kindle), smaller tablets @ 600 or @ 640 wide. */
+}
+
+@media (min-width: 641px) {
+  /* portrait tablets, portrait iPad, landscape e-readers, landscape 800x480 or 854x480 phones */
+}
+
+@media (min-width: 961px) {
+  /* tablet, landscape iPad, lo-res laptops ands desktops */
+  .old {
+    display: block;
+  }
+  #published {
+    max-width: 50em;
+  }
+  .pre {
+    font-family: monospace;
+  }
+}
+
+@media (min-width: 1025px) {
+  /* big landscape tablets, laptops, and desktops */
+}
+
+@media (min-width: 1281px) {
+  /* hi-res laptops and desktops */
+}
+
+body {
+  line-height: 20px;
+  background-color: tan;
+  color: #3e2723;
+}
+
+#published,
+.old {
+  white-space: pre-wrap;
+}
+
+.old {
+  max-width: 50em;
+  opacity: 0.5;
+}
+
+.flexrow {
+  display: flex;
+}
+
+.hidedebug {
+  display: none;
+}
+
+.showdebug {
+  display: block;
+  opacity: 0.5;
+}

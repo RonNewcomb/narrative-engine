@@ -1,3 +1,4 @@
+import { getPlayerChoices } from "../interface/playerInputStyle1";
 import {
   ActionDefinition,
   Character,
@@ -11,7 +12,6 @@ import {
   spelling,
   weCouldTry,
 } from "../src/narrativeEngine";
-import { getPlayerChoices } from "../src/playerInputStyle1";
 
 ///////////////
 

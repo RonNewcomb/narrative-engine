@@ -6,6 +6,9 @@
   .pre {
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   }
+  #published {
+    margin-bottom: 10em;
+  }
 }
 
 @media (min-width: 481px) {
@@ -26,6 +29,9 @@
   }
   .pre {
     font-family: monospace;
+  }
+  .columnscontainer {
+    display: flex;
   }
 }
 
@@ -51,10 +57,6 @@ body {
 .old {
   max-width: 50em;
   opacity: 0.5;
-}
-
-.flexrow {
-  display: flex;
 }
 
 .hidedebug {

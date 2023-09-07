@@ -1,0 +1,44 @@
+.playerChoices {
+  margin: auto;
+  margin-bottom: 1.5em;
+  width: calc(100% - 4em);
+  padding: 1em;
+  background-color: wheat;
+  border-radius: 5px;
+  box-shadow: wheat 0 0 8px 11px;
+  overflow: hidden;
+}
+
+.playerChoices .title {
+  font-style: italic;
+}
+
+.playerChoices .slidingWindow {
+  display: flex;
+  flex-flow: row nowrap;
+  gap: 2em;
+  position: relative;
+  /*left: -0%;*/ /* this is set by javascript on prev/next */
+  transition: left 0.75s;
+}
+
+.playerChoices .slidepanel {
+  min-width: 100%;
+  width: 100%;
+  max-width: 100%;
+  text-align: center; /* easiest for fingers to reach */
+}
+
+.playerChoices button,
+.playerChoiceButton {
+  line-height: 2em;
+  margin-top: 1em;
+  margin-right: 2em;
+  border: 0;
+  font-family: sans-serif;
+  background-color: cadetblue;
+  color: white;
+  padding: 0.3em 1.2em;
+  border-radius: 13px;
+  width: 100%; /* easiest for fingers to reach */
+}

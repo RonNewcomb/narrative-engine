@@ -1,4 +1,4 @@
-import { div, element } from "../src/layout";
+import { div, element, paragraph } from "../src/layout";
 import {
   createAttempt,
   type ActionDefinition,
@@ -37,10 +37,7 @@ export async function getPlayerChoices(
     // pre-existing wrapper
     const published = document.getElementById("published")!;
 
-    function whenFinished() {
-      // closes the choiceBox
-      published.removeChild(slides.container);
-
+    async function whenFinished() {
       // returns to the story
       const attempt = slides.answers.action
         ? createAttempt<Resource, Resource>(
@@ -52,6 +49,13 @@ export async function getPlayerChoices(
           )
         : undefined;
       awaited(attempt);
+
+      // animate closing
+      slides.container.classList.add("exit");
+      await new Promise(r => setTimeout(r, 1500)); // match transition time in interface.CSS
+
+      // closes the choiceBox
+      published.removeChild(slides.container);
     }
 
     const setSlide = (slides: SlideDeck) => {
@@ -87,7 +91,7 @@ export async function getPlayerChoices(
     const slides: SlideDeck = {
       currentSlide: 0,
       container: div([], { className: "playerChoices" }),
-      title: div([], { className: "title", innerText: viewpointCharacter.name + " will..." }),
+      title: paragraph([], { className: "title", innerText: viewpointCharacter.name + " will..." }),
       slidingWindow: div([], { className: "slidingWindow" }),
       panels: [
         { container: () => createVerbPanel(slides, story, decidePanels) },

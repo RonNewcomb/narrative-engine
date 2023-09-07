@@ -2,14 +2,16 @@ import type { ActionDefinition } from "./actions";
 import { createAttempt, createGoal, type Attempt } from "./attempts";
 import { createBelief, initializeDesireables, type ShouldBe } from "./beliefs";
 import { author, type Character } from "./characters";
+import { attachMainMenu } from "./layout";
 import { console_log, stringify } from "./paragraphs";
+import { save as autosave, load } from "./persistence";
 import { weCouldTry, whatTheyAreTryingToDoNow } from "./planningTree";
 import type { Desireable, Resource } from "./resources";
 import { can, cant } from "./rulebooks";
 import { SceneType, createScene, type Scene } from "./scenes";
 import { spelling } from "./spellcheck";
 import { playStory, type SolicitPlayerInput, type Story } from "./story";
-import type { iFictionRecord } from "./treatyOfBabel";
+import { titleScreen, type iFictionRecord } from "./treatyOfBabel";
 
 export {
   can,
@@ -49,6 +51,11 @@ export async function narrativeEngine(
   for (const action of actions) Object.freeze(action);
   for (const character of characters) Object.freeze(character);
 
+  const stoppingPoint: SolicitPlayerInput = async (...rest: Parameters<SolicitPlayerInput>): ReturnType<SolicitPlayerInput> => {
+    autosave();
+    return getPlayerInput ? getPlayerInput(...rest) : undefined;
+  };
+
   // const narrationRules: ((story: Story, viewpoint: Character, scene: Scene, scenePosition: "begin" | "mid" | "end") => string | false)[] =
   //   narration.map(n => {
   //     const text = n.pop();
@@ -75,15 +82,13 @@ export async function narrativeEngine(
   console_log(initialScenes.length + " initial scenes");
   const initialScene: Scene = initialScenes[0];
 
+  attachMainMenu();
+
+  // is a game already in progress?
+  if (!load()) await titleScreen();
+
   // GO
-  const theEnd = await playStory(
-    characters,
-    actions,
-    desireablesRecord,
-    notableScenes,
-    getPlayerInput || (async () => undefined),
-    initialScene
-  );
+  const theEnd = await playStory(characters, actions, desireablesRecord, notableScenes, stoppingPoint, initialScene);
 
   return theEnd;
 }

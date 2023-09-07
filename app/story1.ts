@@ -18,7 +18,7 @@ import {
 const doorkey: Desireable = { name: "door key", isKey: true };
 const door: Desireable = { name: "door", isLocked: true };
 const inheritance: Desireable = { name: "Rose's inheritance" };
-const legitimacy: Desireable = { name: "Legitimacy in the eyes of the court" };
+const legitimacy: Desireable = { name: "legitimacy in the eyes of the court" };
 const appointment: Desireable = { name: "to be at Harrenfall before the 12th" };
 
 ////////////////

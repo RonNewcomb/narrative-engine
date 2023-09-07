@@ -1,13 +1,10 @@
 @media (min-width: 320px) {
   /* smartphones, iPhone, portrait 480x320 phones */
-  .old {
-    display: none;
-  }
-  .pre {
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  }
   #published {
     margin-bottom: 10em;
+  }
+  .hidedebug {
+    display: none;
   }
 }
 
@@ -21,17 +18,8 @@
 
 @media (min-width: 961px) {
   /* tablet, landscape iPad, lo-res laptops ands desktops */
-  .old {
-    display: block;
-  }
   #published {
     max-width: 50em;
-  }
-  .pre {
-    font-family: monospace;
-  }
-  .columnscontainer {
-    display: flex;
   }
 }
 
@@ -44,26 +32,66 @@
 }
 
 body {
-  line-height: 20px;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6em;
   background-color: tan;
   color: #3e2723;
 }
 
-#published,
-.old {
+#published {
   white-space: pre-wrap;
 }
 
-.old {
-  max-width: 50em;
-  opacity: 0.5;
+p {
+  margin: 0;
+  transition: all 0.5s;
 }
 
-.hidedebug {
+.mainmenuicon {
+  height: 80px;
+  width: 80px;
+  background-color: wheat;
+  position: fixed;
+  top: -40px;
+  right: -40px;
+  border-radius: 29%;
+  z-index: 10;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  /* pointer-events: none; */
+  z-index: 20;
   display: none;
 }
 
-.showdebug {
-  display: block;
-  opacity: 0.5;
+.mainmenuflyout {
+  position: fixed;
+  overflow: auto;
+  display: flex;
+  flex-flow: column nowrap;
+  margin: auto;
+  max-width: calc(100% - 4em);
+  padding: 1em;
+  background-color: wheat;
+  border-radius: 5px;
+  text-align: right;
+  right: 0.5em;
+  top: 3em;
+  line-height: 3em;
+  box-shadow: tan 0px 0px 20px 8px;
+}
+
+.mainMenuButton {
+  line-height: initial;
+  margin: 1.7em 0;
+  border: none;
+  border-bottom: 1px solid #3e2723;
+  background-color: wheat;
+  color: #3e2723;
+  text-align: right;
 }

@@ -6,7 +6,6 @@ import { type News } from "./news";
 import { console_log, publish, publishStyled, stringify, stringifyAction } from "./paragraphs";
 import { type Desireable } from "./resources";
 import { getNextScene, playScene, type Scene, type SceneType } from "./scenes";
-import { titleScreen } from "./treatyOfBabel";
 
 export interface SolicitPlayerInput {
   (story: Story, viewpointCharacter: Character, currentScene: Scene | undefined): Promise<Attempt | undefined>;
@@ -32,20 +31,10 @@ export async function playStory(
   firstScene?: Scene
 ) {
   // initialize story
-  const story: Story = {
-    characters,
-    actionset,
-    desireables,
-    getPlayerInput,
-    notableScenes,
-    sceneStack: [],
-    history: [],
-  };
+  const story: Story = { characters, actionset, desireables, getPlayerInput, notableScenes, sceneStack: [], history: [] };
   if (firstScene) createSceneSet(story, { choice: "ally", scene: firstScene });
 
   let turn = 0;
-
-  await titleScreen();
 
   let suggestedNextScene: Scene | undefined;
   for (let currentScene = firstScene; currentScene; currentScene = getNextScene(story, suggestedNextScene)) {

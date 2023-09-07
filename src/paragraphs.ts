@@ -1,13 +1,13 @@
 import type { Attempt } from "./attempts";
 import type { ShouldBe } from "./beliefs";
-import { div } from "./layout";
+import { paragraph } from "./layout";
 import { spellcheck } from "./spellcheck";
 
 export let console_log: (...data: any[]) => void = (...texts: any[]): void => {
   console.log(...texts);
-  const text = texts.join(" ");
-  const container = div([], { className: "hidedebug", innerText: text });
-  document.getElementById("published")!.appendChild(container);
+  // const text = texts.join(" ");
+  // const container = paragraph([], { className: "hidedebug", innerText: text });
+  // document.getElementById("published")!.appendChild(container);
 };
 
 export let console_error: (...data: any[]) => void = console.error;
@@ -79,14 +79,14 @@ export function stringifyAttempt(
 export function publish(...texts: any[]): void {
   console.log(...texts);
   const text = spellcheck(texts.join(" "));
-  const container = div([], { innerText: text });
+  const container = paragraph([], { innerText: text });
   document.getElementById("published")!.appendChild(container);
 }
 
 export function publishStyled(style: Partial<HTMLSpanElement["style"]>, ...texts: any[]): void {
   console.log(...texts);
   const text = spellcheck(texts.join(" "));
-  const container = div([], { innerText: text });
+  const container = paragraph([], { innerText: text });
   for (const [key, value] of Object.entries(style)) container.style[key as any] = value as any;
   document.getElementById("published")!.appendChild(container);
 }

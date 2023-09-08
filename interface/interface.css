@@ -8,14 +8,14 @@
   box-shadow: wheat 0 0 8px 11px;
   overflow: hidden;
 
-  transition: all 1.5s;
-  max-height: 100em; /* for animation */
+  transition: all 0.2s ease-out;
+  max-height: 100vh; /*for animation*/
 }
 
 .playerChoices.exit {
   max-height: 0;
-  padding: 0;
   opacity: 0.1;
+  transform: scale(0);
 }
 
 .playerChoices .title {

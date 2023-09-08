@@ -76,19 +76,23 @@ export function stringifyAttempt(
   return stringifyAction(attempt, { withStatus: true, ...options });
 }
 
-export function publish(...texts: any[]): void {
+function containerize(texts: any[]): HTMLParagraphElement {
   console.log(...texts);
   const text = spellcheck(texts.join(" "));
   const container = paragraph([], { innerText: text });
-  document.getElementById("published")!.appendChild(container);
+  return container;
 }
 
-export function publishStyled(style: Partial<HTMLSpanElement["style"]>, ...texts: any[]): void {
-  console.log(...texts);
-  const text = spellcheck(texts.join(" "));
-  const container = paragraph([], { innerText: text });
+export function publish(...texts: any[]): void {
+  const container = containerize(texts);
+  publishHTML(container);
+}
+
+export function publishStyled(style: Partial<HTMLSpanElement["style"]> & { className?: string }, ...texts: any[]): void {
+  const container = containerize(texts);
   for (const [key, value] of Object.entries(style)) container.style[key as any] = value as any;
-  document.getElementById("published")!.appendChild(container);
+  if (style.className) container.className = style.className;
+  publishHTML(container);
 }
 
 export function publishHTML(element: HTMLElement): void {

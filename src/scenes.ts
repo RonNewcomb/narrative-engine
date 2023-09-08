@@ -1,6 +1,6 @@
 import { doThingAsAScene, type Attempt } from "./attempts";
 import { type Character } from "./characters";
-import { div } from "./layout";
+import { paragraph } from "./layout";
 import { console_error, publish, publishHTML, stringifyAction } from "./paragraphs";
 import { type Resource } from "./resources";
 import { can, type RuleOutcome } from "./rulebooks";
@@ -34,22 +34,17 @@ export type ResultOfBeginScene = string | void;
 export type ResultOfMidScene = RuleOutcome;
 export type ResultOfEndScene = Scene | void | undefined;
 
-export const SCENEBREAK = div([], {
-  // innerText: "* * *",
-  style: { margin: "1em 0", textAlign: "center", fontWeight: "bold", fontSize: "larger", borderTop: "1px dashed brown" },
-});
-
 export const defaultSceneType: SceneType = {
   match: () => true,
   beginning: attempt => attempt.actor.name + " arrives to " + stringifyAction(attempt, { omitActor: true }) + ".",
   middle: (attempt, story, scene) => {
     if (attempt) return doThingAsAScene(attempt, scene, story);
-    console_error("no action -- run AI to pick a scene-action that does/un-does the news? adjusts for it?");
+    console_error("no scene action");
     return can; // TODO i guess?
   },
   end: attempt => {
     publish(attempt.actor.name, "leaves.");
-    publishHTML(SCENEBREAK);
+    publishHTML(paragraph([], { className: "endscene" }));
   },
 };
 

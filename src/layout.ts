@@ -37,23 +37,36 @@ toggleDebug();
 
 const mainMenuItems: HTMLButtonElement[] = [
   button({ className: "mainMenuButton", innerText: "Undo", onclick: () => confirm("Are you sure you wish to undo?") }),
-  button({ className: "mainMenuButton", innerText: "Restart", onclick: () => confirm("Are you sure you wish to restart?") && restart() }),
+  button({
+    className: "mainMenuButton",
+    innerText: "Restart",
+    onclick: () => {
+      if (!confirm("Are you sure you wish to restart?")) return;
+      restart();
+      window.location.reload();
+    },
+  }),
   button({ className: "mainMenuButton", innerText: "Sync with Cloud..." }),
 ];
 
-const icon = `<div style="
-    position: relative;
-    top: 37px;
-    left: 11px;
-    font-size: xx-large;
-    opacity: 0.4;
-">...</div>`;
+const getFlyout = () => document.getElementsByClassName("overlay")[0] as HTMLDivElement;
+const showFlyout = (e: MouseEvent) => {
+  e.stopPropagation();
+  getFlyout().style.display = "block";
+};
+const hideFlyout = (e: MouseEvent) => {
+  e.stopPropagation();
+  getFlyout().style.display = "none";
+};
 
 export function attachMainMenu() {
-  const getFlyout = () => document.getElementsByClassName("overlay")[0] as HTMLDivElement;
-  const cornerIcon = div([], { className: "mainmenuicon", innerHTML: icon, onclick: () => (getFlyout().style.display = "block") });
-  const mainMenuFlyout = div(mainMenuItems, { className: "mainmenuflyout", onclick: () => (getFlyout().style.display = "none") });
-  const mainMenuOverlay = div([mainMenuFlyout], { className: "overlay", onclick: () => (getFlyout().style.display = "none") });
-  const mainMenu = div([cornerIcon, mainMenuOverlay]);
-  document.body.appendChild(mainMenu);
+  const mainmenuicon = button({ className: "mainmenuicon", innerText: "...", onclick: showFlyout });
+  const mainmenuflyout = element<HTMLDivElement>(
+    "nav",
+    { className: "mainmenuflyout", role: "dialog", ariaModal: "true", onclick: hideFlyout },
+    mainMenuItems
+  );
+  const overlay = div([mainmenuflyout], { className: "overlay", onclick: hideFlyout });
+  const cornerMenu = element<HTMLDivElement>("aside", { id: "cornerMenu" }, [mainmenuicon, overlay]);
+  document.body.insertBefore(cornerMenu, document.body.firstChild);
 }

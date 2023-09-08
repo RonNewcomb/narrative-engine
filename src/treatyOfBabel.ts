@@ -46,7 +46,7 @@ export interface iFictionRecord {
 
 export async function titleScreen() {
   return new Promise<HTMLElement>(resolve => {
-    publishStyled({ fontWeight: "bold" }, "Untitled Story");
+    publishStyled({ className: "b" }, "Untitled Story");
     publish(`An Interactive Fiction by Story Author`);
     publish(`Release 1 / Serial number ${new Date().toISOString().replace(/-/g, "").slice(2, 8)} / Tin Book`);
     publish(" ");

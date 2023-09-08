@@ -46,7 +46,7 @@ export async function playStory(
 
     // debugging input
     const turn0 = await getPlayerInput(story, firstScene!.viewpoint, firstScene);
-    publishStyled({ fontWeight: "bold" }, stringifyAction(turn0) + ".");
+    publishStyled({ className: "b" }, stringifyAction(turn0) + ".");
     // ////
 
     //console_log(stringify(characters));

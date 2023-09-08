@@ -37,7 +37,7 @@ export async function getPlayerChoices(
     // pre-existing wrapper
     const published = document.getElementById("published")!;
 
-    async function whenFinished() {
+    async function whenFinished(slides: SlideDeck) {
       // returns to the story
       const attempt = slides.answers.action
         ? createAttempt<Resource, Resource>(
@@ -50,9 +50,12 @@ export async function getPlayerChoices(
         : undefined;
       awaited(attempt);
 
-      // animate closing
+      // // animate closing
+      // slides.container.style.height = slides.container.clientHeight + "px";
+      // await new Promise(r => setTimeout(r));
+      // slides.container.style.height = "0px";  // required since inline css overrides the css class
       slides.container.classList.add("exit");
-      await new Promise(r => setTimeout(r, 1500)); // match transition time in interface.CSS
+      await new Promise(r => setTimeout(r, 200)); // match transition time in interface.CSS, .playerChoices, transition
 
       // closes the choiceBox
       published.removeChild(slides.container);
@@ -60,9 +63,9 @@ export async function getPlayerChoices(
 
     const setSlide = (slides: SlideDeck) => {
       const i = slides.currentSlide;
-      if (!slides.panels[i]) return whenFinished();
+      if (!slides.panels[i]) return whenFinished(slides);
       const newPanel = slides.panels[i].container();
-      newPanel.className = "slidepanel";
+      newPanel.className = "slidepanel"; // just in case
       slides.slidingWindow.replaceChild(newPanel, slides.slidingWindow.childNodes[i]);
       slides.slidingWindow.style.left = `calc(-${i * 100}% - ${i * 2}em)`; // 2em is the flex-gap
     };
@@ -82,7 +85,7 @@ export async function getPlayerChoices(
       slides.answers.nouns = []; // reset
       slides.panels = [slides.panels[0]]; // reset other panels
       const action = slides.answers.action;
-      if (!action) return whenFinished();
+      if (!action) return whenFinished(slides);
       const numNouns = action.verb.match(/_/g)?.length || 0;
       for (let i = 0; i < numNouns; i++) slides.panels.push({ container: () => createNounPanel(slides, story, i, nextSlide) });
       nextSlide(slides);
@@ -90,7 +93,7 @@ export async function getPlayerChoices(
 
     const slides: SlideDeck = {
       currentSlide: 0,
-      container: div([], { className: "playerChoices" }),
+      container: element<HTMLDivElement>("section", { className: "playerChoices" }),
       title: paragraph([], { className: "title", innerText: viewpointCharacter.name + " will..." }),
       slidingWindow: div([], { className: "slidingWindow" }),
       panels: [
@@ -113,7 +116,7 @@ export async function getPlayerChoices(
 }
 
 function createVerbPanel(slides: SlideDeck, story: Story, next: (slides: SlideDeck) => void): HTMLDivElement {
-  const container = div([], { className: "slidepanel" });
+  const container = element<HTMLDivElement>("nav", { className: "slidepanel" });
   // loop through whole palette
   for (const action of story.actionset) {
     // const verb = action.verb.charAt(0).toUpperCase() + action.verb.slice(1).replace(/_/g, "...");
@@ -126,8 +129,7 @@ function createVerbPanel(slides: SlideDeck, story: Story, next: (slides: SlideDe
         next(slides);
       },
     });
-    const line = div([button]);
-    container.appendChild(line);
+    container.appendChild(button);
   }
   return container;
 }
@@ -138,7 +140,7 @@ function createNounPanel(slides: SlideDeck, story: Story, nth: number, next: (sl
   verb = verb.replace(/_/g, "...");
   slides.title.innerText = slides.context.viewpointCharacter.name + " will " + verb;
 
-  const container = div([], { className: "slidepanel" });
+  const container = element<HTMLDivElement>("nav", { className: "slidepanel" });
   for (const character of story.characters) {
     const button = element<HTMLButtonElement>("button", {
       type: "button",
@@ -148,8 +150,7 @@ function createNounPanel(slides: SlideDeck, story: Story, nth: number, next: (sl
         next(slides);
       },
     });
-    const line = div([button]);
-    container.appendChild(line);
+    container.appendChild(button);
   }
   const keys = Object.getOwnPropertySymbols(story.desireables);
   for (const key of keys) {
@@ -163,8 +164,7 @@ function createNounPanel(slides: SlideDeck, story: Story, nth: number, next: (sl
         next(slides);
       },
     });
-    const line = div([button]);
-    container.appendChild(line);
+    container.appendChild(button);
   }
   return container;
 }

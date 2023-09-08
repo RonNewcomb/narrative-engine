@@ -67,6 +67,7 @@ p {
   /* pointer-events: none; */
   z-index: 20;
   display: none;
+  background-color: rgba(0, 0, 0, 0.3);
 }
 
 .mainmenuflyout {
@@ -83,7 +84,7 @@ p {
   right: 0.5em;
   top: 3em;
   line-height: 3em;
-  box-shadow: tan 0px 0px 20px 8px;
+  box-shadow: tan 0px 0px 6px 2px;
 }
 
 .mainMenuButton {

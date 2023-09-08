@@ -1,4 +1,4 @@
-import { div, element } from "./layout";
+import { button, div } from "./layout";
 import { publish, publishHTML, publishStyled } from "./paragraphs";
 
 export interface iFictionRecord {
@@ -51,13 +51,9 @@ export async function titleScreen() {
     publish(`Release 1 / Serial number ${new Date().toISOString().replace(/-/g, "").slice(2, 8)} / Tin Book`);
     publish(" ");
     publish(" ");
-    const button = element<HTMLButtonElement>("button", {
-      type: "button",
-      className: "playerChoiceButton",
-      innerText: "Open",
-      onclick: () => resolve(panel),
-    });
-    const panel = div([button]);
+    const btn = button({ className: "playerChoiceButton", innerText: "Open", onclick: () => resolve(panel) });
+    const panel = div([btn]);
+    btn.style.margin = "0 0 2.4em 0";
     publishHTML(panel);
   }).then(panel => {
     while (panel.firstChild) panel.removeChild(panel.firstChild);

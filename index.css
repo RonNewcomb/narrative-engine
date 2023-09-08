@@ -44,7 +44,7 @@ body {
 
 p {
   margin: 0;
-  transition: all 0.5s;
+  text-indent: 1.5em;
 }
 
 .b {

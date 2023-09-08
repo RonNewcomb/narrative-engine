@@ -7,6 +7,11 @@ import { can, cant, executeRulebook, type RuleOutcome } from "./rulebooks";
 import type { Scene } from "./scenes";
 import type { Story } from "./story";
 
+export const did = "did";
+export const didnt = "didn't";
+export const trying = "trying";
+export const untried = "untried";
+
 /** An action which has failed.  Attempts record which Check rule prevented the action and whether the action could or should be re-attempted later.
  *  For a re-attempt to be successful, certain pre-requisites need to be 'fulfilled' (a relation) by other actions, so the same Check rule doesn't
  *  simply stop the action again. */
@@ -16,7 +21,7 @@ export interface Attempt<N extends Resource = Resource, SN extends Resource = Re
   secondNoun?: SN;
   actor: Character;
   definition: ActionDefinition<N, SN>;
-  status: "untried" | "failed" | "partly successful" | "successful";
+  status: "untried" | "didn't" | "trying" | "did";
   fulfills: Attempt<any, any> | undefined; // .parent
   fullfilledBy: Attempt<any, any>[]; // .children
 }
@@ -52,7 +57,7 @@ export function createGoal<N extends Resource, SN extends Resource>(
 export async function doThingAsAScene(thisAttempt: Attempt, currentScene: Scene, story: Story): Promise<RuleOutcome> {
   await executeRulebook(thisAttempt, currentScene, story);
 
-  while (thisAttempt.status == "partly successful") {
+  while (thisAttempt.status == trying) {
     let subAttempt = whatTheyAreTryingToDoNowRegarding(thisAttempt.actor, thisAttempt);
     publish("same scene, now", stringifyAttempt(subAttempt));
     if (subAttempt) await executeRulebook(subAttempt, currentScene, story);
@@ -64,11 +69,11 @@ export async function doThingAsAScene(thisAttempt: Attempt, currentScene: Scene,
   }
 
   switch (thisAttempt.status) {
-    case "failed":
+    case didnt:
       return cant;
-    case "successful":
+    case did:
       return can;
-    case "untried":
+    case untried:
       return cant;
   }
 }

@@ -8,8 +8,10 @@ import {
   cant,
   createBelief,
   createGoal,
+  did,
   narrativeEngine,
   spelling,
+  trying,
   weCouldTry,
 } from "../src/narrativeEngine";
 
@@ -27,7 +29,7 @@ const Exiting: ActionDefinition = {
   verb: "exit",
   can: [attempt => (!door.isLocked ? can : weCouldTry(attempt.actor, Unlocking, door, undefined, attempt))],
   change: attempt => [["location", attempt.actor, "=", "out"]],
-  narrate: [attempt => (attempt.status == "successful" ? "Rose left, never to return." : `But her way was blocked by ${attempt.status}.`)],
+  narrate: [attempt => (attempt.status == did ? "Rose left, never to return." : `But her way was blocked by something.`)],
 };
 
 const Waiting: ActionDefinition = {
@@ -58,7 +60,7 @@ const Closing: ActionDefinition = {
 const Unlocking: ActionDefinition = {
   verb: "unlock _ with _",
   can: [
-    // attempt => (attempt.secondNoun?.isKey ? "success" : weCouldTry(attempt.actor, Taking, attempt.secondNoun, undefined, attempt)),
+    // attempt => (attempt.secondNoun?.isKey ? can : weCouldTry(attempt.actor, Taking, attempt.secondNoun, undefined, attempt)),
   ],
   change: attempt => [["isLocked", attempt.noun!, "=", false]],
 };
@@ -67,7 +69,7 @@ const Locking: ActionDefinition = {
   verb: "lock _ with _",
   can: [
     // // second noun must be key
-    // attempt => (attempt.secondNoun?.isKey ? "success" : weCouldTry(attempt.actor, Realizing, doorkey, undefined, attempt)),
+    // attempt => (attempt.secondNoun?.isKey ? can : weCouldTry(attempt.actor, Realizing, doorkey, undefined, attempt)),
     // need to own key
     attempt =>
       !attempt.secondNoun
@@ -105,13 +107,14 @@ const storyStart: SceneType = {
 
 ////////////
 
-spelling({ receiving: "receiveing", the: ["teh", "hte"] });
+spelling({ the: ["teh", "hte"], receiving: "receiveing" });
 
 ///////
 
 const narration = [
-  [Rose, "did", Exiting, `"Finally, teh way is open. I'm free," said Rose.`],
-  [Rose, "didn't", Exiting, `"Damn."`],
+  [Rose, did, Exiting, `"Finally, teh way is open. I'm free," said Rose.`],
+  [Rose, trying, Exiting, `"I'll have to find another way."`],
+  // [storyStart, "begin", Rose, Exiting, `Scenic opening.`],
 ];
 
 //////////////

@@ -1,5 +1,5 @@
-import { ActionResult, ActionResults, isActionDefinition, type ActionDefinition } from "./actions";
-import { createAttempt, createGoal, type Attempt } from "./attempts";
+import { ActionResults, isActionDefinition, type ActionDefinition } from "./actions";
+import { createAttempt, createGoal, did, didnt, trying, untried, type Attempt } from "./attempts";
 import { createBelief, initializeDesireables, type ShouldBe } from "./beliefs";
 import { author, isCharacter, type Character } from "./characters";
 import { attachMainMenu } from "./layout";
@@ -19,7 +19,11 @@ export {
   createAttempt,
   createBelief,
   createGoal,
+  did,
+  didnt,
   spelling,
+  trying,
+  untried,
   weCouldTry,
   type ActionDefinition,
   type Attempt,
@@ -39,7 +43,7 @@ export type Advice = (
   viewpoint: Character,
   scene: Scene,
   scenePosition: ScenePosition,
-  actionResult: ActionResult | undefined
+  actionResult: Attempt["status"] | undefined
 ) => string | false;
 
 export async function narrativeEngine(
@@ -78,7 +82,7 @@ export async function narrativeEngine(
         viewpoint: Character,
         scene: Scene,
         scenePosition: ScenePosition,
-        actionResult: ActionResult | undefined
+        actionResult: Attempt["status"] | undefined
       ): string | false => {
         for (const condition of n) {
           if (isCharacter(condition))

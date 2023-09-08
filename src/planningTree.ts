@@ -1,5 +1,5 @@
 import type { ActionDefinition } from "./actions";
-import { createAttempt, type Attempt } from "./attempts";
+import { createAttempt, did, didnt, trying, untried, type Attempt } from "./attempts";
 import type { Character } from "./characters";
 import { publish, stringifyAction, stringifyAttempt } from "./paragraphs";
 import type { Resource } from "./resources";
@@ -26,17 +26,14 @@ export function weCouldTry<N extends Resource, SN extends Resource>(
   return circumvention;
 }
 
-const inTheFuture = (it: Attempt): boolean => it.status == "untried" && (!it.fulfills || inTheFuture(it.fulfills));
+const inTheFuture = (it: Attempt): boolean => it.status == untried && (!it.fulfills || inTheFuture(it.fulfills));
 const inThePresent = (it: Attempt) =>
-  (it.status == "failed" || it.status == "partly successful") &&
-  it.fullfilledBy.filter(at => at.status == "untried").length > 0 &&
-  it.fullfilledBy.filter(at => at.status == "successful").length == 0;
+  (it.status == didnt || it.status == trying) &&
+  it.fullfilledBy.filter(at => at.status == untried).length > 0 &&
+  it.fullfilledBy.filter(at => at.status == did).length == 0;
 const inThePast = (it: Attempt) =>
-  it.status == "successful" ||
-  it.status == "partly successful" ||
-  (it.status == "failed" && it.fullfilledBy.filter(at => at.status == "untried").length == 0);
-const couldveBeen = (it: Attempt) =>
-  it.status == "untried" && it.fulfills && ["successful", "partly successful"].includes(it.fulfills.status);
+  it.status == did || it.status == trying || (it.status == didnt && it.fullfilledBy.filter(at => at.status == untried).length == 0);
+const couldveBeen = (it: Attempt) => it.status == untried && it.fulfills && [did, trying].includes(it.fulfills.status);
 const isTopLevel = (it: Attempt) => !it.fulfills; // someone plans the cause of it  // it fulfills no higher goal
 const busy = (actor: Character) => actor.goals!.filter(at => !inThePast(at)).length == 0; // all attempts which [could possibly] fulfill goals of actor are in past;
 
@@ -117,30 +114,28 @@ export const whatTheyAreTryingToDoNowRegarding = (actor: Character, act: Attempt
   while (thisAct) {
     //	while a hindered attempt (called details) fulfills thisAct:
     previous = thisAct;
-    thisAct = previous.fullfilledBy.find(g => g.status == "partly successful");
+    thisAct = previous.fullfilledBy.find(g => g.status == trying);
     //if (!thisAct) thisAct = previous.fullfilledBy.find(g => g.status == "untried");
   }
-  thisAct = previous.fullfilledBy.find(at => at.status == "successful")
-    ? previous
-    : previous.fullfilledBy.find(at => at.status == "untried");
+  thisAct = previous.fullfilledBy.find(at => at.status == did) ? previous : previous.fullfilledBy.find(at => at.status == "untried");
   publish("  Q: What is", actor.name, "trying to do now?");
   publish("  A: " + (thisAct ? stringifyAttempt(thisAct) : "nothing"));
   return thisAct; // [the most finely detailed, and hindered,]
 };
 
 export const whatTheyAreTryingToDoNow = (actor: Character): Attempt | undefined => {
-  let thisAct = actor.goals?.find(g => g.status == "partly successful") || actor.goals?.find(g => g.status == "untried");
+  let thisAct = actor.goals?.find(g => g.status == trying) || actor.goals?.find(g => g.status == untried);
   if (!thisAct) return undefined;
   return whatTheyAreTryingToDoNowRegarding(actor, thisAct);
 };
 
 export const whatTheyWillDoNext = (actor: Character): Attempt | undefined => {
   const current = whatTheyAreTryingToDoNow(actor);
-  const untried = !current ? undefined : howTheyCan(actor, current).find(item => item.status == "untried");
+  const untriedaction = !current ? undefined : howTheyCan(actor, current).find(item => item.status == untried);
   //actor.goals.action = Waiting;
   publish("  Q: What will", actor.name, "do next?");
-  publish("  A: ", untried ? stringifyAttempt(untried) : "No options.");
-  return untried; //actor.goals; // of actor. ["I don't know"]
+  publish("  A: ", untriedaction ? stringifyAttempt(untriedaction) : "No options.");
+  return untriedaction; //actor.goals; // of actor. ["I don't know"]
 };
 
 // const whichActionFromTheAgendaOf = (act: Action, performer: Character): Attempt | undefined => {

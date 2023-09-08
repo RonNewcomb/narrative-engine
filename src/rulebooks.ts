@@ -1,4 +1,4 @@
-import type { Attempt } from "./attempts";
+import { did, didnt, trying, type Attempt } from "./attempts";
 import { moveDesireable, type ShouldBeStatement } from "./beliefs";
 import { ConsequenceWithForeshadowedNewsProvingAgency } from "./consequences";
 import { createNewsItem, reactionsToNews, type News } from "./news";
@@ -34,7 +34,7 @@ export async function executeRulebook(attempt: Attempt, currentScene: Scene, sto
         break;
       }
     }
-  attempt.status = outcome == can ? "successful" : attempt.fullfilledBy.length > 0 ? "partly successful" : "failed";
+  attempt.status = outcome == can ? did : attempt.fullfilledBy.length > 0 ? trying : didnt;
   if (outcome == can && actionDefinition.change) {
     const shouldBeStatements = actionDefinition.change(attempt, story);
     for (const statement of shouldBeStatements) moveDesireable(story, ...statement);
@@ -44,7 +44,7 @@ export async function executeRulebook(attempt: Attempt, currentScene: Scene, sto
 
   // debugging or goes into every Narrate
   publish("DONE:", stringifyAttempt(attempt) + ".");
-  if (attempt.status == "partly successful") {
+  if (attempt.status == trying) {
     const nextSteps = attempt.fullfilledBy.map(x => stringifyAction(x, { ing: true, omitActor: true }));
     publish(attempt.actor.name, "could try", nextSteps);
   }
@@ -59,7 +59,7 @@ export async function executeRulebook(attempt: Attempt, currentScene: Scene, sto
       if (text) publish(text);
     }
     for (const rule of story.narrationRules) {
-      const text = rule(story, currentScene.viewpoint, currentScene, currentScene.position, outcome == can ? "did" : "didn't");
+      const text = rule(story, currentScene.viewpoint, currentScene, currentScene.position, attempt.status);
       if (text) publish(text);
     }
   }

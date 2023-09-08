@@ -15,3 +15,7 @@ export const author: Character = {
   beliefs: [],
   goals: [],
 };
+
+export function isCharacter(obj: any): boolean {
+  return obj.name && obj.beliefs;
+}

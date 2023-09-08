@@ -1,14 +1,14 @@
-import type { ActionDefinition } from "./actions";
+import { ActionResult, ActionResults, isActionDefinition, type ActionDefinition } from "./actions";
 import { createAttempt, createGoal, type Attempt } from "./attempts";
 import { createBelief, initializeDesireables, type ShouldBe } from "./beliefs";
-import { author, type Character } from "./characters";
+import { author, isCharacter, type Character } from "./characters";
 import { attachMainMenu } from "./layout";
 import { console_log, stringify } from "./paragraphs";
 import { save as autosave, load } from "./persistence";
 import { weCouldTry, whatTheyAreTryingToDoNow } from "./planningTree";
 import type { Desireable, Resource } from "./resources";
 import { can, cant } from "./rulebooks";
-import { SceneType, createScene, type Scene } from "./scenes";
+import { ScenePosition, ScenePositions, SceneType, createScene, isScene, type Scene } from "./scenes";
 import { spelling } from "./spellcheck";
 import { playStory, type SolicitPlayerInput, type Story } from "./story";
 import { titleScreen, type iFictionRecord } from "./treatyOfBabel";
@@ -34,11 +34,19 @@ export {
   type iFictionRecord,
 };
 
+export type Advice = (
+  story: Story,
+  viewpoint: Character,
+  scene: Scene,
+  scenePosition: ScenePosition,
+  actionResult: ActionResult | undefined
+) => string | false;
+
 export async function narrativeEngine(
   characters: Character[],
   actions: ActionDefinition<any, any>[],
   desireables: Desireable[],
-  narration: any[][],
+  narrativeAdvices: any[][],
   notableScenes?: SceneType[],
   getPlayerInput?: SolicitPlayerInput
 ) {
@@ -50,24 +58,50 @@ export async function narrativeEngine(
   for (const scene of notableScenes) Object.freeze(scene);
   for (const action of actions) Object.freeze(action);
   for (const character of characters) Object.freeze(character);
+  for (const rule of narrativeAdvices) {
+    if (!rule || !Array.isArray(rule) || rule.length == 0) throw "A narrative advice is empty.";
+    if (typeof rule[rule.length - 1] !== "string") throw "The last item in an advice isn't text.";
+  }
 
   const stoppingPoint: SolicitPlayerInput = async (...rest: Parameters<SolicitPlayerInput>): ReturnType<SolicitPlayerInput> => {
     autosave();
     return getPlayerInput ? getPlayerInput(...rest) : undefined;
   };
 
-  // const narrationRules: ((story: Story, viewpoint: Character, scene: Scene, scenePosition: "begin" | "mid" | "end") => string | false)[] =
-  //   narration.map(n => {
-  //     const text = n.pop();
-  //     return (story: Story, viewpoint: Character, scene: Scene, scenePosition: "begin" | "mid" | "end") => {
-  //       for (const condition of n) {
-  //         if (condition instanceof Character && viewpoint != condition) return false;
-  //         if (condition instanceof Scene && scene != condition) return false;
-  //         if (condition instanceof ActionDefinition && scene.pulse.definition != condition) return false;
-  //         if (typeof condition == "string" && scenePosition != condition) return false;
-  //       }
-  //     };
-  //   });
+  const narrationRules: Advice[] = narrativeAdvices
+    .filter(n => Array.isArray(n) && n.length > 0)
+    .map(n => {
+      const text = n.pop(); // text is string or function returning string?
+
+      return (
+        story: Story,
+        viewpoint: Character,
+        scene: Scene,
+        scenePosition: ScenePosition,
+        actionResult: ActionResult | undefined
+      ): string | false => {
+        for (const condition of n) {
+          if (isCharacter(condition))
+            if (viewpoint == condition) continue;
+            else return false;
+          else if (isScene(condition))
+            if (scene == condition) continue;
+            else return false;
+          else if (isActionDefinition(condition))
+            if (scene.pulse.definition == condition) continue;
+            else return false;
+          else if (typeof condition === "string") {
+            if (ScenePositions.includes(condition as any))
+              if (scenePosition == condition) continue;
+              else return false;
+            else if (ActionResults.includes(condition as any))
+              if (actionResult == condition) continue;
+              else return false;
+          } else throw `Unknown condition ${condition}`;
+        }
+        return text;
+      };
+    });
 
   // debug
   console_log(stringify(characters));
@@ -88,7 +122,7 @@ export async function narrativeEngine(
   if (!load()) await titleScreen();
 
   // GO
-  const theEnd = await playStory(characters, actions, desireablesRecord, notableScenes, stoppingPoint, initialScene);
+  const theEnd = await playStory(characters, actions, desireablesRecord, notableScenes, narrationRules, stoppingPoint, initialScene);
 
   return theEnd;
 }

@@ -53,11 +53,16 @@ export async function executeRulebook(attempt: Attempt, currentScene: Scene, sto
     publish("((But", foreshadow.character.name, "won't like", stringifyAction(foreshadow.news) + ".))");
   }
 
-  if (actionDefinition.narrate)
+  if (actionDefinition.narrate) {
     for (const rule of actionDefinition.narrate) {
       const text = rule(attempt, consequences, story);
       if (text) publish(text);
     }
+    for (const rule of story.narrationRules) {
+      const text = rule(story, currentScene.viewpoint, currentScene, currentScene.position, outcome == can ? "did" : "didn't");
+      if (text) publish(text);
+    }
+  }
 
   return news;
 }

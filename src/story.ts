@@ -2,6 +2,7 @@ import type { ActionDefinition } from "./actions";
 import type { Attempt } from "./attempts";
 import type { Character } from "./characters";
 import { createSceneSet, type ChoiceConsequenceClosure } from "./consequences";
+import { Advice } from "./narrativeEngine";
 import { type News } from "./news";
 import { publish, publishStyled, stringifyAction } from "./paragraphs";
 import { type Desireable } from "./resources";
@@ -17,6 +18,7 @@ export interface Story {
   readonly desireables: Record<symbol, Desireable>;
   readonly getPlayerInput: SolicitPlayerInput;
   readonly notableScenes: SceneType[];
+  readonly narrationRules: Advice[];
 
   readonly sceneStack: ChoiceConsequenceClosure[];
   readonly history: News[];
@@ -27,11 +29,12 @@ export async function playStory(
   actionset: ActionDefinition<any, any>[],
   desireables: Record<symbol, Desireable>,
   notableScenes: SceneType[],
+  narrationRules: Advice[],
   getPlayerInput: SolicitPlayerInput,
   firstScene?: Scene
 ) {
   // initialize story
-  const story: Story = { characters, actionset, desireables, getPlayerInput, notableScenes, sceneStack: [], history: [] };
+  const story: Story = { characters, actionset, desireables, getPlayerInput, notableScenes, narrationRules, sceneStack: [], history: [] };
   if (firstScene) createSceneSet(story, { choice: "ally", scene: firstScene });
 
   let turn = 0;

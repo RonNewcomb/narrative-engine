@@ -110,13 +110,8 @@ spelling({ receiving: "receiveing", the: ["teh", "hte"] });
 ///////
 
 const narration = [
-  [
-    Rose,
-    Exiting,
-    `
-Lorem ipsum.
-`,
-  ],
+  [Rose, "did", Exiting, `"Finally, teh way is open. I'm free," said Rose.`],
+  [Rose, "didn't", Exiting, `"Damn."`],
 ];
 
 //////////////

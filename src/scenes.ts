@@ -35,8 +35,8 @@ export type ResultOfMidScene = RuleOutcome;
 export type ResultOfEndScene = Scene | void | undefined;
 
 export const SCENEBREAK = div([], {
-  innerText: "* * *",
-  style: { margin: "1em 0", textAlign: "center", fontWeight: "bold", fontSize: "larger" },
+  // innerText: "* * *",
+  style: { margin: "1em 0", textAlign: "center", fontWeight: "bold", fontSize: "larger", borderTop: "1px dashed brown" },
 });
 
 export const defaultSceneType: SceneType = {
@@ -55,11 +55,15 @@ export const defaultSceneType: SceneType = {
 
 /////////
 
+export type ScenePosition = "begin" | "mid" | "end";
+export const ScenePositions: readonly ScenePosition[] = ["begin", "mid", "end"] as const;
+
 export interface Scene {
   pulse: Attempt<Resource, Resource>;
   isFinished?: boolean;
   result?: RuleOutcome;
   viewpoint: Character;
+  position: ScenePosition;
 }
 // interface ReflectiveScene extends BaseScene {
 //   type: "reflective";
@@ -71,19 +75,26 @@ export interface Scene {
 // SuspenseScene -- scene with a lot of tension
 // DramaticScene -- scene with strong emotion
 
+export function isScene(obj: any): boolean {
+  return obj.pulse && obj.viewpoint;
+}
+
 export function createScene(pulse: Attempt<Resource, Resource>, viewpoint?: Character): Scene {
-  const scene: Scene = { pulse, viewpoint: viewpoint || pulse.actor };
+  const scene: Scene = { pulse, viewpoint: viewpoint || pulse.actor, position: "begin" };
   return scene;
 }
 
 export async function playScene(scene: Scene, story: Story): Promise<Scene | undefined> {
   const sceneAction = scene.pulse;
   const playbook = story.notableScenes.find(scenetype => scenetype.match(sceneAction, story));
+  scene.position = "begin";
   const beginning = playbook?.beginning ?? defaultSceneType.beginning;
   if (beginning) publish(await Promise.resolve(beginning(scene.pulse, story, scene)));
+  scene.position = "mid";
   const middle = playbook?.middle ?? defaultSceneType.middle;
   scene.result = await Promise.resolve(middle?.(sceneAction, story, scene));
   scene.isFinished = true;
+  scene.position = "end";
   const ending = playbook?.end ?? defaultSceneType.end;
   return (await Promise.resolve(ending?.(scene.pulse, story, scene))) || undefined;
 }

@@ -15,6 +15,13 @@ export interface ActionDefinition<N extends Resource = Noun, SN extends Resource
   verb: Verb;
 }
 
+export function isActionDefinition(obj: any): boolean {
+  return obj.verb;
+}
+
+export type ActionResult = "did" | "didn't";
+export const ActionResults: readonly ActionResult[] = ["did", "didn't"] as const;
+
 export const ReflectUpon: ActionDefinition<Attempt> = {
   verb: "reflect upon attempting _",
   narrate: [attempt => attempt.actor.name + " reflected."],

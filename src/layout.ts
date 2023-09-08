@@ -1,22 +1,25 @@
 import { restart } from "./persistence";
 
-export function button(attrs?: Partial<HTMLButtonElement>): HTMLButtonElement {
+type Attributes<T extends HTMLElement> = Partial<Omit<T, "style">> & { style?: Partial<CSSStyleDeclaration> };
+
+export function button(attrs?: Attributes<HTMLButtonElement>): HTMLButtonElement {
   const btn = element("button", attrs) as HTMLButtonElement;
   btn.type = attrs?.type || "button";
   return btn;
 }
 
-export function div(children?: HTMLElement[], attrs?: Partial<HTMLDivElement>): HTMLDivElement {
+export function div(children?: HTMLElement[], attrs?: Attributes<HTMLDivElement>): HTMLDivElement {
   return element("div", attrs, children) as HTMLDivElement;
 }
 
-export function paragraph(children?: HTMLElement[], attrs?: Partial<HTMLParagraphElement>): HTMLParagraphElement {
+export function paragraph(children?: HTMLElement[], attrs?: Attributes<HTMLParagraphElement>): HTMLParagraphElement {
   return element("p", attrs, children) as HTMLParagraphElement;
 }
 
-export function element<T extends HTMLElement>(tagName: string, attrs?: Partial<T>, children?: HTMLElement[]): T {
+export function element<T extends HTMLElement>(tagName: string, attrs?: Attributes<T>, children?: HTMLElement[]): T {
   const el = document.createElement(tagName) as T;
-  if (attrs) Object.keys(attrs).forEach(attr => ((el as any)[attr] = (attrs as any)[attr]));
+  if (attrs) (Object.keys(attrs) as (keyof T)[]).forEach(attr => (el[attr] = (attrs as any)[attr]));
+  if (attrs && attrs.style) Object.keys(attrs.style).forEach(css => (el.style[css as any] = (attrs.style as any)[css]));
   if (children) children.forEach(child => el.appendChild(child));
   return el;
 }

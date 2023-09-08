@@ -3,7 +3,7 @@ import type { Attempt } from "./attempts";
 import type { Character } from "./characters";
 import { createSceneSet, type ChoiceConsequenceClosure } from "./consequences";
 import { type News } from "./news";
-import { console_log, publish, publishStyled, stringify, stringifyAction } from "./paragraphs";
+import { publish, publishStyled, stringifyAction } from "./paragraphs";
 import { type Desireable } from "./resources";
 import { getNextScene, playScene, type Scene, type SceneType } from "./scenes";
 
@@ -38,8 +38,6 @@ export async function playStory(
 
   let suggestedNextScene: Scene | undefined;
   for (let currentScene = firstScene; currentScene; currentScene = getNextScene(story, suggestedNextScene)) {
-    console_log("TURN", ++turn);
-
     // characters act // creates scene types of Action
     suggestedNextScene = await playScene(currentScene, story);
 
@@ -48,12 +46,11 @@ export async function playStory(
     publishStyled({ fontWeight: "bold" }, stringifyAction(turn0) + ".");
     // ////
 
-    console_log("END TURN", turn);
-    console_log(stringify(characters));
-    if (turn > 7) break;
+    //console_log(stringify(characters));
+    if (turn++ > 7) break;
   }
 
   publish("THE END");
-  console_log(stringify(story.sceneStack));
+  //console_log(stringify(story.sceneStack));
   return story;
 }

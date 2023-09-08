@@ -1,6 +1,7 @@
 import { doThingAsAScene, type Attempt } from "./attempts";
 import { type Character } from "./characters";
-import { console_error, publish, stringifyAction } from "./paragraphs";
+import { div } from "./layout";
+import { console_error, publish, publishHTML, stringifyAction } from "./paragraphs";
 import { type Resource } from "./resources";
 import { can, type RuleOutcome } from "./rulebooks";
 import { type Story } from "./story";
@@ -33,7 +34,10 @@ export type ResultOfBeginScene = string | void;
 export type ResultOfMidScene = RuleOutcome;
 export type ResultOfEndScene = Scene | void | undefined;
 
-const SCENEBREAK = "\n   * * *    \n\n";
+export const SCENEBREAK = div([], {
+  innerText: "* * *",
+  style: { margin: "1em 0", textAlign: "center", fontWeight: "bold", fontSize: "larger" },
+});
 
 export const defaultSceneType: SceneType = {
   match: () => true,
@@ -45,7 +49,7 @@ export const defaultSceneType: SceneType = {
   },
   end: attempt => {
     publish(attempt.actor.name, "leaves.");
-    publish(SCENEBREAK);
+    publishHTML(SCENEBREAK);
   },
 };
 

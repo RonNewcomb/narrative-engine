@@ -8,7 +8,7 @@ import { save as autosave, load } from "./persistence";
 import { weCouldTry, whatTheyAreTryingToDoNow } from "./planningTree";
 import type { Desireable, Resource } from "./resources";
 import { can, cant } from "./rulebooks";
-import { ScenePosition, ScenePositions, SceneType, createScene, isScene, type Scene } from "./scenes";
+import { ScenePosition, ScenePositions, SceneType, createScene, isScene, isSceneType, type Scene } from "./scenes";
 import { spelling } from "./spellcheck";
 import { playStory, type SolicitPlayerInput, type Story } from "./story";
 import { titleScreen, type iFictionRecord } from "./treatyOfBabel";
@@ -94,6 +94,9 @@ export async function narrativeEngine(
           else if (isActionDefinition(condition))
             if (scene.pulse.definition == condition) continue;
             else return false;
+          else if (isSceneType(condition))
+            if ((condition as SceneType).match(scene.pulse, story)) continue;
+            else return false;
           else if (typeof condition === "string") {
             if (ScenePositions.includes(condition as any))
               if (scenePosition == condition) continue;
@@ -101,7 +104,7 @@ export async function narrativeEngine(
             else if (ActionResults.includes(condition as any))
               if (actionResult == condition) continue;
               else return false;
-          } else throw `Unknown condition ${condition}`;
+          } else throw `Unknown thing ${stringify(condition)} in ${stringify(n)}`;
         }
         return text;
       };

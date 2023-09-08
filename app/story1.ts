@@ -114,7 +114,7 @@ spelling({ the: ["teh", "hte"], receiving: "receiveing" });
 const narration = [
   [Rose, did, Exiting, `"Finally, teh way is open. I'm free," said Rose.`],
   [Rose, trying, Exiting, `"I'll have to find another way."`],
-  // [storyStart, "begin", Rose, Exiting, `Scenic opening.`],
+  [storyStart, "begin", Rose, Exiting, `Scenic opening.`],
 ];
 
 //////////////

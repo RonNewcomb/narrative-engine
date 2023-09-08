@@ -30,6 +30,10 @@ export interface SceneType {
   end?: (attempt: Attempt, story: Story, scene: Scene) => ResultOfEndScene | Promise<ResultOfEndScene>;
 }
 
+export function isSceneType(obj: any): boolean {
+  return obj.match || obj.beginning || obj.middle || obj.end;
+}
+
 export type ResultOfBeginScene = string | void;
 export type ResultOfMidScene = RuleOutcome;
 export type ResultOfEndScene = Scene | void | undefined;

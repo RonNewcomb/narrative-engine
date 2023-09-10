@@ -59,10 +59,10 @@ export async function doThingAsAScene(thisAttempt: Attempt, currentScene: Scene,
 
   while (thisAttempt.status == trying) {
     let subAttempt = whatTheyAreTryingToDoNowRegarding(thisAttempt.actor, thisAttempt);
-    publish("same scene, now", stringifyAttempt(subAttempt));
+    publish(thisAttempt.actor, thisAttempt.definition, "same scene, now", stringifyAttempt(subAttempt));
     if (subAttempt) await executeRulebook(subAttempt, currentScene, story);
     else {
-      publish("STUCK:", stringifyAttempt(thisAttempt));
+      publish(thisAttempt.actor, thisAttempt.definition, "STUCK:", stringifyAttempt(thisAttempt));
       if (thisAttempt.actor.goals!.includes(thisAttempt)) thisAttempt.actor.goals = thisAttempt.actor.goals!.filter(g => g != thisAttempt);
       return weCouldTry(thisAttempt.actor, StuckForSolutions, thisAttempt, undefined, undefined);
     }

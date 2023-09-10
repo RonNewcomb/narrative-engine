@@ -60,7 +60,7 @@ export const ReceivingImportantNews: ActionDefinition<News, ShouldBe> = {
       const belief = attempt.secondNoun;
       if (!news) throw "missing News for ReceivingImportantNews";
       if (!belief) throw "missing Belief for ReceivingImportantNews";
-      publish('"', stringifyAttempt(news), ' is bad news."');
+      publish(attempt.actor, attempt.definition, '"', stringifyAttempt(news), ' is bad news."');
 
       const actions = findActions(news, belief, story);
       for (const action of actions) weCouldTry<any, any>(attempt.actor, action, news.noun, news.secondNoun, attempt);

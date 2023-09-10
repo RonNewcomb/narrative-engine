@@ -1,6 +1,9 @@
 import type { Attempt } from "./attempts";
 import type { ShouldBe } from "./beliefs";
-import { paragraph } from "./layout";
+import { Character, author } from "./characters";
+import { element, paragraph } from "./layout";
+import { ActionDefinition } from "./narrativeEngine";
+import { Topic } from "./resources";
 import { spellcheck } from "./spellcheck";
 
 export let console_log: (...data: any[]) => void = (...texts: any[]): void => {
@@ -76,23 +79,47 @@ export function stringifyAttempt(
   return stringifyAction(attempt, { withStatus: true, ...options });
 }
 
-function containerize(texts: any[]): HTMLParagraphElement {
+let previousOwner: Character | Topic = author;
+let previousAction: ActionDefinition<any, any> | undefined = undefined;
+
+export function publish(owner: typeof previousOwner, action: typeof previousAction, ...texts: any[]): void {
   console.log(...texts);
   const text = spellcheck(texts.join(" "));
-  const container = paragraph([], { innerText: text });
-  return container;
+  if (owner != previousOwner || action != previousAction) {
+    const container = paragraph([], { innerText: text });
+    publishHTML(container);
+    previousOwner = owner;
+    previousAction = action;
+  } else {
+    const container = document.getElementById("published")!.lastElementChild as HTMLElement;
+    container.innerText += "  " + text;
+  }
 }
 
-export function publish(...texts: any[]): void {
-  const container = containerize(texts);
-  publishHTML(container);
-}
+export function publishStyled(
+  owner: typeof previousOwner,
+  action: typeof previousAction,
+  style: Partial<HTMLSpanElement["style"]> & { className?: string },
+  ...texts: any[]
+): void {
+  console.log(...texts);
+  const text = spellcheck(texts.join(" "));
+  if (owner != previousOwner || action != previousAction) {
+    const container = paragraph([], { innerText: text });
+    for (const [key, value] of Object.entries(style)) container.style[key as any] = value as any;
+    if (style.className) container.className = style.className;
+    publishHTML(container);
+    previousOwner = owner;
+    previousAction = action;
+  } else {
+    const styledcontainer = element<HTMLSpanElement>("span", { innerText: text });
+    for (const [key, value] of Object.entries(style)) styledcontainer.style[key as any] = value as any;
+    if (style.className) styledcontainer.className = style.className;
 
-export function publishStyled(style: Partial<HTMLSpanElement["style"]> & { className?: string }, ...texts: any[]): void {
-  const container = containerize(texts);
-  for (const [key, value] of Object.entries(style)) container.style[key as any] = value as any;
-  if (style.className) container.className = style.className;
-  publishHTML(container);
+    const container = document.getElementById("published")!.lastElementChild as HTMLElement;
+    container.innerText += "  "; // TODO this is broke when we append AFTER some styledcontainer stuff
+    container.appendChild(styledcontainer);
+  }
 }
 
 export function publishHTML(element: HTMLElement): void {

@@ -43,24 +43,24 @@ export async function executeRulebook(attempt: Attempt, currentScene: Scene, sto
   const consequences = reactionsToNews(news, currentScene, story);
 
   // debugging or goes into every Narrate
-  publish("DONE:", stringifyAttempt(attempt) + ".");
+  publish(attempt.actor, attempt.definition, "DONE:", stringifyAttempt(attempt) + ".");
   if (attempt.status == trying) {
     const nextSteps = attempt.fullfilledBy.map(x => stringifyAction(x, { ing: true, omitActor: true }));
-    publish(attempt.actor.name, "could try", nextSteps);
+    publish(attempt.actor, attempt.definition, attempt.actor.name, "could try", nextSteps);
   }
   for (const consequence of consequences) {
     const foreshadow = consequence.foreshadow!;
-    publish("((But", foreshadow.character.name, "won't like", stringifyAction(foreshadow.news) + ".))");
+    publish(attempt.actor, attempt.definition, "((But", foreshadow.character.name, "won't like", stringifyAction(foreshadow.news) + ".))");
   }
 
   if (actionDefinition.narrate) {
     for (const rule of actionDefinition.narrate) {
       const text = rule(attempt, consequences, story);
-      if (text) publish(text);
+      if (text) publish(attempt.actor, attempt.definition, text);
     }
     for (const rule of story.narrationRules) {
       const text = rule(attempt, currentScene, story);
-      if (text) publish(text);
+      if (text) publish(attempt.actor, attempt.definition, text);
     }
   }
 

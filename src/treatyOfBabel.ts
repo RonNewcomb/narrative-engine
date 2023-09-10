@@ -1,5 +1,5 @@
 import { button, div } from "./layout";
-import { publish, publishHTML, publishStyled } from "./paragraphs";
+import { publishHTML } from "./paragraphs";
 
 export interface iFictionRecord {
   story: {
@@ -46,11 +46,11 @@ export interface iFictionRecord {
 
 export async function titleScreen() {
   return new Promise<HTMLElement>(resolve => {
-    publishStyled({ className: "b" }, "Untitled Story");
-    publish(`An Interactive Fiction by Story Author`);
-    publish(`Release 1 / Serial number ${new Date().toISOString().replace(/-/g, "").slice(2, 8)} / Tin Book`);
-    publish(" ");
-    publish(" ");
+    publishHTML(div([], { innerText: "Untitled Story", className: "b" }));
+    publishHTML(div([], { innerText: `An Interactive Fiction by Story Author` }));
+    publishHTML(div([], { innerText: `Release 1 / Serial number ${new Date().toISOString().replace(/-/g, "").slice(2, 8)} / Tin Book` }));
+    publishHTML(div([], { innerText: " " }));
+    publishHTML(div([], { innerText: " " }));
     const btn = button({ className: "playerChoiceButton", innerText: "Open", onclick: () => resolve(panel) });
     const panel = div([btn]);
     btn.style.margin = "0 0 2.4em 0";

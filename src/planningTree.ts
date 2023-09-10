@@ -15,6 +15,8 @@ export function weCouldTry<N extends Resource, SN extends Resource>(
 ): Attempt {
   const circumvention = createAttempt(actor, definition, noun, secondNoun, failingAction);
   publish(
+    actor,
+    definition,
     actor.name,
     "could try",
     stringifyAction(circumvention, { omitActor: true, ing: true }),
@@ -77,8 +79,10 @@ let confusedAboutTiming: boolean;
 export const howTheyCan = (actor: Character, act: Attempt): Attempt[] => {
   //[	return list of not in past attempts which fulfill act.]
   const options = act.fullfilledBy.filter(a => !inThePast(a));
-  publish("  Q: How can", actor.name, stringifyAttempt(act));
+  publish(actor, act.definition, "  Q: How can", actor.name, stringifyAttempt(act));
   publish(
+    actor,
+    act.definition,
     "  A:",
     options.map(o => stringifyAttempt(o))
   );
@@ -118,8 +122,8 @@ export const whatTheyAreTryingToDoNowRegarding = (actor: Character, act: Attempt
     //if (!thisAct) thisAct = previous.fullfilledBy.find(g => g.status == "untried");
   }
   thisAct = previous.fullfilledBy.find(at => at.status == did) ? previous : previous.fullfilledBy.find(at => at.status == "untried");
-  publish("  Q: What is", actor.name, "trying to do now?");
-  publish("  A: " + (thisAct ? stringifyAttempt(thisAct) : "nothing"));
+  publish(actor, act.definition, "  Q: What is", actor.name, "trying to do now?");
+  publish(actor, act.definition, "  A: " + (thisAct ? stringifyAttempt(thisAct) : "nothing"));
   return thisAct; // [the most finely detailed, and hindered,]
 };
 
@@ -133,8 +137,8 @@ export const whatTheyWillDoNext = (actor: Character): Attempt | undefined => {
   const current = whatTheyAreTryingToDoNow(actor);
   const untriedaction = !current ? undefined : howTheyCan(actor, current).find(item => item.status == untried);
   //actor.goals.action = Waiting;
-  publish("  Q: What will", actor.name, "do next?");
-  publish("  A: ", untriedaction ? stringifyAttempt(untriedaction) : "No options.");
+  publish(actor, undefined, "  Q: What will", actor.name, "do next?");
+  publish(actor, undefined, "  A: ", untriedaction ? stringifyAttempt(untriedaction) : "No options.");
   return untriedaction; //actor.goals; // of actor. ["I don't know"]
 };
 

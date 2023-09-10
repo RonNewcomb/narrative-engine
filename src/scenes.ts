@@ -25,9 +25,9 @@ import { type Story } from "./story";
  */
 export interface SceneType {
   match: (attempt: Attempt, story: Story) => boolean;
-  beginning?: (attempt: Attempt, story: Story, scene: Scene) => ResultOfBeginScene | Promise<ResultOfBeginScene>;
-  middle?: (attempt: Attempt, story: Story, scene: Scene) => ResultOfMidScene | Promise<ResultOfMidScene>;
-  end?: (attempt: Attempt, story: Story, scene: Scene) => ResultOfEndScene | Promise<ResultOfEndScene>;
+  beginning?: (texts: string[], attempt: Attempt, story: Story, scene: Scene) => ResultOfBeginScene | Promise<ResultOfBeginScene>;
+  middle?: (texts: string[], attempt: Attempt, story: Story, scene: Scene) => ResultOfMidScene | Promise<ResultOfMidScene>;
+  end?: (texts: string[], attempt: Attempt, story: Story, scene: Scene) => ResultOfEndScene | Promise<ResultOfEndScene>;
 }
 
 export function isSceneType(obj: any): boolean {
@@ -40,20 +40,19 @@ export type ResultOfEndScene = Scene | void | undefined;
 
 export const defaultSceneType: SceneType = {
   match: () => true,
-  beginning: (attempt, story, scene) => {
-    const texts = story.narrationRules.map(rule => rule(attempt, scene, story)).filter(x => !!x);
-    if (texts.length == 0) publish(attempt.actor.name + " arrives to " + stringifyAction(attempt, { omitActor: true }) + ".");
-    else texts.forEach(text => publish(text));
+  beginning: (texts, attempt, story, scene) => {
+    if (texts.length) texts.forEach(text => publish(text));
+    else publish(attempt.actor.name + " arrives to " + stringifyAction(attempt, { omitActor: true }) + ".");
   },
-  middle: (attempt, story, scene) => {
+  middle: (texts, attempt, story, scene) => {
+    if (texts.length) texts.forEach(text => publish(text));
     if (attempt) return doThingAsAScene(attempt, scene, story);
     console_error("no scene action");
     return can; // TODO i guess?
   },
-  end: (attempt, story, scene) => {
-    const texts = story.narrationRules.map(rule => rule(attempt, scene, story)).filter(x => !!x);
-    if (texts.length == 0) publish(attempt.actor.name, "leaves.");
-    else texts.forEach(text => publish(text));
+  end: (texts, attempt, story, scene) => {
+    if (texts.length) texts.forEach(text => publish(text));
+    else publish(attempt.actor.name, "leaves.");
     publishHTML(paragraph([], { className: "endscene" }));
   },
 };
@@ -90,13 +89,26 @@ export async function playScene(scene: Scene, story: Story): Promise<Scene | und
   const playbook = story.notableScenes.find(scenetype => scenetype.match(sceneAction, story));
   scene.position = "begin";
   const beginning = playbook?.beginning ?? defaultSceneType.beginning;
-  if (beginning) publish(await Promise.resolve(beginning(scene.pulse, story, scene)));
+  if (beginning) {
+    const texts = story.narrationRules.map(rule => rule(scene.pulse, scene, story)).filter(x => !!x);
+    const retval = beginning(texts, scene.pulse, story, scene);
+    publish(await Promise.resolve(retval));
+  }
   scene.position = "mid";
   const middle = playbook?.middle ?? defaultSceneType.middle;
-  scene.result = await Promise.resolve(middle?.(sceneAction, story, scene));
+  if (middle) {
+    const texts = story.narrationRules.map(rule => rule(scene.pulse, scene, story)).filter(x => !!x);
+    const retval = middle?.(texts, sceneAction, story, scene);
+    scene.result = await Promise.resolve(retval);
+  }
   scene.position = "end";
   const ending = playbook?.end ?? defaultSceneType.end;
-  return (await Promise.resolve(ending?.(scene.pulse, story, scene))) || undefined;
+  if (ending) {
+    const texts = story.narrationRules.map(rule => rule(scene.pulse, scene, story)).filter(x => !!x);
+    const suggestedNextScene = ending?.(texts, scene.pulse, story, scene);
+    return (await Promise.resolve(suggestedNextScene)) || undefined;
+  }
+  return undefined;
 }
 
 export function getNextScene(story: Story, suggestedNextScene?: Scene): Scene | undefined {

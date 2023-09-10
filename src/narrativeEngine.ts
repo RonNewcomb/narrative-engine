@@ -1,26 +1,31 @@
-import { ActionResults, isActionDefinition, type ActionDefinition } from "./actions";
+import { type ActionDefinition } from "./actions";
+import { debug, toAdvice } from "./advice";
 import { createAttempt, createGoal, did, didnt, trying, untried, type Attempt } from "./attempts";
 import { createBelief, initializeDesireables, type ShouldBe } from "./beliefs";
-import { author, isCharacter, type Character } from "./characters";
+import { author, type Character } from "./characters";
 import { attachMainMenu } from "./layout";
 import { console_log, stringify } from "./paragraphs";
 import { save as autosave, load } from "./persistence";
 import { weCouldTry, whatTheyAreTryingToDoNow } from "./planningTree";
 import type { Desireable, Resource } from "./resources";
 import { can, cant } from "./rulebooks";
-import { ScenePosition, ScenePositions, SceneType, createScene, isScene, isSceneType, type Scene } from "./scenes";
+import { SceneType, begin, createScene, end, mid, type Scene } from "./scenes";
 import { spelling } from "./spellcheck";
 import { playStory, type SolicitPlayerInput, type Story } from "./story";
 import { titleScreen, type iFictionRecord } from "./treatyOfBabel";
 
 export {
+  begin,
   can,
   cant,
   createAttempt,
   createBelief,
   createGoal,
+  debug,
   did,
   didnt,
+  end,
+  mid,
   spelling,
   trying,
   untried,
@@ -37,14 +42,6 @@ export {
   type Story,
   type iFictionRecord,
 };
-
-export type Advice = (
-  story: Story,
-  viewpoint: Character,
-  scene: Scene,
-  scenePosition: ScenePosition,
-  actionResult: Attempt["status"] | undefined
-) => string | false;
 
 export async function narrativeEngine(
   characters: Character[],
@@ -67,49 +64,6 @@ export async function narrativeEngine(
     if (typeof rule[rule.length - 1] !== "string") throw "The last item in an advice isn't text.";
   }
 
-  const stoppingPoint: SolicitPlayerInput = async (...rest: Parameters<SolicitPlayerInput>): ReturnType<SolicitPlayerInput> => {
-    autosave();
-    return getPlayerInput ? getPlayerInput(...rest) : undefined;
-  };
-
-  const narrationRules: Advice[] = narrativeAdvices
-    .filter(n => Array.isArray(n) && n.length > 0)
-    .map(n => {
-      const text = n.pop(); // text is string or function returning string?
-
-      return (
-        story: Story,
-        viewpoint: Character,
-        scene: Scene,
-        scenePosition: ScenePosition,
-        actionResult: Attempt["status"] | undefined
-      ): string | false => {
-        for (const condition of n) {
-          if (isCharacter(condition))
-            if (viewpoint == condition) continue;
-            else return false;
-          else if (isScene(condition))
-            if (scene == condition) continue;
-            else return false;
-          else if (isActionDefinition(condition))
-            if (scene.pulse.definition == condition) continue;
-            else return false;
-          else if (isSceneType(condition))
-            if ((condition as SceneType).match(scene.pulse, story)) continue;
-            else return false;
-          else if (typeof condition === "string") {
-            if (ScenePositions.includes(condition as any))
-              if (scenePosition == condition) continue;
-              else return false;
-            else if (ActionResults.includes(condition as any))
-              if (actionResult == condition) continue;
-              else return false;
-          } else throw `Unknown thing ${stringify(condition)} in ${stringify(n)}`;
-        }
-        return text;
-      };
-    });
-
   // debug
   console_log(stringify(characters));
 
@@ -121,6 +75,12 @@ export async function narrativeEngine(
 
   //if (!initialScenes.length) throw "cannot find first character and action. No one has a Goal.";
   console_log(initialScenes.length + " initial scenes");
+
+  const narrationRules = toAdvice(narrativeAdvices);
+  const stoppingPoint: SolicitPlayerInput = async (...rest: Parameters<SolicitPlayerInput>): ReturnType<SolicitPlayerInput> => {
+    autosave();
+    return getPlayerInput ? getPlayerInput(...rest) : undefined;
+  };
   const initialScene: Scene = initialScenes[0];
 
   attachMainMenu();

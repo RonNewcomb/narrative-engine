@@ -59,7 +59,7 @@ export async function executeRulebook(attempt: Attempt, currentScene: Scene, sto
       if (text) publish(text);
     }
     for (const rule of story.narrationRules) {
-      const text = rule(story, currentScene.viewpoint, currentScene, currentScene.position, attempt.status);
+      const text = rule(attempt, currentScene, story);
       if (text) publish(text);
     }
   }

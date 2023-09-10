@@ -40,39 +40,41 @@ export type ResultOfEndScene = Scene | void | undefined;
 
 export const defaultSceneType: SceneType = {
   match: () => true,
-  beginning: attempt => attempt.actor.name + " arrives to " + stringifyAction(attempt, { omitActor: true }) + ".",
+  beginning: (attempt, story, scene) => {
+    const texts = story.narrationRules.map(rule => rule(attempt, scene, story)).filter(x => !!x);
+    if (texts.length == 0) publish(attempt.actor.name + " arrives to " + stringifyAction(attempt, { omitActor: true }) + ".");
+    else texts.forEach(text => publish(text));
+  },
   middle: (attempt, story, scene) => {
     if (attempt) return doThingAsAScene(attempt, scene, story);
     console_error("no scene action");
     return can; // TODO i guess?
   },
-  end: attempt => {
-    publish(attempt.actor.name, "leaves.");
+  end: (attempt, story, scene) => {
+    const texts = story.narrationRules.map(rule => rule(attempt, scene, story)).filter(x => !!x);
+    if (texts.length == 0) publish(attempt.actor.name, "leaves.");
+    else texts.forEach(text => publish(text));
     publishHTML(paragraph([], { className: "endscene" }));
   },
 };
 
 /////////
 
-export type ScenePosition = "begin" | "mid" | "end";
-export const ScenePositions: readonly ScenePosition[] = ["begin", "mid", "end"] as const;
+export const begin = "begin";
+export const mid = "mid";
+export const end = "end";
+export type ScenePosition = typeof begin | typeof mid | typeof end;
+export const ScenePositions: readonly ScenePosition[] = [begin, mid, end] as const;
 
 export interface Scene {
   pulse: Attempt<Resource, Resource>;
-  isFinished?: boolean;
-  result?: RuleOutcome;
   viewpoint: Character;
+  result?: RuleOutcome;
   position: ScenePosition;
 }
-// interface ReflectiveScene extends BaseScene {
-//   type: "reflective";
-//   actor: Character;
-//   // can a ShouldBe be supported, ArgMap-like, by smaller ShouldBes,
-//   // so that each reflective scene knocks down a supporting ShouldBe until no support exists,
-//   // and a final blow to break the larger ShouldBe ?
-// }
-// SuspenseScene -- scene with a lot of tension
-// DramaticScene -- scene with strong emotion
+// can a ShouldBe be supported, ArgMap-like, by smaller ShouldBes,
+// so that each reflective scene knocks down a supporting ShouldBe until no support exists,
+// and a final blow to break the larger ShouldBe ?
 
 export function isScene(obj: any): boolean {
   return obj.pulse && obj.viewpoint;
@@ -92,7 +94,6 @@ export async function playScene(scene: Scene, story: Story): Promise<Scene | und
   scene.position = "mid";
   const middle = playbook?.middle ?? defaultSceneType.middle;
   scene.result = await Promise.resolve(middle?.(sceneAction, story, scene));
-  scene.isFinished = true;
   scene.position = "end";
   const ending = playbook?.end ?? defaultSceneType.end;
   return (await Promise.resolve(ending?.(scene.pulse, story, scene))) || undefined;
@@ -100,11 +101,13 @@ export async function playScene(scene: Scene, story: Story): Promise<Scene | und
 
 export function getNextScene(story: Story, suggestedNextScene?: Scene): Scene | undefined {
   if (suggestedNextScene) return suggestedNextScene; // TODO sometimes we want a Meanwhile or other interstitial
-  const startScenes = story.sceneStack.filter(s => !s.choice.scene.isFinished);
+  const startScenes = story.sceneStack.filter(s => s.choice.scene.position !== "end");
   if (startScenes.length) return startScenes[0].choice.scene;
-  const midScenes = story.sceneStack.filter(s => s.consequences && s.consequences.length && s.consequences.some(c => !c.scene.isFinished));
-  if (midScenes.length) return midScenes[0].consequences.find(c => !c.scene.isFinished)!.scene;
-  const endScenes = story.sceneStack.filter(s => !s.closure.scene.isFinished);
+  const midScenes = story.sceneStack.filter(
+    s => s.consequences && s.consequences.length && s.consequences.some(c => c.scene.position !== "end")
+  );
+  if (midScenes.length) return midScenes[0].consequences.find(c => c.scene.position !== "end")!.scene;
+  const endScenes = story.sceneStack.filter(s => s.closure.scene.position !== "end");
   if (endScenes.length) return endScenes.reverse()[0].closure.scene;
   return undefined;
 }

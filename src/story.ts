@@ -1,11 +1,11 @@
 import type { ActionDefinition } from "./actions";
+import type { Advice } from "./advice";
 import type { Attempt } from "./attempts";
 import type { Character } from "./characters";
 import { createSceneSet, type ChoiceConsequenceClosure } from "./consequences";
-import { Advice } from "./narrativeEngine";
-import { type News } from "./news";
+import type { News } from "./news";
 import { publish, publishStyled, stringifyAction } from "./paragraphs";
-import { type Desireable } from "./resources";
+import type { Desireable } from "./resources";
 import { getNextScene, playScene, type Scene, type SceneType } from "./scenes";
 
 export interface SolicitPlayerInput {

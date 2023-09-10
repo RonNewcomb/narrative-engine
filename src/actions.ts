@@ -1,4 +1,4 @@
-import { createAttempt, did, didnt, type Attempt } from "./attempts";
+import { createAttempt, did, didnt, trying, untried, type Attempt } from "./attempts";
 import type { ShouldBe } from "./beliefs";
 import type { Character } from "./characters";
 import { createNewsItem, type News } from "./news";
@@ -19,7 +19,7 @@ export function isActionDefinition(obj: any): boolean {
   return obj.verb;
 }
 
-export const ActionResults: readonly Attempt["status"][] = [did, didnt] as const;
+export const ActionResults: readonly Attempt["status"][] = [did, didnt, trying, untried] as const;
 
 export const ReflectUpon: ActionDefinition<Attempt> = {
   verb: "reflect upon attempting _",

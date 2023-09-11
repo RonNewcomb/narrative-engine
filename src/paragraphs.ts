@@ -56,6 +56,7 @@ export function stringifyAction(
   options: { omitActor?: boolean; ing?: boolean; withStatus?: boolean } = {}
 ): string {
   if (!act) return "nothing";
+  if (!act.verb) throw Error(`Unknown action ${stringify(act)}`);
   const nounName: string = stringifyNoun(act.noun);
   const noun2Name: string = stringifyNoun(act.secondNoun);
   let rearrange: boolean = act.verb.includes("_");

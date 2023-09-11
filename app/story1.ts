@@ -1,22 +1,35 @@
 import { getPlayerChoices } from "../interface/playerInputStyle1";
-import { ReflectUpon } from "../src/actions";
+import { Noun } from "../src/actions";
 import {
   ActionDefinition,
   Attempt,
   Character,
   Desireable,
+  ReceivingImportantNews,
+  ReflectUpon,
+  Resource,
   SceneType,
+  ShouldBe,
   begin,
   can,
   cant,
+  cause,
+  choose,
+  consider,
   createBelief,
   createGoal,
   did,
+  feel,
+  foresee,
   narrativeEngine,
+  speak,
   spelling,
+  stringifyAction,
+  stringifyAttempt,
   trying,
   weCouldTry,
 } from "../src/narrativeEngine";
+import { News } from "../src/news";
 
 ///////////////
 
@@ -114,12 +127,30 @@ spelling({ the: ["teh", "hte"], receiving: "receiveing" });
 ///////
 
 const narration = [
-  [Rose, did, Exiting, `"Finally, teh way is open. I'm free," said Rose.`],
-  [Rose, trying, Exiting, `"I'll have to find another way."`],
+  [Rose, did, Exiting, speak, `"Finally, teh way is open. I'm free," said Rose.`],
+  [Rose, trying, Exiting, speak, `"I'll have to find another way."`],
   [storyStart, begin, Rose, Exiting, `Scenic opening.`],
-  [Rose, did, Exiting, "Rose left, never to return."],
-  [Rose, trying, Exiting, `But her way was blocked by something.`],
-  [ReflectUpon, did, (attempt: Attempt) => `${attempt.actor.name} reflected.`],
+  [Rose, did, Exiting, choose, "Rose left, never to return."],
+  [Rose, trying, Exiting, feel, `But her way was blocked by something.`],
+  [
+    trying,
+    consider,
+    (attempt: Attempt) => {
+      const nextSteps = attempt.fullfilledBy.map(x => stringifyAction(x, { ing: true, omitActor: true })).join(", or ");
+      if (nextSteps) return `${attempt.actor.name} could try ${nextSteps}.`;
+      else return "";
+    },
+  ],
+  [ReflectUpon, did, (attempt: Attempt<Attempt<Resource, Resource>, Noun>) => `${attempt.actor.name} reflected.`],
+  [
+    foresee,
+    (attempt: Attempt) => {
+      if (!attempt.consequences) return "";
+      return attempt.consequences.map(c => `((But ${c.foreshadow!.character.name} won't like ${stringifyAction(c.foreshadow!.news)}.))`);
+    },
+  ],
+  [cause, (attempt: Attempt) => `DONE: ${stringifyAttempt(attempt)}.`],
+  [Zafra, ReceivingImportantNews, feel, (attempt: Attempt<News, ShouldBe>) => `"${stringifyAction(attempt)} is bad news. ${attempt.verb}"`],
 ];
 
 //////////////

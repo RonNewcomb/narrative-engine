@@ -1,7 +1,7 @@
 import type { ActionDefinition } from "./actions";
 import { createAttempt, did, didnt, trying, untried, type Attempt } from "./attempts";
 import type { Character } from "./characters";
-import { publish, stringifyAction, stringifyAttempt } from "./paragraphs";
+import { publish, stringifyAttempt } from "./paragraphs";
 import type { Resource } from "./resources";
 
 /** attaches a suggestion to the tree */
@@ -14,15 +14,15 @@ export function weCouldTry<N extends Resource, SN extends Resource>(
   failingAction: Attempt<any, any> | undefined
 ): Attempt {
   const circumvention = createAttempt(actor, definition, noun, secondNoun, failingAction);
-  publish(
-    actor,
-    definition,
-    actor.name,
-    "could try",
-    stringifyAction(circumvention, { omitActor: true, ing: true }),
-    "before",
-    stringifyAction(failingAction, { omitActor: true, ing: true, withStatus: true }) + "."
-  );
+  // publish(
+  //   actor,
+  //   failingAction?.definition,
+  //   actor.name,
+  //   "could try",
+  //   stringifyAction(circumvention, { omitActor: true, ing: true }),
+  //   "before",
+  //   stringifyAction(failingAction, { omitActor: true, ing: true, withStatus: true }) + "."
+  // );
   if (failingAction) failingAction.fullfilledBy.push(circumvention);
   else actor.goals!.push(circumvention);
   return circumvention;

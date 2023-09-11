@@ -79,3 +79,35 @@ Dialogue generator.. ok, most people's speech isn't that special or unique. At l
 Regarding 4 more tasks for the paragraph: NPC cooperation and gratitude is what? If it's so important...
 
 There's pleasure in making things happen. Most CYOAs have lots of non-choice stuff that could honestly be excised with no ill effect. Even asking someone to do or help with something would be better than being passive-with-buttons.
+
+## MRUs
+
+1. motivating factor
+1. involutary subconscious response
+1. involuntary body language
+1. conscious body language
+1. speech
+
+or,
+
+1. motivating factor
+1. emotional reaction
+1. review what happened, reasoning out why, consider options available
+1. anticipation of what follows from those options
+1. choice
+
+or, combining,
+
+1. motivating factor
+1. "feel", involuntary subconscious response
+1. "flinch", involuntary body language
+1. "move", conscious body language
+1. "review", review what happened, reasoning out why,
+1. "consider", consider options available
+1. "foresee", anticipation of what follows from those options
+1. "choose", choice
+1. "speak", speech
+
+### Run
+
+`tsc && rollup --file build.js build/app/story1.js `

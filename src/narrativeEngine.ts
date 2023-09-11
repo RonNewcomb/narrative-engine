@@ -1,23 +1,28 @@
-import { type ActionDefinition } from "./actions";
+import { ReceivingImportantNews, ReflectUpon, type ActionDefinition } from "./actions";
 import { debug, toAdvice } from "./advice";
 import { createAttempt, createGoal, did, didnt, trying, untried, type Attempt } from "./attempts";
 import { createBelief, initializeDesireables, type ShouldBe } from "./beliefs";
 import { author, type Character } from "./characters";
 import { attachMainMenu } from "./layout";
-import { console_log, stringify } from "./paragraphs";
+import { console_log, stringify, stringifyAction, stringifyAttempt } from "./paragraphs";
 import { save as autosave, load } from "./persistence";
 import { weCouldTry, whatTheyAreTryingToDoNow } from "./planningTree";
 import type { Desireable, Resource } from "./resources";
-import { can, cant } from "./rulebooks";
+import { can, cant, cause, choose, consider, feel, flinch, foresee, move, review, speak } from "./rulebooks";
 import { SceneType, begin, createScene, end, mid, type Scene } from "./scenes";
 import { spelling } from "./spellcheck";
 import { playStory, type SolicitPlayerInput, type Story } from "./story";
 import { titleScreen, type iFictionRecord } from "./treatyOfBabel";
 
 export {
+  ReceivingImportantNews,
+  ReflectUpon,
   begin,
   can,
   cant,
+  cause,
+  choose,
+  consider,
   createAttempt,
   createBelief,
   createGoal,
@@ -25,8 +30,16 @@ export {
   did,
   didnt,
   end,
+  feel,
+  flinch,
+  foresee,
   mid,
+  move,
+  review,
+  speak,
   spelling,
+  stringifyAction,
+  stringifyAttempt,
   trying,
   untried,
   weCouldTry,

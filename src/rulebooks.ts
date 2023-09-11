@@ -2,7 +2,7 @@ import { textGen } from "./advice";
 import { did, didnt, trying, type Attempt } from "./attempts";
 import { moveDesireable, type ShouldBeStatement } from "./beliefs";
 import { createNewsItem, reactionsToNews, type News } from "./news";
-import { publish, stringifyAction, stringifyAttempt } from "./paragraphs";
+import { publish } from "./paragraphs";
 import type { Resource } from "./resources";
 import type { Scene } from "./scenes";
 import type { Story } from "./story";
@@ -37,22 +37,33 @@ export async function executeRulebook(attempt: Attempt, currentScene: Scene, sto
   attempt.consequences = reactionsToNews(news, currentScene, story);
 
   // debugging or goes into every Narrate
-  publish(attempt.actor, attempt.definition, "DONE:", stringifyAttempt(attempt) + ".");
-  const nextSteps =
-    attempt.status == trying ? attempt.fullfilledBy.map(x => stringifyAction(x, { ing: true, omitActor: true })) : undefined;
+  //publish(attempt.actor, attempt.definition, "DONE:", stringifyAttempt(attempt) + ".");
+  // const nextSteps =
+  //   attempt.status == trying ? attempt.fullfilledBy.map(x => stringifyAction(x, { ing: true, omitActor: true })) : undefined;
+  // if (nextSteps) publish(attempt.actor, attempt.definition, attempt.actor.name, "could try", nextSteps);
 
-  if (nextSteps) publish(attempt.actor, attempt.definition, attempt.actor.name, "could try", nextSteps);
+  // for (const consequence of attempt.consequences) {
+  //   const foreshadow = consequence.foreshadow!;
+  //   publish(attempt.actor, attempt.definition, "((But", foreshadow.character.name, "won't like", stringifyAction(foreshadow.news) + ".))");
+  // }
 
-  for (const consequence of attempt.consequences) {
-    const foreshadow = consequence.foreshadow!;
-    publish(attempt.actor, attempt.definition, "((But", foreshadow.character.name, "won't like", stringifyAction(foreshadow.news) + ".))");
-  }
-
-  for (const rule of story.narrationRules) {
-    const textFn = rule(attempt, currentScene, story, attempt.consequences, attempt.fullfilledBy);
-    const text: string = textGen(textFn, attempt, currentScene, story, attempt.consequences, attempt.fullfilledBy);
-    if (text) publish(attempt.actor, attempt.definition, text);
-  }
+  for (const phase of phases)
+    for (const rule of story.narrationRules) {
+      const textFn = rule(attempt, currentScene, story, attempt.consequences, attempt.fullfilledBy, phase);
+      const text: string = textGen(textFn, attempt, currentScene, story, attempt.consequences, attempt.fullfilledBy, phase);
+      if (text) publish(attempt.actor, attempt.definition, text);
+    }
 
   return news;
 }
+
+export const cause = "cause"; // motivation
+export const feel = "feel"; //  involuntary subconscious response
+export const flinch = "flinch"; // involuntary body language
+export const move = "move"; // conscious body language
+export const review = "review"; // review what happened, reasoning out why,
+export const consider = "consider"; // consider options available
+export const foresee = "foresee"; // anticipation of what follows from those options
+export const choose = "choose"; // choice
+export const speak = "speak"; // speech
+export const phases = [cause, feel, flinch, move, review, consider, foresee, choose, speak] as const;

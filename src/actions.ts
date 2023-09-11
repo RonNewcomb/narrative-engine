@@ -23,7 +23,6 @@ export const ActionResults: readonly Attempt["status"][] = [did, didnt, trying, 
 
 export const ReflectUpon: ActionDefinition<Attempt> = {
   verb: "reflect upon attempting _",
-  narrate: [attempt => attempt.actor.name + " reflected."],
 };
 
 export const SpreadNewsToOthers: ActionDefinition<News, Character[]> = {

@@ -1,5 +1,5 @@
+import type { Advice } from "./advice";
 import { ActionDefinition, Character, Desireable, Scene, ShouldBe } from "./narrativeEngine";
-import { NarrateRule } from "./rulebooks";
 
 export function parse(source: string) {
   // characters, actions, beliefs, desireables, scenes, tagged narration
@@ -8,7 +8,7 @@ export function parse(source: string) {
   const beliefs: ShouldBe[] = [];
   const desireables: Desireable[] = [];
   const scenes: Scene[] = [];
-  const texts: NarrateRule<any, any>[] = [];
+  const texts: Advice[] = [];
 
   for (let word = source.replace(/\b.*\b/, ""); word; word = source.replace(/\b.*\b/, "")) {
     switch (word.toLowerCase()) {
@@ -69,6 +69,6 @@ export function parseDesireable(source: string): undefined | Desireable {
 export function parseScene(source: string): undefined | Scene {
   return undefined;
 }
-export function parseText(source: string): undefined | NarrateRule<any, any> {
+export function parseText(source: string): undefined | Advice {
   return undefined;
 }

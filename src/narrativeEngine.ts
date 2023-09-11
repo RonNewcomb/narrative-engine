@@ -61,7 +61,7 @@ export async function narrativeEngine(
   for (const character of characters) Object.freeze(character);
   for (const rule of narrativeAdvices) {
     if (!rule || !Array.isArray(rule) || rule.length == 0) throw "A narrative advice is empty.";
-    if (typeof rule[rule.length - 1] !== "string") throw "The last item in an advice isn't text.";
+    if (!["string", "function"].includes(typeof rule[rule.length - 1])) throw "The last item in an advice isn't text or text function.";
   }
 
   // debug

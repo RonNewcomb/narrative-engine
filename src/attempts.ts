@@ -1,5 +1,6 @@
 import { StuckForSolutions, type ActionDefinition, type Verb } from "./actions";
 import { author, type Character } from "./characters";
+import { ConsequenceWithForeshadowedNewsProvingAgency } from "./consequences";
 import { publish, stringifyAttempt } from "./paragraphs";
 import { weCouldTry, whatTheyAreTryingToDoNowRegarding } from "./planningTree";
 import type { Resource } from "./resources";
@@ -24,6 +25,7 @@ export interface Attempt<N extends Resource = Resource, SN extends Resource = Re
   status: "untried" | "didn't" | "trying" | "did";
   fulfills: Attempt<any, any> | undefined; // .parent
   fullfilledBy: Attempt<any, any>[]; // .children
+  consequences?: ConsequenceWithForeshadowedNewsProvingAgency[];
 }
 
 export function createAttempt<N extends Resource, SN extends Resource>(

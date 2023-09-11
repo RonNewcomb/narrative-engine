@@ -1,6 +1,6 @@
+import { textGen } from "./advice";
 import { did, didnt, trying, type Attempt } from "./attempts";
 import { moveDesireable, type ShouldBeStatement } from "./beliefs";
-import { ConsequenceWithForeshadowedNewsProvingAgency } from "./consequences";
 import { createNewsItem, reactionsToNews, type News } from "./news";
 import { publish, stringifyAction, stringifyAttempt } from "./paragraphs";
 import type { Resource } from "./resources";
@@ -10,16 +10,10 @@ import type { Story } from "./story";
 export const can = "can";
 export const cant = "cant";
 export type RuleOutcome = undefined | false | typeof can | typeof cant | Attempt | Attempt[];
-export type NarrateRule<N extends Resource, SN extends Resource> = (
-  attempt: Attempt<N, SN>,
-  consequences: ConsequenceWithForeshadowedNewsProvingAgency[],
-  story: Story
-) => void | string;
 
 export interface Rulebooks<N extends Resource, SN extends Resource> {
   can?: ((attempt: Attempt<N, SN>, story: Story, scene?: Scene) => RuleOutcome | Promise<RuleOutcome>)[];
   change?: (attempt: Attempt<N, SN>, story: Story) => ShouldBeStatement[];
-  narrate?: NarrateRule<N, SN>[];
 }
 
 export async function executeRulebook(attempt: Attempt, currentScene: Scene, story: Story): Promise<News> {
@@ -40,28 +34,24 @@ export async function executeRulebook(attempt: Attempt, currentScene: Scene, sto
     for (const statement of shouldBeStatements) moveDesireable(story, ...statement);
   }
   const news = createNewsItem(attempt, story);
-  const consequences = reactionsToNews(news, currentScene, story);
+  attempt.consequences = reactionsToNews(news, currentScene, story);
 
   // debugging or goes into every Narrate
   publish(attempt.actor, attempt.definition, "DONE:", stringifyAttempt(attempt) + ".");
-  if (attempt.status == trying) {
-    const nextSteps = attempt.fullfilledBy.map(x => stringifyAction(x, { ing: true, omitActor: true }));
-    publish(attempt.actor, attempt.definition, attempt.actor.name, "could try", nextSteps);
-  }
-  for (const consequence of consequences) {
+  const nextSteps =
+    attempt.status == trying ? attempt.fullfilledBy.map(x => stringifyAction(x, { ing: true, omitActor: true })) : undefined;
+
+  if (nextSteps) publish(attempt.actor, attempt.definition, attempt.actor.name, "could try", nextSteps);
+
+  for (const consequence of attempt.consequences) {
     const foreshadow = consequence.foreshadow!;
     publish(attempt.actor, attempt.definition, "((But", foreshadow.character.name, "won't like", stringifyAction(foreshadow.news) + ".))");
   }
 
-  if (actionDefinition.narrate) {
-    for (const rule of actionDefinition.narrate) {
-      const text = rule(attempt, consequences, story);
-      if (text) publish(attempt.actor, attempt.definition, text);
-    }
-    for (const rule of story.narrationRules) {
-      const text = rule(attempt, currentScene, story);
-      if (text) publish(attempt.actor, attempt.definition, text);
-    }
+  for (const rule of story.narrationRules) {
+    const textFn = rule(attempt, currentScene, story, attempt.consequences, attempt.fullfilledBy);
+    const text: string = textGen(textFn, attempt, currentScene, story, attempt.consequences, attempt.fullfilledBy);
+    if (text) publish(attempt.actor, attempt.definition, text);
   }
 
   return news;

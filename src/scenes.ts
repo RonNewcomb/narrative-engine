@@ -1,3 +1,4 @@
+import { textGen } from "./advice";
 import { doThingAsAScene, type Attempt } from "./attempts";
 import { type Character } from "./characters";
 import { paragraph } from "./layout";
@@ -88,39 +89,52 @@ export function createScene(pulse: Attempt<Resource, Resource>, viewpoint?: Char
 export async function playScene(scene: Scene, story: Story): Promise<Scene | undefined> {
   const sceneAction = scene.pulse;
   const playbook = story.notableScenes.find(scenetype => scenetype.match(sceneAction, story));
-  scene.position = "begin";
+
+  scene.position = begin;
   const beginning = playbook?.beginning ?? defaultSceneType.beginning;
   if (beginning) {
-    const texts = story.narrationRules.map(rule => rule(scene.pulse, scene, story)).filter(x => !!x);
+    const texts = story.narrationRules
+      .map(rule => rule(scene.pulse, scene, story, scene.pulse.consequences, scene.pulse.fullfilledBy))
+      .map(textFn => textGen(textFn, scene.pulse, scene, story, scene.pulse.consequences, scene.pulse.fullfilledBy))
+      .filter(x => !!x);
     const retval = beginning(texts, scene.pulse, story, scene);
     publish(scene.viewpoint, scene.pulse.definition, await Promise.resolve(retval));
   }
-  scene.position = "mid";
+
+  scene.position = mid;
   const middle = playbook?.middle ?? defaultSceneType.middle;
   if (middle) {
-    const texts = story.narrationRules.map(rule => rule(scene.pulse, scene, story)).filter(x => !!x);
+    const texts = story.narrationRules
+      .map(rule => rule(scene.pulse, scene, story, scene.pulse.consequences, scene.pulse.fullfilledBy))
+      .map(textFn => textGen(textFn, scene.pulse, scene, story, scene.pulse.consequences, scene.pulse.fullfilledBy))
+      .filter(x => !!x);
     const retval = middle?.(texts, sceneAction, story, scene);
     scene.result = await Promise.resolve(retval);
   }
-  scene.position = "end";
+
+  scene.position = end;
   const ending = playbook?.end ?? defaultSceneType.end;
   if (ending) {
-    const texts = story.narrationRules.map(rule => rule(scene.pulse, scene, story)).filter(x => !!x);
+    const texts = story.narrationRules
+      .map(rule => rule(scene.pulse, scene, story, scene.pulse.consequences, scene.pulse.fullfilledBy))
+      .map(textFn => textGen(textFn, scene.pulse, scene, story, scene.pulse.consequences, scene.pulse.fullfilledBy))
+      .filter(x => !!x);
     const suggestedNextScene = ending?.(texts, scene.pulse, story, scene);
     return (await Promise.resolve(suggestedNextScene)) || undefined;
   }
+
   return undefined;
 }
 
 export function getNextScene(story: Story, suggestedNextScene?: Scene): Scene | undefined {
   if (suggestedNextScene) return suggestedNextScene; // TODO sometimes we want a Meanwhile or other interstitial
-  const startScenes = story.sceneStack.filter(s => s.choice.scene.position !== "end");
+  const startScenes = story.sceneStack.filter(s => s.choice.scene.position !== end);
   if (startScenes.length) return startScenes[0].choice.scene;
   const midScenes = story.sceneStack.filter(
-    s => s.consequences && s.consequences.length && s.consequences.some(c => c.scene.position !== "end")
+    s => s.consequences && s.consequences.length && s.consequences.some(c => c.scene.position !== end)
   );
-  if (midScenes.length) return midScenes[0].consequences.find(c => c.scene.position !== "end")!.scene;
-  const endScenes = story.sceneStack.filter(s => s.closure.scene.position !== "end");
+  if (midScenes.length) return midScenes[0].consequences.find(c => c.scene.position !== end)!.scene;
+  const endScenes = story.sceneStack.filter(s => s.closure.scene.position !== end);
   if (endScenes.length) return endScenes.reverse()[0].closure.scene;
   return undefined;
 }

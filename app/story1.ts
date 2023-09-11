@@ -1,6 +1,8 @@
 import { getPlayerChoices } from "../interface/playerInputStyle1";
+import { ReflectUpon } from "../src/actions";
 import {
   ActionDefinition,
+  Attempt,
   Character,
   Desireable,
   SceneType,
@@ -30,7 +32,6 @@ const Exiting: ActionDefinition = {
   verb: "exit",
   can: [attempt => (!door.isLocked ? can : weCouldTry(attempt.actor, Unlocking, door, undefined, attempt))],
   change: attempt => [["location", attempt.actor, "=", "out"]],
-  narrate: [attempt => (attempt.status == did ? "Rose left, never to return." : `But her way was blocked by something.`)],
 };
 
 const Waiting: ActionDefinition = {
@@ -116,6 +117,9 @@ const narration = [
   [Rose, did, Exiting, `"Finally, teh way is open. I'm free," said Rose.`],
   [Rose, trying, Exiting, `"I'll have to find another way."`],
   [storyStart, begin, Rose, Exiting, `Scenic opening.`],
+  [Rose, did, Exiting, "Rose left, never to return."],
+  [Rose, trying, Exiting, `But her way was blocked by something.`],
+  [ReflectUpon, did, (attempt: Attempt) => `${attempt.actor.name} reflected.`],
 ];
 
 //////////////

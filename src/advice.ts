@@ -1,12 +1,30 @@
 import { ActionResults, isActionDefinition } from "./actions";
 import { isCharacter } from "./characters";
+import { ConsequenceWithForeshadowedNewsProvingAgency } from "./consequences";
 import { Attempt, Scene, SceneType, Story } from "./narrativeEngine";
 import { stringify } from "./paragraphs";
 import { ScenePositions, isScene, isSceneType } from "./scenes";
 
 /** a function that given world state, will publish its text based on conditions */
 export interface Advice {
-  (action: Attempt, scene: Scene, story: Story): string;
+  (
+    action: Attempt,
+    scene: Scene,
+    story: Story,
+    consequences: ConsequenceWithForeshadowedNewsProvingAgency[] | undefined,
+    nextSteps: Attempt[] | undefined
+  ): string | TextGenerator;
+}
+
+/** last argument of an Advice if it isn't a string. Same inputs as the advice, meaning, basically the whole world */
+export interface TextGenerator {
+  (
+    action: Attempt,
+    scene: Scene,
+    story: Story,
+    consequences: ConsequenceWithForeshadowedNewsProvingAgency[] | undefined,
+    nextSteps: Attempt[] | undefined
+  ): string;
 }
 
 export const debug = "debug";
@@ -15,8 +33,8 @@ export function toAdvice(narrativeAdvices: any[][]): Advice[] {
   const advices: Advice[] = narrativeAdvices
     .filter(n => Array.isArray(n) && n.length > 0)
     .map<Advice>(untypedTuple => {
-      const text = untypedTuple.pop(); // text is string or function returning string?
-      const advice: Advice = (action: Attempt, scene: Scene, story: Story): string => {
+      const text: string | Advice = untypedTuple.pop(); // text is string or function returning string?
+      const advice: Advice = (action: Attempt, scene: Scene, story: Story): string | TextGenerator => {
         let d = false;
         // loop through all tuple items (except the last) and if the tuple doesn't apply here, return ""
         for (const condition of untypedTuple) {
@@ -45,10 +63,14 @@ export function toAdvice(narrativeAdvices: any[][]): Advice[] {
             if (!(condition as SceneType).match(scene.pulse, story)) return "";
           } else throw `Unknown thing ${stringify(condition)} in ${stringify(untypedTuple)}`;
         }
-        return text;
+        return typeof text == "function" ? (text as TextGenerator) : text;
       };
 
       return advice;
     });
   return advices;
+}
+
+export function textGen(textFn: TextGenerator | string, ...rest: Parameters<Advice>): string {
+  return typeof textFn === "function" ? textFn(...rest) : textFn;
 }

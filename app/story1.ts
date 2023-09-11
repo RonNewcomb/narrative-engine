@@ -18,6 +18,7 @@ import {
   consider,
   createBelief,
   createGoal,
+  debug,
   did,
   feel,
   foresee,
@@ -150,7 +151,13 @@ const narration = [
     },
   ],
   [cause, (attempt: Attempt) => `DONE: ${stringifyAttempt(attempt)}.`],
-  [Zafra, ReceivingImportantNews, feel, (attempt: Attempt<News, ShouldBe>) => `"${stringifyAction(attempt)} is bad news. ${attempt.verb}"`],
+  [
+    Zafra,
+    debug,
+    ReceivingImportantNews,
+    feel,
+    (attempt: Attempt<News, ShouldBe>) => `"${stringifyAction(attempt)} is bad news. ${attempt.verb}"`,
+  ],
 ];
 
 //////////////

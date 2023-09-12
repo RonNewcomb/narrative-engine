@@ -46,7 +46,8 @@ export function toAdvice(narrativeAdvices: any[][]): Advice[] {
       ): string | TextGenerator => {
         let d = false;
         // loop through all tuple items (except the last) and if the tuple doesn't apply here, return ""
-        const conditionPhase: string = untypedTuple.find(p => phases.includes(p)) || review;
+        const conditionPhase: string = untypedTuple.find(p => phases.includes(p));
+        if (!conditionPhase) untypedTuple.unshift(review);
         for (const condition of untypedTuple) {
           if (typeof condition === "string") {
             if (d) console.warn("IS STRING", condition);
@@ -60,20 +61,20 @@ export function toAdvice(narrativeAdvices: any[][]): Advice[] {
               if (action.status != condition) return "";
             } else if (phases.includes(condition as any)) {
               if (d) console.warn("IS NARRATIVE MRU PHASE", condition, phase);
-              if (phase != conditionPhase) return "";
+              if (phase != condition) return "";
             } else throw `Unknown string ${condition} in ${stringify(untypedTuple)}`;
           } else if (isCharacter(condition)) {
             if (d) console.warn("IS CHARACTER", condition);
-            if (scene.viewpoint != condition) return "";
+            if (action.actor != condition) return "";
           } else if (isScene(condition)) {
             if (d) console.warn("IS SCENE", condition);
             if (scene != condition) return "";
           } else if (isActionDefinition(condition)) {
             if (d) console.warn("IS ACTION", condition);
-            if (scene.pulse.definition != condition) return "";
+            if (action.definition != condition) return "";
           } else if (isSceneType(condition)) {
             if (d) console.warn("IS SCENETYPE", condition);
-            if (!(condition as SceneType).match(scene.pulse, story)) return "";
+            if (!(condition as SceneType).match(scene.pulse, story)) return ""; // pulse or current action?
           } else throw `Unknown thing ${stringify(condition)} in ${stringify(untypedTuple)}`;
         }
         return typeof text == "function" ? (text as TextGenerator) : text;

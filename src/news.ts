@@ -3,6 +3,7 @@ import { createAttempt, type Attempt } from "./attempts";
 import { type ShouldBe } from "./beliefs";
 import { type Character } from "./characters";
 import { createSceneSet, isButtonPushed, type ConsequenceWithForeshadowedNewsProvingAgency, type ForeShadowing } from "./consequences";
+import { stringify } from "./paragraphs";
 import { createScene, type Scene } from "./scenes";
 import { type Story } from "./story";
 
@@ -27,6 +28,7 @@ export function reactionsToNews(news: News, scene: Scene, story: Story): Consequ
         for (const belief of character.beliefs)
           if (isButtonPushed(news, belief, story)) {
             const foreshadowThis: ForeShadowing = { character, belief, news };
+            console.log("ReceivingImportantNews for news ", stringify(news));
             const sceneAction = createAttempt<News, ShouldBe>(character, ReceivingImportantNews, news, belief, undefined);
             const reactionScene = createScene(sceneAction);
             const consequence: ConsequenceWithForeshadowedNewsProvingAgency = { scene: reactionScene, foreshadow: foreshadowThis };

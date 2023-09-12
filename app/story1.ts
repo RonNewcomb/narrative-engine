@@ -142,7 +142,7 @@ const narration = [
       else return "";
     },
   ],
-  [ReflectUpon, did, (attempt: Attempt<Attempt<Resource, Resource>, Noun>) => `${attempt.actor.name} reflected.`],
+  [debug, ReflectUpon, did, (attempt: Attempt<Attempt<Resource, Resource>, Noun>) => `${attempt.actor.name} reflected.`],
   [
     foresee,
     (attempt: Attempt) => {
@@ -151,13 +151,7 @@ const narration = [
     },
   ],
   [cause, (attempt: Attempt) => `DONE: ${stringifyAttempt(attempt)}.`],
-  [
-    Zafra,
-    debug,
-    ReceivingImportantNews,
-    feel,
-    (attempt: Attempt<News, ShouldBe>) => `"${stringifyAction(attempt)} is bad news. ${attempt.verb}"`,
-  ],
+  [Zafra, ReceivingImportantNews, feel, (attempt: Attempt<News, ShouldBe>) => `"${stringifyAction(attempt.noun)} is bad news."`],
 ];
 
 //////////////

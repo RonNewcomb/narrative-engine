@@ -12,7 +12,10 @@ export function div(children?: HTMLElement[], attrs?: Attributes<HTMLDivElement>
   return element("div", attrs, children) as HTMLDivElement;
 }
 
-export function paragraph(children?: HTMLElement[], attrs?: Attributes<HTMLParagraphElement>): HTMLParagraphElement {
+export function paragraph(
+  children?: HTMLElement[],
+  attrs?: Attributes<HTMLParagraphElement> & { "data-subject"?: string }
+): HTMLParagraphElement {
   return element("p", attrs, children) as HTMLParagraphElement;
 }
 

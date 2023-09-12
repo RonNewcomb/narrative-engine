@@ -1,7 +1,7 @@
 import type { ActionDefinition } from "./actions";
 import type { Advice } from "./advice";
 import type { Attempt } from "./attempts";
-import { author, type Character } from "./characters";
+import { narrator, type Character } from "./characters";
 import { createSceneSet, type ChoiceConsequenceClosure } from "./consequences";
 import type { News } from "./news";
 import { publish, publishStyled, stringifyAction } from "./paragraphs";
@@ -46,14 +46,14 @@ export async function playStory(
 
     // debugging input
     const turn0 = await getPlayerInput(story, firstScene!.viewpoint, firstScene);
-    publishStyled(author, turn0?.definition, { className: "b" }, stringifyAction(turn0) + ".");
+    publishStyled(narrator, turn0?.definition, { className: "b" }, stringifyAction(turn0) + ".");
     // ////
 
     //console_log(stringify(characters));
     if (turn++ > 7) break;
   }
 
-  publish(author, undefined, "THE END");
+  publish(narrator, undefined, "THE END");
   //console_log(stringify(story.sceneStack));
   return story;
 }

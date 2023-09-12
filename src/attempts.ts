@@ -1,7 +1,6 @@
 import { StuckForSolutions, type ActionDefinition, type Verb } from "./actions";
-import { author, type Character } from "./characters";
+import { narrator, type Character } from "./characters";
 import { ConsequenceWithForeshadowedNewsProvingAgency } from "./consequences";
-import { publish, stringifyAttempt } from "./paragraphs";
 import { weCouldTry, whatTheyAreTryingToDoNowRegarding } from "./planningTree";
 import type { Resource } from "./resources";
 import { can, cant, executeRulebook, type RuleOutcome } from "./rulebooks";
@@ -53,7 +52,7 @@ export function createGoal<N extends Resource, SN extends Resource>(
   noun?: N,
   secondNoun?: SN
 ): Attempt<N, SN> {
-  return createAttempt(author, definition, noun, secondNoun, undefined);
+  return createAttempt(narrator, definition, noun, secondNoun, undefined);
 }
 
 export async function doThingAsAScene(thisAttempt: Attempt, currentScene: Scene, story: Story): Promise<RuleOutcome> {
@@ -61,20 +60,20 @@ export async function doThingAsAScene(thisAttempt: Attempt, currentScene: Scene,
 
   while (thisAttempt.status == trying) {
     let subAttempt = whatTheyAreTryingToDoNowRegarding(thisAttempt.actor, thisAttempt);
-    publish(thisAttempt.actor, thisAttempt.definition, "same scene, now", stringifyAttempt(subAttempt));
+    //publish(thisAttempt.actor, thisAttempt.definition, "same scene, now", stringifyAttempt(subAttempt));
     if (subAttempt) await executeRulebook(subAttempt, currentScene, story);
     else {
-      publish(thisAttempt.actor, thisAttempt.definition, "STUCK:", stringifyAttempt(thisAttempt));
+      //publish(thisAttempt.actor, thisAttempt.definition, "STUCK:", stringifyAttempt(thisAttempt));
       if (thisAttempt.actor.goals!.includes(thisAttempt)) thisAttempt.actor.goals = thisAttempt.actor.goals!.filter(g => g != thisAttempt);
       return weCouldTry(thisAttempt.actor, StuckForSolutions, thisAttempt, undefined, undefined);
     }
   }
 
   switch (thisAttempt.status) {
-    case didnt:
-      return cant;
     case did:
       return can;
+    case didnt:
+      return cant;
     case untried:
       return cant;
   }

@@ -36,17 +36,7 @@ export async function executeRulebook(attempt: Attempt, currentScene: Scene, sto
   const news = createNewsItem(attempt, story);
   attempt.consequences = reactionsToNews(news, currentScene, story);
 
-  // debugging or goes into every Narrate
-  //publish(attempt.actor, attempt.definition, "DONE:", stringifyAttempt(attempt) + ".");
-  // const nextSteps =
-  //   attempt.status == trying ? attempt.fullfilledBy.map(x => stringifyAction(x, { ing: true, omitActor: true })) : undefined;
-  // if (nextSteps) publish(attempt.actor, attempt.definition, attempt.actor.name, "could try", nextSteps);
-
-  // for (const consequence of attempt.consequences) {
-  //   const foreshadow = consequence.foreshadow!;
-  //   publish(attempt.actor, attempt.definition, "((But", foreshadow.character.name, "won't like", stringifyAction(foreshadow.news) + ".))");
-  // }
-
+  // OUTPUT
   for (const phase of phases)
     for (const rule of story.narrationRules) {
       const textFn = rule(attempt, currentScene, story, attempt.consequences, attempt.fullfilledBy, phase);

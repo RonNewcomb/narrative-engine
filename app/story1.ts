@@ -18,7 +18,6 @@ import {
   consider,
   createBelief,
   createGoal,
-  debug,
   did,
   feel,
   foresee,
@@ -142,7 +141,7 @@ const narration = [
       else return "";
     },
   ],
-  [debug, ReflectUpon, did, (attempt: Attempt<Attempt<Resource, Resource>, Noun>) => `${attempt.actor.name} reflected.`],
+  [ReflectUpon, did, (attempt: Attempt<Attempt<Resource, Resource>, Noun>) => `${attempt.actor.name} reflected.`],
   [
     foresee,
     (attempt: Attempt) => {
@@ -150,7 +149,7 @@ const narration = [
       return attempt.consequences.map(c => `((But ${c.foreshadow!.character.name} won't like ${stringifyAction(c.foreshadow!.news)}.))`);
     },
   ],
-  [cause, (attempt: Attempt) => `DONE: ${stringifyAttempt(attempt)}.`],
+  [cause, (attempt: Attempt) => `MOTIVATION: ${stringifyAttempt(attempt)}.`],
   [Zafra, ReceivingImportantNews, feel, (attempt: Attempt<News, ShouldBe>) => `"${stringifyAction(attempt.noun)} is bad news."`],
 ];
 

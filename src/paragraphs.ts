@@ -1,6 +1,6 @@
 import type { Attempt } from "./attempts";
 import type { ShouldBe } from "./beliefs";
-import { Character, author } from "./characters";
+import { Character, narrator } from "./characters";
 import { element, paragraph } from "./layout";
 import { ActionDefinition } from "./narrativeEngine";
 import { Topic } from "./resources";
@@ -80,14 +80,17 @@ export function stringifyAttempt(
   return stringifyAction(attempt, { withStatus: true, ...options });
 }
 
-let previousOwner: Character | Topic = author;
-let previousAction: ActionDefinition<any, any> | undefined = undefined;
+let previousOwner: Character = narrator;
+let previousAction: ActionDefinition<any, any> | Topic | undefined = undefined;
 
 export function publish(owner: typeof previousOwner, action: typeof previousAction, ...texts: any[]): void {
   console.log(...texts);
   const text = spellcheck(texts.join(" "));
   if (owner != previousOwner || action != previousAction) {
-    const container = paragraph([], { innerText: text });
+    const container = paragraph([], {
+      innerText: text,
+      "data-subject": `${owner.name || "?"} ${(action as ActionDefinition)?.verb || (action as Topic)?.topic || "?"}`,
+    });
     publishHTML(container);
     previousOwner = owner;
     previousAction = action;
@@ -106,7 +109,10 @@ export function publishStyled(
   console.log(...texts);
   const text = spellcheck(texts.join(" "));
   if (owner != previousOwner || action != previousAction) {
-    const container = paragraph([], { innerText: text });
+    const container = paragraph([], {
+      innerText: text,
+      "data-subject": `${owner.name || "?"} ${(action as ActionDefinition)?.verb || (action as Topic)?.topic || "?"}`,
+    });
     for (const [key, value] of Object.entries(style)) container.style[key as any] = value as any;
     if (style.className) container.className = style.className;
     publishHTML(container);

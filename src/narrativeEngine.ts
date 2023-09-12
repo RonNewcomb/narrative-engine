@@ -2,7 +2,7 @@ import { ReceivingImportantNews, ReflectUpon, type ActionDefinition } from "./ac
 import { debug, toAdvice } from "./advice";
 import { createAttempt, createGoal, did, didnt, trying, untried, type Attempt } from "./attempts";
 import { createBelief, initializeDesireables, type ShouldBe } from "./beliefs";
-import { author, type Character } from "./characters";
+import { narrator, type Character } from "./characters";
 import { attachMainMenu } from "./layout";
 import { console_log, stringify, stringifyAction, stringifyAttempt } from "./paragraphs";
 import { save as autosave, load } from "./persistence";
@@ -66,7 +66,8 @@ export async function narrativeEngine(
 ) {
   // sanitize setup
   for (const character of characters) if (!character.goals) character.goals = [];
-  for (const character of characters) for (const goal of character.goals!) if (!goal.actor || goal.actor == author) goal.actor = character;
+  for (const character of characters)
+    for (const goal of character.goals!) if (!goal.actor || goal.actor == narrator) goal.actor = character;
   const desireablesRecord = initializeDesireables(desireables);
   if (!notableScenes) notableScenes = [];
   for (const scene of notableScenes) Object.freeze(scene);

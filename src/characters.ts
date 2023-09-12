@@ -10,8 +10,8 @@ export interface Character extends Resource {
   playersChoice?: SolicitPlayerInput;
 }
 
-export const author: Character = {
-  name: "myself",
+export const narrator: Character = {
+  name: "narrator",
   beliefs: [],
   goals: [],
 };

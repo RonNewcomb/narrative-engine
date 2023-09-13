@@ -11,5 +11,5 @@
     //   "tslib": ["path/to/node_modules/tslib/tslib.d.ts"]
     // }
   },
-  "include": ["src/*.ts", "app/*.ts"]
+  "references": [{ "path": "../src/tsconfig.json" }]
 }

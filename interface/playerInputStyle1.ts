@@ -9,6 +9,7 @@ import {
   type Story,
 } from "../src/narrativeEngine";
 import { stringifyNoun } from "../src/paragraphs";
+import "./interface.css";
 
 interface SlideDeck {
   currentSlide: number;

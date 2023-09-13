@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "lib": ["es2017", "dom"],
+    "module": "es2015",
+    "target": "es2017",
+    "outDir": "build",
+    "strict": true,
+    "allowJs": false,
+    // "importHelpers": true,
+    // "paths": {
+    //   "tslib": ["path/to/node_modules/tslib/tslib.d.ts"]
+    // }
+    "composite": true
+  }
+}

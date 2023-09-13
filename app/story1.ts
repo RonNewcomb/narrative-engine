@@ -30,6 +30,7 @@ import {
   trying,
   weCouldTry,
 } from "../src/narrativeEngine";
+import bibliographic from "./bibliographic.json";
 
 ///////////////
 
@@ -156,14 +157,7 @@ const narration = [
 //////////////
 
 narrativeEngine(
-  {
-    title: "Untitled Story",
-    author: "Some Author",
-    language: "en",
-    headline: "An Interactive Fiction",
-    firstpublished: new Date().toISOString(),
-    description: "",
-  },
+  bibliographic,
   [Rose, Zafra],
   [Waiting, Exiting, Taking, Dropping, Locking, Unlocking, Opening, Closing, AskingFor],
   [inheritance, legitimacy, appointment, doorkey, door],

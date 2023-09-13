@@ -108,8 +108,17 @@ or, combining,
 1. "choose", choice
 1. "speak", speech
 
+### Publishing
+
+```bash
+cd publishing
+bun run publish.ts
+```
+
 ### Run
 
 `bun build ./app/story1.ts  --outfile build.js  --watch`
+
+or
 
 `tsc && rollup --file build.js build/app/story1.js `

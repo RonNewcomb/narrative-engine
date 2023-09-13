@@ -1,10 +1,11 @@
 import { getPlayerChoices } from "../interface/playerInputStyle1";
-import { Noun } from "../src/actions";
 import {
   ActionDefinition,
   Attempt,
   Character,
   Desireable,
+  News,
+  Noun,
   ReceivingImportantNews,
   ReflectUpon,
   Resource,
@@ -29,7 +30,6 @@ import {
   trying,
   weCouldTry,
 } from "../src/narrativeEngine";
-import { News } from "../src/news";
 
 ///////////////
 
@@ -156,6 +156,14 @@ const narration = [
 //////////////
 
 narrativeEngine(
+  {
+    title: "Untitled Story",
+    author: "Some Author",
+    language: "en",
+    headline: "An Interactive Fiction",
+    firstpublished: new Date().toISOString(),
+    description: "",
+  },
   [Rose, Zafra],
   [Waiting, Exiting, Taking, Dropping, Locking, Unlocking, Opening, Closing, AskingFor],
   [inheritance, legitimacy, appointment, doorkey, door],

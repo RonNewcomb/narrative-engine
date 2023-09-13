@@ -1,6 +1,8 @@
 import { button, div } from "./layout";
 import { publishHTML } from "./paragraphs";
 
+const tool = "Tin Book";
+
 export interface iFictionRecord {
   story: {
     identification: {
@@ -14,11 +16,11 @@ export interface iFictionRecord {
       headline: string;
       firstpublished: string | number;
       genre?: string;
-      group: "The Narrative Engine";
+      group?: typeof tool;
       forgiveness?: string;
       description: string;
       series?: string;
-      seriesnumber: string | number;
+      seriesnumber?: string | number;
       resources?: {
         auxiliary?: {
           leafname?: string;
@@ -37,18 +39,20 @@ export interface iFictionRecord {
       };
     };
     colophon?: {
-      generator: "The Narrative Engine";
+      generator: typeof tool;
       generatorversion: string;
       originated: string; // yyyy-mm-dd
     };
   };
 }
 
-export async function titleScreen() {
+export async function titleScreen(story: iFictionRecord["story"]["bibliographic"]) {
   return new Promise<HTMLElement>(resolve => {
-    publishHTML(div([], { innerText: "Untitled Story", className: "b" }));
-    publishHTML(div([], { innerText: `An Interactive Fiction by Story Author` }));
-    publishHTML(div([], { innerText: `Release 1 / Serial number ${new Date().toISOString().replace(/-/g, "").slice(2, 8)} / Tin Book` }));
+    publishHTML(div([], { innerText: story.title, className: "b" }));
+    publishHTML(div([], { innerText: `${story.headline} by ${story.author}` }));
+    publishHTML(
+      div([], { innerText: `Release 1 / Serial number ${story.firstpublished.toString().replace(/-/g, "").slice(2, 8)} / ${tool}` })
+    );
     publishHTML(div([], { innerText: " " }));
     publishHTML(div([], { innerText: " " }));
     const btn = button({ className: "playerChoiceButton", innerText: "Open", onclick: () => resolve(panel) });

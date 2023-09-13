@@ -110,4 +110,6 @@ or, combining,
 
 ### Run
 
+`bun build ./app/story1.ts  --outfile build.js  --watch`
+
 `tsc && rollup --file build.js build/app/story1.js `

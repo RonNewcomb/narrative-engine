@@ -1,15 +1,16 @@
-import { ReceivingImportantNews, ReflectUpon, type ActionDefinition } from "./actions";
+import { ReceivingImportantNews, ReflectUpon, type ActionDefinition, type Noun } from "./actions";
 import { debug, toAdvice } from "./advice";
 import { createAttempt, createGoal, did, didnt, trying, untried, type Attempt } from "./attempts";
 import { createBelief, initializeDesireables, type ShouldBe } from "./beliefs";
 import { narrator, type Character } from "./characters";
 import { attachMainMenu } from "./layout";
+import type { News } from "./news";
 import { console_log, stringify, stringifyAction, stringifyAttempt } from "./paragraphs";
 import { save as autosave, load } from "./persistence";
 import { weCouldTry, whatTheyAreTryingToDoNow } from "./planningTree";
 import type { Desireable, Resource } from "./resources";
 import { can, cant, cause, choose, consider, feel, flinch, foresee, move, review, speak } from "./rulebooks";
-import { SceneType, begin, createScene, end, mid, type Scene } from "./scenes";
+import { begin, createScene, end, mid, type Scene, type SceneType } from "./scenes";
 import { spelling } from "./spellcheck";
 import { playStory, type SolicitPlayerInput, type Story } from "./story";
 import { titleScreen, type iFictionRecord } from "./treatyOfBabel";
@@ -47,6 +48,8 @@ export {
   type Attempt,
   type Character,
   type Desireable,
+  type News,
+  type Noun,
   type Resource,
   type Scene,
   type SceneType,
@@ -57,6 +60,7 @@ export {
 };
 
 export async function narrativeEngine(
+  story: iFictionRecord["story"]["bibliographic"],
   characters: Character[],
   actions: ActionDefinition<any, any>[],
   desireables: Desireable[],
@@ -100,7 +104,7 @@ export async function narrativeEngine(
   attachMainMenu();
 
   // is a game already in progress?
-  if (!load()) await titleScreen();
+  if (!load()) await titleScreen(story);
 
   // GO
   const theEnd = await playStory(characters, actions, desireablesRecord, notableScenes, narrationRules, stoppingPoint, initialScene);

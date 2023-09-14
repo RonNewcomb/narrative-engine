@@ -70,8 +70,7 @@ export async function narrativeEngine(
 ) {
   // sanitize setup
   for (const character of characters) if (!character.goals) character.goals = [];
-  for (const character of characters)
-    for (const goal of character.goals!) if (!goal.actor || goal.actor == narrator) goal.actor = character;
+  for (const character of characters) for (const goal of character.goals!) if (!goal.actor || goal.actor == narrator) goal.actor = character;
   const desireablesRecord = initializeDesireables(desireables);
   if (!notableScenes) notableScenes = [];
   for (const scene of notableScenes) Object.freeze(scene);

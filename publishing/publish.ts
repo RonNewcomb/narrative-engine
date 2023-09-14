@@ -6,16 +6,12 @@ const appDir = "../app/";
 const buildDir = "../build/";
 const commonDir = "../common/";
 
-function templating(file: string, substitutions: Record<string, string | number | boolean>): string {
-  for (const [key, value] of Object.entries(substitutions)) file = file.replaceAll("${" + key + "}", value.toString());
-  return file;
-}
-
 console.log("Bun v" + Bun.version);
 readdirSync(buildDir).forEach(filename => rmSync(`${buildDir}/${filename}`));
 
-const ifid = new Date().toISOString();
 const bibliographic: iFictionRecord["story"]["bibliographic"] = await Bun.file(appDir + "bibliographic.json").json();
+const { title, author, headline, firstpublished, language, description } = bibliographic;
+const ifid = new Date().toISOString();
 
 // go
 
@@ -30,24 +26,27 @@ const css = buildResult.outputs
   .map(c => `    <link rel="stylesheet" type="text/css" href="${c.path.slice(1 + c.path.lastIndexOf("/"))}" />`);
 
 const substitutions: Record<string, string | number | boolean> = {
-  title: bibliographic.title,
-  author: bibliographic.author,
-  language: bibliographic.language || "en",
-  headline: bibliographic.headline,
-  firstpublished: bibliographic.firstpublished,
-  description: bibliographic.description,
-  ifid,
-  appName,
+  "${appName}": appName,
+  "${ifid}": ifid,
+  "${title}": title,
+  "${author}": author,
+  "${headline}": headline,
+  "${firstpublished}": firstpublished,
+  "${language}": language || "en",
+  "${description}": description || `${title}: ${headline} by ${author}`,
+  "</head>": css.join("\n") + "\n</head>",
 };
 
+function templating(file: string): string {
+  for (const [key, value] of Object.entries(substitutions)) file = file.replaceAll(key, value.toString());
+  return file;
+}
+
 let manifestJson = await Bun.file(commonDir + "template.manifest.json").text();
-manifestJson = templating(manifestJson, substitutions);
-await Bun.write(buildDir + ".webmanifest", manifestJson);
+await Bun.write(buildDir + ".webmanifest", templating(manifestJson));
 
 let indexHtml = await Bun.file(commonDir + "template.index.html").text();
-indexHtml = templating(indexHtml, substitutions);
-indexHtml = indexHtml.replace("</head>", css.join("\n") + "\n</head>");
-await Bun.write(buildDir + "index.html", indexHtml);
+await Bun.write(buildDir + "index.html", templating(indexHtml));
 
 await Bun.write(buildDir + "index.css", Bun.file(commonDir + "index.css"));
 

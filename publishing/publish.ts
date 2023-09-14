@@ -10,11 +10,11 @@ const appName = "story1";
 const appDir = "../app/";
 const buildDir = "../build/";
 const commonDir = "../common/";
-const deployDir = "/mnt/c/inetpub/wwwroot/tin/";
+const deployDir = ""; // "/mnt/c/inetpub/wwwroot/tin/";
 
 console.log("Clear build folder", buildDir);
+if (existsSync(buildDir)) rmSync(buildDir, { recursive: true, force: true });
 if (!existsSync(buildDir)) mkdirSync(buildDir);
-else readdirSync(buildDir).forEach(filename => rmSync(`${buildDir}/${filename}`));
 
 console.log("Read", appDir + "bibliographic.json");
 const about: iFictionRecord["story"]["bibliographic"] = await Bun.file(appDir + "bibliographic.json").json();
@@ -27,7 +27,7 @@ const css = buildResult.outputs
   .filter(f => f.kind == "asset" && f.path.endsWith(".css"))
   .map(c => `    <link rel="stylesheet" type="text/css" href="${c.path.slice(1 + c.path.lastIndexOf("/"))}" />`);
 
-const substitutions: Record<string, string | number | boolean> = {
+const substitutions = Object.entries(<Record<string, string | number | boolean>>{
   "${appName}": appName,
   "${ifid}": ifid,
   "${title}": about.title,
@@ -37,12 +37,10 @@ const substitutions: Record<string, string | number | boolean> = {
   "${language}": about.language || "en",
   "${description}": about.description || `${about.title}: ${about.headline} by ${about.author}`,
   "</head>": css.join("\n") + "\n</head>",
-};
+});
 
-function templating(file: string): string {
-  for (const [key, value] of Object.entries(substitutions)) file = file.replaceAll(key, value.toString());
-  return file;
-}
+const templating = (contents: string): string =>
+  substitutions.reduce((text, [key, value]) => (text = text.replaceAll(key, value.toString())), contents);
 
 console.log("Create", buildDir + "manifest.json", "from", commonDir + "template.manifest.json");
 let manifestJson = await Bun.file(commonDir + "template.manifest.json").text();
@@ -54,7 +52,6 @@ await Bun.write(buildDir + "index.html", templating(indexHtml));
 
 console.log("Copy", commonDir + "index.css", "to", buildDir + "index.css");
 copyFileSync(commonDir + "index.css", buildDir + "index.css");
-//await Bun.write(buildDir + "index.css", Bun.file(commonDir + "index.css"));
 
 console.log(" ");
 console.log(buildResult.success ? "Success." : "Problem.");

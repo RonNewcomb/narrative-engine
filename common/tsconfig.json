@@ -1,8 +1,16 @@
 {
   "compilerOptions": {
-    "lib": ["ESNext"],
+    "lib": [
+      "ESNext"
+    ],
     "module": "esnext",
     "target": "esnext",
+    "outDir": "build",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "allowJs": false,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
     "composite": true
   }
 }

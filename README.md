@@ -110,6 +110,8 @@ or, combining,
 
 ### Publishing
 
+Publishing is a special build pipeline requiring Node or Bun. It outputs to `/build` a set of files ready for a web server to serve.
+
 ```bash
 cd publishing
 bun run publish.ts
@@ -117,8 +119,10 @@ bun run publish.ts
 
 ### Run
 
+Running locally using either the Bun runner:
+
 `bun build ./app/story1.ts  --outfile build.js  --watch`
 
-or
+or just build and rollup in-place and point a browser to it:
 
 `tsc && rollup --file build.js build/app/story1.js `

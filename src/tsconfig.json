@@ -1,6 +1,9 @@
 {
   "compilerOptions": {
-    "lib": ["es2017", "dom"],
+    "lib": [
+      "es2017",
+      "dom"
+    ],
     "module": "es2015",
     "target": "es2017",
     "outDir": "build",
@@ -11,5 +14,10 @@
     //   "tslib": ["path/to/node_modules/tslib/tslib.d.ts"]
     // }
     "composite": true
-  }
+  },
+  "references": [
+    {
+      "path": "../common/tsconfig.json"
+    }
+  ]
 }

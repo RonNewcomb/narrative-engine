@@ -40,11 +40,11 @@ const substitutions: Record<string, string | number | boolean> = {
 
 let manifestJson = await Bun.file(commonDir + "/template.manifest.json").text();
 manifestJson = templating(manifestJson, substitutions);
-const manifestResult = await Bun.write(buildDir + "/.webmanifest", manifestJson);
+await Bun.write(buildDir + "/.webmanifest", manifestJson);
 
 let indexHtml = await Bun.file(commonDir + "/template.index.html").text();
 indexHtml = templating(indexHtml, substitutions);
 indexHtml = indexHtml.replace("</head>", css.join("\n") + "\n</head>");
-const indexResult = await Bun.write(buildDir + "/index.html", indexHtml);
+await Bun.write(buildDir + "/index.html", indexHtml);
 
-console.log(buildResult, manifestResult, indexResult);
+console.log(buildResult);

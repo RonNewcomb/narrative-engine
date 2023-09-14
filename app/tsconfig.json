@@ -1,15 +1,25 @@
 {
   "compilerOptions": {
-    "lib": ["es2017", "dom"],
+    "lib": [
+      "es2017",
+      "dom"
+    ],
     "module": "es2015",
+    "moduleResolution": "Bundler",
     "target": "es2017",
     "outDir": "build",
     "strict": true,
-    "allowJs": false
+    "allowJs": false,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
     // "importHelpers": true,
     // "paths": {
     //   "tslib": ["path/to/node_modules/tslib/tslib.d.ts"]
     // }
   },
-  "references": [{ "path": "../src/tsconfig.json" }]
+  "references": [
+    {
+      "path": "../src/tsconfig.json"
+    }
+  ]
 }

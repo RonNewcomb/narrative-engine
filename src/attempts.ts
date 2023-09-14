@@ -3,7 +3,7 @@ import { narrator, type Character } from "./characters";
 import { ConsequenceWithForeshadowedNewsProvingAgency } from "./consequences";
 import { weCouldTry, whatTheyAreTryingToDoNowRegarding } from "./planningTree";
 import type { Resource } from "./resources";
-import { can, cant, executeRulebook, type RuleOutcome } from "./rulebooks";
+import { can, cant, executeRulebook, type CanOrCantOrTryThese } from "./rulebooks";
 import type { Scene } from "./scenes";
 import type { Story } from "./story";
 
@@ -55,7 +55,7 @@ export function createGoal<N extends Resource, SN extends Resource>(
   return createAttempt(narrator, definition, noun, secondNoun, undefined);
 }
 
-export async function doThingAsAScene(thisAttempt: Attempt, currentScene: Scene, story: Story): Promise<RuleOutcome> {
+export async function doThingAsAScene(thisAttempt: Attempt, currentScene: Scene, story: Story): Promise<CanOrCantOrTryThese> {
   await executeRulebook(thisAttempt, currentScene, story);
 
   while (thisAttempt.status == trying) {

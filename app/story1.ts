@@ -2,6 +2,7 @@ import { getPlayerChoices } from "../interface/playerInputStyle1";
 import {
   ActionDefinition,
   Attempt,
+  CanOrCantOrTryThese,
   Character,
   Desireable,
   News,
@@ -20,9 +21,11 @@ import {
   createBelief,
   createGoal,
   did,
+  doThingAsAScene,
   feel,
   foresee,
   narrativeEngine,
+  shouldBe,
   speak,
   spelling,
   stringifyAction,
@@ -32,6 +35,11 @@ import {
 } from "../src/narrativeEngine";
 import bibliographic from "./bibliographic.json";
 
+//////////
+
+type positioning = "rock" | "paper" | "scissors" | "";
+const positions = ["rock", "paper", "scissors"];
+
 ///////////////
 
 const doorkey: Desireable = { name: "door key", isKey: true };
@@ -39,13 +47,30 @@ const door: Desireable = { name: "door", isLocked: true };
 const inheritance: Desireable = { name: "Rose's inheritance" };
 const legitimacy: Desireable = { name: "legitimacy in the eyes of the court" };
 const appointment: Desireable = { name: "to be at Harrenfall before the 12th" };
+const rook: Desireable = { name: "rook", pins: "" as positioning };
+const pawn: Desireable = { name: "pawn", at: "rock" as positioning };
 
 ////////////////
+
+const Aim: ActionDefinition<positioning> = {
+  verb: "aim _",
+  change: attempt => [["pins", rook, shouldBe, attempt.noun as positioning]],
+};
+
+const Zig: ActionDefinition = {
+  verb: "zig",
+  change: attempt => [["at", pawn, shouldBe, positions[(pawn.at + 1 + 3) % 3]]],
+};
+
+const Zag: ActionDefinition = {
+  verb: "zag",
+  change: attempt => [["at", pawn, shouldBe, positions[(pawn.at - 1 + 3) % 3]]],
+};
 
 const Exiting: ActionDefinition = {
   verb: "exit",
   can: [attempt => (!door.isLocked ? can : weCouldTry(attempt.actor, Unlocking, door, undefined, attempt))],
-  change: attempt => [["location", attempt.actor, "=", "out"]],
+  change: attempt => [["location", attempt.actor, shouldBe, "out"]],
 };
 
 const Waiting: ActionDefinition = {
@@ -54,23 +79,23 @@ const Waiting: ActionDefinition = {
 
 const Taking: ActionDefinition = {
   verb: "take _",
-  change: attempt => [["owned", attempt.noun!, "=", true]],
+  change: attempt => [["owned", attempt.noun!, shouldBe, true]],
 };
 
 const Dropping: ActionDefinition = {
   verb: "drop _",
-  change: attempt => [["owned", attempt.noun!, "=", false]],
+  change: attempt => [["owned", attempt.noun!, shouldBe, false]],
 };
 
 const Opening: ActionDefinition = {
   verb: "open _",
   can: [attempt => ((attempt.noun as any)?.isLocked ? weCouldTry(attempt.actor, Unlocking, attempt.noun, undefined, attempt) : can)],
-  change: attempt => [["isOpen", attempt.noun!, "=", true]],
+  change: attempt => [["isOpen", attempt.noun!, shouldBe, true]],
 };
 
 const Closing: ActionDefinition = {
   verb: "close _",
-  change: attempt => [["isOpen", attempt.noun!, "=", false]],
+  change: attempt => [["isOpen", attempt.noun!, shouldBe, false]],
 };
 
 const Unlocking: ActionDefinition = {
@@ -78,7 +103,7 @@ const Unlocking: ActionDefinition = {
   can: [
     // attempt => (attempt.secondNoun?.isKey ? can : weCouldTry(attempt.actor, Taking, attempt.secondNoun, undefined, attempt)),
   ],
-  change: attempt => [["isLocked", attempt.noun!, "=", false]],
+  change: attempt => [["isLocked", attempt.noun!, shouldBe, false]],
 };
 
 const Locking: ActionDefinition = {
@@ -94,7 +119,7 @@ const Locking: ActionDefinition = {
         ? can
         : weCouldTry(attempt.actor, Taking, attempt.secondNoun, undefined, attempt),
   ],
-  change: attempt => [["isLocked", attempt.noun!, "=", true]],
+  change: attempt => [["isLocked", attempt.noun!, shouldBe, true]],
 };
 
 const AskingFor: ActionDefinition = {
@@ -111,14 +136,30 @@ const Rose: Character = {
 
 const Zafra: Character = {
   name: "Zafra",
-  beliefs: [createBelief("isLocked", door, "=", true)],
+  beliefs: [createBelief("isLocked", door, shouldBe, true)],
 };
 
 ////////////
 
 const storyStart: SceneType = {
-  match: ({ actor, verb }, story) => verb == Exiting.verb && actor == Rose,
+  match: ({ actor, definition }, story) => definition == Exiting && actor == Rose,
   beginning: () => "Rose wanted to escape the confines of her birth.",
+};
+
+const zLocking: SceneType = {
+  match: ({ actor, definition }, story) => {
+    console.warn("Checking", actor, definition);
+    return definition == Locking && actor == Zafra;
+  },
+  beginning: () => "Zafra wonders how to reverse the change.",
+  middle: async (texts, attempt, story, scene) => {
+    let result: CanOrCantOrTryThese = cant;
+    while (rook.pins != pawn.at) {
+      const action = await getPlayerChoices(story, scene.viewpoint, scene);
+      if (action) result = await doThingAsAScene(action, scene, story);
+    }
+    return result;
+  },
 };
 
 ////////////
@@ -159,9 +200,9 @@ const narration = [
 narrativeEngine(
   bibliographic,
   [Rose, Zafra],
-  [Waiting, Exiting, Taking, Dropping, Locking, Unlocking, Opening, Closing, AskingFor],
+  [Waiting, Exiting, Taking, Dropping, Locking, Unlocking, Opening, Closing, AskingFor, Aim, Zig, Zag],
   [inheritance, legitimacy, appointment, doorkey, door],
   narration,
-  [storyStart],
+  [zLocking, storyStart],
   getPlayerChoices
 );

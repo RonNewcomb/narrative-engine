@@ -1,7 +1,7 @@
 import { ReceivingImportantNews, ReflectUpon, type ActionDefinition, type Noun } from "./actions";
 import { debug, toAdvice } from "./advice";
-import { createAttempt, createGoal, did, didnt, trying, untried, type Attempt } from "./attempts";
-import { createBelief, initializeDesireables, type ShouldBe } from "./beliefs";
+import { createAttempt, createGoal, did, didnt, doThingAsAScene, trying, untried, type Attempt } from "./attempts";
+import { createBelief, initializeDesireables, shouldBe, type ShouldBe } from "./beliefs";
 import { narrator, type Character } from "./characters";
 import { attachMainMenu } from "./layout";
 import type { News } from "./news";
@@ -9,7 +9,7 @@ import { console_log, stringify, stringifyAction, stringifyAttempt } from "./par
 import { save as autosave, load } from "./persistence";
 import { weCouldTry, whatTheyAreTryingToDoNow } from "./planningTree";
 import type { Desireable, Resource } from "./resources";
-import { can, cant, cause, choose, consider, feel, flinch, foresee, move, review, speak } from "./rulebooks";
+import { can, cant, cause, choose, consider, feel, flinch, foresee, move, review, speak, type CanOrCantOrTryThese } from "./rulebooks";
 import { begin, createScene, end, mid, type Scene, type SceneType } from "./scenes";
 import { spelling } from "./spellcheck";
 import { playStory, type SolicitPlayerInput, type Story } from "./story";
@@ -30,6 +30,7 @@ export {
   debug,
   did,
   didnt,
+  doThingAsAScene,
   end,
   feel,
   flinch,
@@ -37,6 +38,7 @@ export {
   mid,
   move,
   review,
+  shouldBe,
   speak,
   spelling,
   stringifyAction,
@@ -46,6 +48,7 @@ export {
   weCouldTry,
   type ActionDefinition,
   type Attempt,
+  type CanOrCantOrTryThese,
   type Character,
   type Desireable,
   type News,
@@ -70,7 +73,8 @@ export async function narrativeEngine(
 ) {
   // sanitize setup
   for (const character of characters) if (!character.goals) character.goals = [];
-  for (const character of characters) for (const goal of character.goals!) if (!goal.actor || goal.actor == narrator) goal.actor = character;
+  for (const character of characters)
+    for (const goal of character.goals!) if (!goal.actor || goal.actor == narrator) goal.actor = character;
   const desireablesRecord = initializeDesireables(desireables);
   if (!notableScenes) notableScenes = [];
   for (const scene of notableScenes) Object.freeze(scene);

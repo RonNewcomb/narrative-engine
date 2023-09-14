@@ -108,7 +108,7 @@ or, combining,
 1. "choose", choice
 1. "speak", speech
 
-### Publishing
+### Publish
 
 Publishing is a special build pipeline requiring Bun (an alternative to NodeJS). It outputs to `/build` a set of files ready for a web server to serve.
 
@@ -119,11 +119,17 @@ bun run publish.ts
 
 ### Run
 
-Running locally using either the Bun runner:
+Publish first. Running locally using either the Bun runner:
 
-`bun build ./app/story1.ts  --outfile build.js  --watch`
+```bash
+bun build ./app/story1.ts  --outfile story1.js --outdir build --watch
+```
 
-or just build and rollup in-place and point a browser to it:
+## without bun
+
+no longer works.
+
+Build and rollup in-place and point a browser to it:
 
 ```bash
 tsc -p common/tsconfig.json && tsc -p src/tsconfig.json && tsc -p app/tsconfig.json

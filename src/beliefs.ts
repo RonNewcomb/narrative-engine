@@ -2,10 +2,13 @@ import type { NewsSensitivity } from "./news";
 import type { Desireable, Resource } from "./resources";
 import type { Story } from "./story";
 
+export const shouldBe = "=";
+export const shouldBeIn = "in";
+
 export interface ShouldBe extends Resource {
   property: string;
   ofDesireable: Desireable;
-  shouldBe: "=" | "in";
+  shouldBe: typeof shouldBe | typeof shouldBeIn;
   toValue: any | any[];
   /** default to Success */
   sensitivity?: NewsSensitivity;
@@ -30,9 +33,13 @@ export function moveDesireable(
   const propName: symbol = ofDesireable[hiddenPermanentName];
   const desireable: Desireable = story.desireables[propName] || ofDesireable; // hack if you really need those symbols
   switch (shouldBe) {
-    case "=":
+    case shouldBe:
       desireable[property] = toValue;
       return;
+    // case shouldBeIn:
+    //   if (!Array.isArray(toValue)) toValue = [];
+    // if (Array.isArray(toValue) && !toValue.includes())  toValue.push(desireable[property]);
+    //   return;
     default:
       throw "Unknown operation on desireable resource " + shouldBe;
   }

@@ -4,7 +4,7 @@ import { type Character } from "./characters";
 import { paragraph } from "./layout";
 import { console_error, publish, publishHTML, stringifyAction } from "./paragraphs";
 import { type Resource } from "./resources";
-import { can, type RuleOutcome } from "./rulebooks";
+import { can, type CanOrCantOrTryThese } from "./rulebooks";
 import { type Story } from "./story";
 
 /**
@@ -36,7 +36,7 @@ export function isSceneType(obj: any): boolean {
 }
 
 export type ResultOfBeginScene = string | void;
-export type ResultOfMidScene = RuleOutcome;
+export type ResultOfMidScene = CanOrCantOrTryThese;
 export type ResultOfEndScene = Scene | void | undefined;
 
 export const defaultSceneType: SceneType = {
@@ -70,7 +70,7 @@ export const ScenePositions: readonly ScenePosition[] = [begin, mid, end] as con
 export interface Scene {
   pulse: Attempt<Resource, Resource>;
   viewpoint: Character;
-  result?: RuleOutcome;
+  result?: CanOrCantOrTryThese;
   position: ScenePosition;
 }
 // can a ShouldBe be supported, ArgMap-like, by smaller ShouldBes,
@@ -89,6 +89,7 @@ export function createScene(pulse: Attempt<Resource, Resource>, viewpoint?: Char
 export async function playScene(scene: Scene, story: Story): Promise<Scene | undefined> {
   const sceneAction = scene.pulse;
   const playbook = story.notableScenes.find(scenetype => scenetype.match(sceneAction, story));
+  if (playbook) console.warn("FOUND", playbook);
   const phase = "";
 
   scene.position = begin;

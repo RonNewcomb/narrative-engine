@@ -9,17 +9,17 @@ import type { Story } from "./story";
 
 export const can = "can";
 export const cant = "cant";
-export type RuleOutcome = undefined | false | typeof can | typeof cant | Attempt | Attempt[];
+export type CanOrCantOrTryThese = undefined | false | typeof can | typeof cant | Attempt | Attempt[];
 
 export interface Rulebooks<N extends Resource, SN extends Resource> {
-  can?: ((attempt: Attempt<N, SN>, story: Story, scene?: Scene) => RuleOutcome | Promise<RuleOutcome>)[];
+  can?: ((attempt: Attempt<N, SN>, story: Story, scene?: Scene) => CanOrCantOrTryThese | Promise<CanOrCantOrTryThese>)[];
   change?: (attempt: Attempt<N, SN>, story: Story) => ShouldBeStatement[];
 }
 
 export async function executeRulebook(attempt: Attempt, currentScene: Scene, story: Story): Promise<News> {
   const actionDefinition = attempt.definition;
   if (!actionDefinition) return createNewsItem(attempt, story);
-  let outcome: RuleOutcome = can;
+  let outcome: CanOrCantOrTryThese = can;
   if (actionDefinition.can)
     for (const rule of actionDefinition.can) {
       const ruleResult = await Promise.resolve(rule(attempt, story));

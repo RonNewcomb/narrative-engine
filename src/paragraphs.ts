@@ -89,7 +89,7 @@ export function publish(owner: typeof previousOwner, action: typeof previousActi
   if (owner != previousOwner || action != previousAction) {
     const container = paragraph([], {
       innerText: text,
-      "data-subject": `${owner.name || "?"} ${(action as ActionDefinition)?.verb || (action as Topic)?.topic || "?"}`,
+      title: `${owner.name || "?"} ${(action as ActionDefinition)?.verb || (action as Topic)?.topic || "?"}`,
     });
     publishHTML(container);
     previousOwner = owner;
@@ -111,7 +111,7 @@ export function publishStyled(
   if (owner != previousOwner || action != previousAction) {
     const container = paragraph([], {
       innerText: text,
-      "data-subject": `${owner.name || "?"} ${(action as ActionDefinition)?.verb || (action as Topic)?.topic || "?"}`,
+      title: `${owner.name || "?"} ${(action as ActionDefinition)?.verb || (action as Topic)?.topic || "?"}`,
     });
     for (const [key, value] of Object.entries(style)) container.style[key as any] = value as any;
     if (style.className) container.className = style.className;

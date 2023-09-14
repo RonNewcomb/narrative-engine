@@ -148,8 +148,23 @@ const storyStart: SceneType = {
 
 const zLocking: SceneType = {
   match: ({ actor, definition }, story) => {
-    console.warn("Checking", actor, definition);
     return definition == Locking && actor == Zafra;
+  },
+  beginning: () => "Zafra wonders how to reverse the change.",
+  middle: async (texts, attempt, story, scene) => {
+    let result: CanOrCantOrTryThese = cant;
+    while (rook.pins != pawn.at) {
+      const action = await getPlayerChoices(story, scene.viewpoint, scene);
+      if (action) result = await doThingAsAScene(action, scene, story);
+    }
+    return result;
+  },
+};
+
+const weakDoor: SceneType = {
+  match: ({ actor, definition, noun: news, secondNoun: belief }, story) => {
+    console.warn("Checking", actor, definition);
+    return definition == ReceivingImportantNews && actor == Zafra && (belief as ShouldBe).ofDesireable == door;
   },
   beginning: () => "Zafra wonders how to reverse the change.",
   middle: async (texts, attempt, story, scene) => {
@@ -179,17 +194,14 @@ const narration = [
     consider,
     (attempt: Attempt) => {
       const nextSteps = attempt.fullfilledBy.map(x => stringifyAction(x, { ing: true, omitActor: true })).join(", or ");
-      if (nextSteps) return `${attempt.actor.name} could try ${nextSteps}.`;
-      else return "";
+      return nextSteps ? `${attempt.actor.name} could try ${nextSteps}.` : "";
     },
   ],
   [ReflectUpon, did, (attempt: Attempt<Attempt<Resource, Resource>, Noun>) => `${attempt.actor.name} reflected.`],
   [
     foresee,
-    (attempt: Attempt) => {
-      if (!attempt.consequences) return "";
-      return attempt.consequences.map(c => `((But ${c.foreshadow!.character.name} won't like ${stringifyAction(c.foreshadow!.news)}.))`);
-    },
+    ({ consequences }: Attempt) =>
+      consequences?.map(c => `((But ${c.foreshadow!.character.name} won't like ${stringifyAction(c.foreshadow!.news)}.))`) || "",
   ],
   [cause, (attempt: Attempt) => `MOTIVATION: ${stringifyAttempt(attempt)}.`],
   [Zafra, ReceivingImportantNews, feel, (attempt: Attempt<News, ShouldBe>) => `"${stringifyAction(attempt.noun)} is bad news."`],
@@ -203,6 +215,6 @@ narrativeEngine(
   [Waiting, Exiting, Taking, Dropping, Locking, Unlocking, Opening, Closing, AskingFor, Aim, Zig, Zag],
   [inheritance, legitimacy, appointment, doorkey, door],
   narration,
-  [zLocking, storyStart],
+  [zLocking, storyStart, weakDoor],
   getPlayerChoices
 );

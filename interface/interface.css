@@ -1,6 +1,7 @@
 .playerChoices {
   margin: auto;
   margin-bottom: 1.5em;
+  margin-top: 0.5em;
   width: calc(100% - 4em);
   padding: 1em;
   background-color: wheat;

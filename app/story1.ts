@@ -2,10 +2,10 @@ import { getPlayerChoices } from "../interface/playerInputStyle1";
 import {
   ActionDefinition,
   Attempt,
-  Noun,
   Character,
   Desireable,
   News,
+  Noun,
   ReceivingImportantNews,
   ReflectUpon,
   Resource,

@@ -18,7 +18,7 @@ Is there pleasure in having an effect on people? Maybe "actions" based on how it
 
 ## Install and Run
 
-With typescript and rollup both installed globally `npm i rollup --global` and `npm install tslib --global` issue the commands:
+With typescript and rollup both installed globally `npm i rollup --global` and `npm i --global @rollup/plugin-json` and `npm install tslib --global` issue the commands:
 
 `tsc && rollup --file build.js build/app/story1.js `
 
@@ -110,7 +110,7 @@ or, combining,
 
 ### Publishing
 
-Publishing is a special build pipeline requiring Node or Bun. It outputs to `/build` a set of files ready for a web server to serve.
+Publishing is a special build pipeline requiring Bun (an alternative to NodeJS). It outputs to `/build` a set of files ready for a web server to serve.
 
 ```bash
 cd publishing
@@ -125,4 +125,7 @@ Running locally using either the Bun runner:
 
 or just build and rollup in-place and point a browser to it:
 
-`tsc && rollup --file build.js build/app/story1.js `
+```bash
+tsc -p common/tsconfig.json && tsc -p src/tsconfig.json && tsc -p app/tsconfig.json
+rollup --file build/build.js build/app/story1.js  --plugin json
+```

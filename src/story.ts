@@ -37,7 +37,7 @@ export async function playStory(
   const story: Story = { characters, actionset, desireables, getPlayerInput, notableScenes, narrationRules, sceneStack: [], history: [] };
   if (firstScene) createSceneSet(story, { choice: "ally", scene: firstScene });
 
-  let turn = 0;
+  let sceneCount = 0;
 
   let suggestedNextScene: Scene | undefined;
   for (let currentScene = firstScene; currentScene; currentScene = getNextScene(story, suggestedNextScene)) {
@@ -45,10 +45,13 @@ export async function playStory(
     suggestedNextScene = await playScene(currentScene, story);
 
     //console_log(stringify(characters));
-    if (turn++ > 7) break;
+    if (sceneCount++ > 7) {
+      publish(narrator, undefined, "TIME OVER.");
+      break;
+    }
   }
 
-  publish(narrator, undefined, "THE END");
+  publish(narrator, undefined, "END.");
   //console_log(stringify(story.sceneStack));
   return story;
 }

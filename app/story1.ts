@@ -55,19 +55,19 @@ const pawn: Desireable = { name: "pawn", at: "rock" as positioning };
 ////////////////
 
 const Aim: ActionDefinition<positioning> = {
-  verb: "aim _",
+  verb: "aim at _",
   options1: positions,
   change: attempt => [["pins", rook, shouldBe, attempt.noun]],
 };
 
 const Zig: ActionDefinition = {
   verb: "zig",
-  change: attempt => [["at", pawn, shouldBe, positions[(pawn.at + 1 + 3) % 3]]],
+  change: attempt => [["at", pawn, shouldBe, pawn.at == "rock" ? "paper" : "scissors"]],
 };
 
 const Zag: ActionDefinition = {
   verb: "zag",
-  change: attempt => [["at", pawn, shouldBe, positions[(pawn.at - 1 + 3) % 3]]],
+  change: attempt => [["at", pawn, shouldBe, pawn.at == "rock" ? "scissors" : "paper"]],
 };
 
 const Exiting: ActionDefinition = {
@@ -189,10 +189,8 @@ const zLocking: SceneType = {
 };
 
 const weakDoor: SceneType = {
-  match: ({ actor, definition, noun: news, secondNoun: belief }, story) => {
-    console.warn("Checking", actor, definition);
-    return definition == ReceivingImportantNews && actor == Zafra && (belief as ShouldBe).ofDesireable == door;
-  },
+  match: ({ actor, definition, noun: news, secondNoun: belief }, story) =>
+    definition == ReceivingImportantNews && actor == Zafra && (belief as ShouldBe).ofDesireable == door,
   beginning: () => "Zafra wonders how to reverse the change.",
   middle: async (texts, attempt, story, scene) => {
     let result: CanOrCantOrTryThese = cant;

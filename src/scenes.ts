@@ -89,7 +89,7 @@ export function createScene(pulse: Attempt<Resource, Resource>, viewpoint?: Char
 export async function playScene(scene: Scene, story: Story): Promise<Scene | undefined> {
   const sceneAction = scene.pulse;
   const playbook = story.notableScenes.find(scenetype => scenetype.match(sceneAction, story));
-  if (playbook) console.warn("FOUND", playbook);
+  // if (playbook) console.warn("FOUND", playbook);
   const phase = "";
 
   scene.position = begin;

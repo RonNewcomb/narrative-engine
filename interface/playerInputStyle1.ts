@@ -36,7 +36,7 @@ export async function getPlayerChoices(
 ): Promise<Attempt | undefined> {
   return new Promise(awaited => {
     // pre-existing wrapper
-    const published = document.getElementById("published")!;
+    const choicesLandingSpot = document.getElementById("choices")!;
 
     async function whenFinished(slides: SlideDeck) {
       // returns to the story
@@ -59,7 +59,7 @@ export async function getPlayerChoices(
       await new Promise(r => setTimeout(r, 200)); // match transition time in interface.CSS, .playerChoices, transition
 
       // closes the choiceBox
-      published.removeChild(slides.container);
+      choicesLandingSpot.removeChild(slides.container);
     }
 
     const setSlide = (slides: SlideDeck) => {
@@ -105,7 +105,7 @@ export async function getPlayerChoices(
       context: { viewpointCharacter, scene },
       answers: { action: undefined, nouns: [] },
     };
-    published.appendChild(slides.container);
+    choicesLandingSpot.appendChild(slides.container);
     slides.container.appendChild(slides.title);
     slides.container.appendChild(slides.slidingWindow);
     slides.slidingWindow.appendChild(div([], { className: "slidepanel" }));

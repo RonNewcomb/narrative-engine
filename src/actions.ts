@@ -12,6 +12,8 @@ export type Noun = Desireable | Character; // Resource? ShouldBe? must have a .n
 
 export interface ActionDefinition<N extends Resource = Noun, SN extends Resource = Noun> extends Rulebooks<N, SN> {
   verb: Verb;
+  options1?: string[];
+  options2?: string[];
 }
 
 export function isActionDefinition(obj: any): boolean {

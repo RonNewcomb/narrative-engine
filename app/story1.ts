@@ -21,10 +21,12 @@ import {
   createBelief,
   createGoal,
   did,
+  didnt,
   doThingAsAScene,
   feel,
   foresee,
   narrativeEngine,
+  publishStyled,
   shouldBe,
   speak,
   spelling,
@@ -54,7 +56,8 @@ const pawn: Desireable = { name: "pawn", at: "rock" as positioning };
 
 const Aim: ActionDefinition<positioning> = {
   verb: "aim _",
-  change: attempt => [["pins", rook, shouldBe, attempt.noun as positioning]],
+  options1: positions,
+  change: attempt => [["pins", rook, shouldBe, attempt.noun]],
 };
 
 const Zig: ActionDefinition = {
@@ -77,14 +80,20 @@ const Waiting: ActionDefinition = {
   verb: "wait",
 };
 
-const Taking: ActionDefinition = {
+const Taking: ActionDefinition<Desireable> = {
   verb: "take _",
-  change: attempt => [["owned", attempt.noun!, shouldBe, true]],
+  change: attempt => [
+    ["owned", attempt.noun!, shouldBe, true],
+    ["owner", attempt.noun!, shouldBe, attempt.actor],
+  ],
 };
 
 const Dropping: ActionDefinition = {
   verb: "drop _",
-  change: attempt => [["owned", attempt.noun!, shouldBe, false]],
+  change: attempt => [
+    ["owned", attempt.noun!, shouldBe, false],
+    ["owner", attempt.noun!, shouldBe, undefined],
+  ],
 };
 
 const Opening: ActionDefinition = {
@@ -106,7 +115,7 @@ const Unlocking: ActionDefinition = {
   change: attempt => [["isLocked", attempt.noun!, shouldBe, false]],
 };
 
-const Locking: ActionDefinition = {
+const Locking: ActionDefinition<Desireable, Desireable> = {
   verb: "lock _ with _",
   can: [
     // // second noun must be key
@@ -146,6 +155,21 @@ const storyStart: SceneType = {
   beginning: () => "Rose wanted to escape the confines of her birth.",
 };
 
+const otherRose: SceneType = {
+  match: ({ actor, definition }, story) => actor == Rose,
+  middle: async (texts, attempt, story, scene) => {
+    let result: CanOrCantOrTryThese = cant;
+
+    const action = await getPlayerChoices(story, scene.viewpoint, scene);
+    if (action) {
+      if (action) publishStyled(action.actor, action?.definition, { className: "b" }, stringifyAction(action) + ".");
+      result = await doThingAsAScene(action, scene, story);
+    }
+
+    return result;
+  },
+};
+
 const zLocking: SceneType = {
   match: ({ actor, definition }, story) => {
     return definition == Locking && actor == Zafra;
@@ -155,7 +179,10 @@ const zLocking: SceneType = {
     let result: CanOrCantOrTryThese = cant;
     while (rook.pins != pawn.at) {
       const action = await getPlayerChoices(story, scene.viewpoint, scene);
-      if (action) result = await doThingAsAScene(action, scene, story);
+      if (action) {
+        if (action) publishStyled(action.actor, action?.definition, { className: "b" }, stringifyAction(action) + ".");
+        result = await doThingAsAScene(action, scene, story);
+      }
     }
     return result;
   },
@@ -171,7 +198,10 @@ const weakDoor: SceneType = {
     let result: CanOrCantOrTryThese = cant;
     while (rook.pins != pawn.at) {
       const action = await getPlayerChoices(story, scene.viewpoint, scene);
-      if (action) result = await doThingAsAScene(action, scene, story);
+      if (action) {
+        if (action) publishStyled(action.actor, action?.definition, { className: "b" }, stringifyAction(action) + ".");
+        result = await doThingAsAScene(action, scene, story);
+      }
     }
     return result;
   },
@@ -179,7 +209,7 @@ const weakDoor: SceneType = {
 
 ////////////
 
-spelling({ the: ["teh", "hte"], receiving: "receiveing" });
+spelling({ the: ["teh", "hte"], receiving: "receiveing", taking: "takeing" });
 
 ///////
 
@@ -205,6 +235,8 @@ const narration = [
   ],
   [cause, (attempt: Attempt) => `MOTIVATION: ${stringifyAttempt(attempt)}.`],
   [Zafra, ReceivingImportantNews, feel, (attempt: Attempt<News, ShouldBe>) => `"${stringifyAction(attempt.noun)} is bad news."`],
+  [Taking, did, (attempt: Attempt<Desireable>) => `${attempt.actor.name} took ${attempt.noun!.name}. `],
+  [Taking, didnt, (attempt: Attempt<Desireable>) => `${attempt.actor.name} couldn't get ${attempt.noun!.name}. `],
 ];
 
 //////////////
@@ -215,6 +247,6 @@ narrativeEngine(
   [Waiting, Exiting, Taking, Dropping, Locking, Unlocking, Opening, Closing, AskingFor, Aim, Zig, Zag],
   [inheritance, legitimacy, appointment, doorkey, door],
   narration,
-  [zLocking, storyStart, weakDoor],
+  [zLocking, storyStart, weakDoor, otherRose],
   getPlayerChoices
 );

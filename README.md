@@ -96,17 +96,26 @@ or,
 1. anticipation of what follows from those options
 1. choice
 
-or, combining,
+so maybe,
 
-1. motivating factor
+1. "cause", motivating factor
 1. "feel", involuntary subconscious response
 1. "flinch", involuntary body language
 1. "move", conscious body language
+1. "exclaim", semiconscious speech?
 1. "review", review what happened, reasoning out why,
 1. "consider", consider options available
 1. "foresee", anticipation of what follows from those options
 1. "choose", choice
 1. "speak", speech
+
+## Devlog
+
+1. had an infinite loop because the action that was supposed to solve a failing action didn't actually solve the issue. (Property `owned` vs `owner` mismatch.)
+
+So, I need infinite loop protection and some kind of typing to make the error impossible. And a method to hunt down such problems that doesn't involve tracing the library.
+
+## How to Run
 
 ### Publish
 

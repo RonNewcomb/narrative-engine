@@ -83,21 +83,24 @@ export function stringifyAttempt(
 let previousOwner: Character = narrator;
 let previousAction: ActionDefinition<any, any> | Topic | undefined = undefined;
 
-export function publish(owner: typeof previousOwner, action: typeof previousAction, ...texts: any[]): void {
-  console.log(...texts);
-  const text = spellcheck(texts.join(" "));
+export function newParagraphIfNecessary(owner: typeof previousOwner, action: typeof previousAction): void {
   if (owner != previousOwner || action != previousAction) {
     const container = paragraph([], {
-      innerText: text,
       title: `${owner.name || "?"} ${(action as ActionDefinition)?.verb || (action as Topic)?.topic || "?"}`,
     });
     publishHTML(container);
     previousOwner = owner;
     previousAction = action;
-  } else {
-    const container = document.getElementById("published")!.lastElementChild as HTMLElement;
-    container.innerText += "  " + text;
   }
+}
+
+export function publish(owner: typeof previousOwner, action: typeof previousAction, ...texts: any[]): void {
+  console.log(...texts);
+  const text = spellcheck(texts.join(" "));
+  newParagraphIfNecessary(owner, action);
+
+  const mostRecentParagraph = document.getElementById("published")!.lastElementChild as HTMLElement;
+  mostRecentParagraph.innerHTML += text + "  ";
 }
 
 export function publishStyled(
@@ -108,25 +111,14 @@ export function publishStyled(
 ): void {
   console.log(...texts);
   const text = spellcheck(texts.join(" "));
-  if (owner != previousOwner || action != previousAction) {
-    const container = paragraph([], {
-      innerText: text,
-      title: `${owner.name || "?"} ${(action as ActionDefinition)?.verb || (action as Topic)?.topic || "?"}`,
-    });
-    for (const [key, value] of Object.entries(style)) container.style[key as any] = value as any;
-    if (style.className) container.className = style.className;
-    publishHTML(container);
-    previousOwner = owner;
-    previousAction = action;
-  } else {
-    const styledcontainer = element<HTMLSpanElement>("span", { innerText: text });
-    for (const [key, value] of Object.entries(style)) styledcontainer.style[key as any] = value as any;
-    if (style.className) styledcontainer.className = style.className;
+  newParagraphIfNecessary(owner, action);
 
-    const container = document.getElementById("published")!.lastElementChild as HTMLElement;
-    container.innerText += "  "; // TODO this is broke when we append AFTER some styledcontainer stuff
-    container.appendChild(styledcontainer);
-  }
+  const styledSpan = element<HTMLSpanElement>("span", { innerText: text + "  " });
+  for (const [key, value] of Object.entries(style)) styledSpan.style[key as any] = value as any;
+  if (style.className) styledSpan.className = style.className;
+
+  const mostRecentParagraph = document.getElementById("published")!.lastElementChild as HTMLElement;
+  mostRecentParagraph.appendChild(styledSpan);
 }
 
 export function publishHTML(element: HTMLElement): void {

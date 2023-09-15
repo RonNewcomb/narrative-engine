@@ -5,8 +5,8 @@ import { createBelief, initializeDesireables, shouldBe, type ShouldBe } from "./
 import { narrator, type Character } from "./characters";
 import { attachMainMenu } from "./layout";
 import type { News } from "./news";
-import { console_log, stringify, stringifyAction, stringifyAttempt } from "./paragraphs";
-import { save as autosave, load } from "./persistence";
+import { console_log, publishStyled, stringify, stringifyAction, stringifyAttempt } from "./paragraphs";
+import { load, save } from "./persistence";
 import { weCouldTry, whatTheyAreTryingToDoNow } from "./planningTree";
 import type { Desireable, Resource } from "./resources";
 import { can, cant, cause, choose, consider, feel, flinch, foresee, move, review, speak, type CanOrCantOrTryThese } from "./rulebooks";
@@ -37,10 +37,12 @@ export {
   foresee,
   mid,
   move,
+  publishStyled,
   review,
   shouldBe,
   speak,
   spelling,
+  stringify,
   stringifyAction,
   stringifyAttempt,
   trying,
@@ -99,8 +101,10 @@ export async function narrativeEngine(
 
   const narrationRules = toAdvice(narrativeAdvices);
   const stoppingPoint: SolicitPlayerInput = async (...rest: Parameters<SolicitPlayerInput>): ReturnType<SolicitPlayerInput> => {
-    autosave();
-    return getPlayerInput ? getPlayerInput(...rest) : undefined;
+    save();
+    const turn0 = getPlayerInput ? await getPlayerInput(...rest) : undefined;
+    if (turn0) publishStyled(turn0.actor, turn0?.definition, { className: "b" }, stringifyAction(turn0) + ".");
+    return turn0;
   };
   const initialScene: Scene = initialScenes[0];
 

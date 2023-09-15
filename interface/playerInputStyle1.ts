@@ -142,6 +142,23 @@ function createNounPanel(slides: SlideDeck, story: Story, nth: number, next: (sl
   slides.title.innerText = slides.context.viewpointCharacter.name + " will " + verb;
 
   const container = element<HTMLDivElement>("nav", { className: "slidepanel" });
+
+  const explicitOptions = nth == 0 ? slides.answers.action!.options1 : slides.answers.action!.options2;
+  if (explicitOptions && explicitOptions.length) {
+    for (const option of explicitOptions) {
+      const button = element<HTMLButtonElement>("button", {
+        type: "button",
+        innerText: option,
+        onclick: () => {
+          slides.answers.nouns[nth] = option;
+          next(slides);
+        },
+      });
+      container.appendChild(button);
+    }
+    return container;
+  }
+
   for (const character of story.characters) {
     const button = element<HTMLButtonElement>("button", {
       type: "button",

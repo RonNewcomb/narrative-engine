@@ -4,7 +4,7 @@ import type { Attempt } from "./attempts";
 import { narrator, type Character } from "./characters";
 import { createSceneSet, type ChoiceConsequenceClosure } from "./consequences";
 import type { News } from "./news";
-import { publish, publishStyled, stringifyAction } from "./paragraphs";
+import { publish } from "./paragraphs";
 import type { Desireable } from "./resources";
 import { getNextScene, playScene, type Scene, type SceneType } from "./scenes";
 
@@ -43,11 +43,6 @@ export async function playStory(
   for (let currentScene = firstScene; currentScene; currentScene = getNextScene(story, suggestedNextScene)) {
     // characters act // creates scene types of Action
     suggestedNextScene = await playScene(currentScene, story);
-
-    // debugging input
-    const turn0 = await getPlayerInput(story, firstScene!.viewpoint, firstScene);
-    publishStyled(narrator, turn0?.definition, { className: "b" }, stringifyAction(turn0) + ".");
-    // ////
 
     //console_log(stringify(characters));
     if (turn++ > 7) break;

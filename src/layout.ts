@@ -34,24 +34,28 @@ document.head.appendChild(element<HTMLStyleElement>("style", { id: "debug-style"
   (e?.target as any)?.scrollIntoViewIfNeeded();
 };
 
-export function attachMainMenu() {
-  const getFlyout = () => document.getElementsByClassName("overlay")[0] as HTMLDivElement;
+export function clickTo(id: string, handler: (this: GlobalEventHandlers, ev: MouseEvent) => any) {
+  const el = document.getElementById(id);
+  if (el) el.onclick = handler;
+}
+
+export function hydrateMainMenu() {
   const showFlyout = (e: MouseEvent) => {
     e.stopPropagation();
-    getFlyout().style.display = "block";
+    document.getElementById("main-menu-overlay")!.style.display = "block";
   };
   const hideFlyout = (e: MouseEvent) => {
     e.stopPropagation();
-    getFlyout().style.display = "none";
+    document.getElementById("main-menu-overlay")!.style.display = "none";
   };
-  document.getElementById("open-main-menu-btn")!.onclick = showFlyout;
-  document.getElementById("main-menu-flyout")!.onclick = hideFlyout;
-  document.getElementById("main-menu-overlay")!.onclick = hideFlyout;
-  document.getElementById("undo-btn")!.onclick = () => confirm("Are you sure you wish to undo?");
-  document.getElementById("sync-btn")!.onclick = () => {};
-  document.getElementById("restart-btn")!.onclick = () => {
+  clickTo("open-main-menu-btn", showFlyout);
+  clickTo("main-menu-flyout", hideFlyout);
+  clickTo("main-menu-overlay", hideFlyout);
+  clickTo("undo-btn", () => confirm("Are you sure you wish to undo?"));
+  clickTo("sync-btn", () => {});
+  clickTo("restart-btn", () => {
     if (!confirm("Are you sure you wish to restart?")) return;
     restart();
     window.location.reload();
-  };
+  });
 }

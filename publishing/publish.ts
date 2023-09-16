@@ -1,16 +1,35 @@
 import { copyFileSync, existsSync, mkdirSync, readdirSync, rmSync } from "node:fs";
 import type { iFictionRecord } from "../common/iFictionRecord";
+import { exit } from "node:process";
 
 /**
  * To install dependencies,  bun install
- * To run: bun run publish.ts
+ * To run,                   bun publish.ts
  */
 
-const appName = "story1";
-const appDir = "../app/";
-const buildDir = "../build/";
-const commonDir = "../common/";
-const deployDir = ""; // "/mnt/c/inetpub/wwwroot/tin/";
+const argTypes: Record<string, string> = {
+  "-n": "name",
+  "-a": "appDir",
+  "-b": "buildDir",
+  "-c": "commonDir",
+  "-d": "deployDir",
+};
+
+const parsedargs: Record<string, string | undefined> = {};
+for (let args = Bun.argv.slice(2); args.length; true) {
+  const paramSwitch = argTypes[args.shift() || ""];
+  if (!paramSwitch) {
+    console.log(JSON.stringify(argTypes, undefined, 2));
+    exit(1);
+  }
+  parsedargs[paramSwitch] = args.shift();
+}
+
+const appName = parsedargs.name || "story1";
+const appDir = parsedargs.appDir || "../app/";
+const buildDir = parsedargs.buildDir || "../build/";
+const commonDir = parsedargs.commonDir || "../common/";
+const deployDir = parsedargs.deployDir || ""; // "/mnt/c/inetpub/wwwroot/tin/";
 
 console.log("Clear build folder", buildDir);
 if (existsSync(buildDir)) rmSync(buildDir, { recursive: true, force: true });
@@ -25,7 +44,7 @@ const buildResult = await Bun.build({ entrypoints: [appDir + appName + ".ts"], o
 
 const css = buildResult.outputs
   .filter(f => f.kind == "asset" && f.path.endsWith(".css"))
-  .map(c => `    <link rel="stylesheet" type="text/css" href="${c.path.slice(1 + c.path.lastIndexOf("/"))}" />`);
+  .map(c => `    <link rel="stylesheet" href="${c.path.slice(1 + c.path.lastIndexOf("/"))}" />`);
 
 const substitutions = Object.entries(<Record<string, string | number | boolean>>{
   "${appName}": appName,
@@ -39,8 +58,7 @@ const substitutions = Object.entries(<Record<string, string | number | boolean>>
   "</head>": css.join("\n") + "\n</head>",
 });
 
-const templating = (contents: string): string =>
-  substitutions.reduce((text, [key, value]) => (text = text.replaceAll(key, value.toString())), contents);
+const templating = (contents: string): string => substitutions.reduce((text, [key, value]) => (text = text.replaceAll(key, value.toString())), contents);
 
 console.log("Create", buildDir + "manifest.json", "from", commonDir + "template.manifest.json");
 let manifestJson = await Bun.file(commonDir + "template.manifest.json").text();

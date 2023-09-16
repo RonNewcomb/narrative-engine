@@ -3,7 +3,7 @@ import { debug, toAdvice } from "./advice";
 import { createAttempt, createGoal, did, didnt, doThingAsAScene, trying, untried, type Attempt } from "./attempts";
 import { createBelief, initializeDesireables, shouldBe, type ShouldBe } from "./beliefs";
 import { narrator, type Character } from "./characters";
-import { attachMainMenu } from "./layout";
+import { hydrateMainMenu } from "./layout";
 import type { News } from "./news";
 import { console_log, publishStyled, stringify, stringifyAction, stringifyAttempt } from "./paragraphs";
 import { load, save } from "./persistence";
@@ -75,8 +75,7 @@ export async function narrativeEngine(
 ) {
   // sanitize setup
   for (const character of characters) if (!character.goals) character.goals = [];
-  for (const character of characters)
-    for (const goal of character.goals!) if (!goal.actor || goal.actor == narrator) goal.actor = character;
+  for (const character of characters) for (const goal of character.goals!) if (!goal.actor || goal.actor == narrator) goal.actor = character;
   const desireablesRecord = initializeDesireables(desireables);
   if (!notableScenes) notableScenes = [];
   for (const scene of notableScenes) Object.freeze(scene);
@@ -108,7 +107,7 @@ export async function narrativeEngine(
   };
   const initialScene: Scene = initialScenes[0];
 
-  attachMainMenu();
+  hydrateMainMenu();
 
   // is a game already in progress?
   if (!load()) await titleScreen(story);

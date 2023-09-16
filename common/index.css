@@ -60,7 +60,7 @@ p {
   content: "~  ~  ~";
 }
 
-.mainmenuicon {
+#open-main-menu-btn {
   height: 40px;
   width: 40px;
   background-color: wheat;
@@ -75,7 +75,7 @@ p {
   padding: 0 0 11px 4px;
 }
 
-.overlay {
+#main-menu-overlay {
   position: fixed;
   top: 0;
   bottom: 0;
@@ -87,7 +87,7 @@ p {
   background-color: rgba(0, 0, 0, 0.3);
 }
 
-.mainmenuflyout {
+#main-menu-flyout {
   position: fixed;
   overflow: auto;
   display: flex;

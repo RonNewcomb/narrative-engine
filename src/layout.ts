@@ -12,10 +12,7 @@ export function div(children?: HTMLElement[], attrs?: Attributes<HTMLDivElement>
   return element("div", attrs, children) as HTMLDivElement;
 }
 
-export function paragraph(
-  children?: HTMLElement[],
-  attrs?: Attributes<HTMLParagraphElement> & { "data-subject"?: string }
-): HTMLParagraphElement {
+export function paragraph(children?: HTMLElement[], attrs?: Attributes<HTMLParagraphElement>): HTMLParagraphElement {
   return element("p", attrs, children) as HTMLParagraphElement;
 }
 
@@ -27,49 +24,34 @@ export function element<T extends HTMLElement>(tagName: string, attrs?: Attribut
   return el;
 }
 
-let debugMode = false;
-function toggleDebug(e?: Event) {
-  if (debugMode) document.querySelectorAll(".hidedebug").forEach(el => (el.className = "showdebug"));
-  else document.querySelectorAll(".showdebug").forEach(el => (el.className = "hidedebug"));
-  debugMode = !debugMode;
+const debugOn = ".debug { display: block; }";
+const debugOff = ".debug { display: none; }";
+let isDebugOn = false;
+document.head.appendChild(element<HTMLStyleElement>("style", { id: "debug-style", innerText: debugOff }));
+(window as any).toggleDebug = (e?: Event) => {
+  isDebugOn = !isDebugOn;
+  document.getElementById("debug-style")!.innerText = isDebugOn ? debugOn : debugOff;
   (e?.target as any)?.scrollIntoViewIfNeeded();
-}
-toggleDebug();
-toggleDebug();
-(window as any).toggleDebug = toggleDebug;
-
-const mainMenuItems: HTMLButtonElement[] = [
-  button({ className: "mainMenuButton", innerText: "Undo", onclick: () => confirm("Are you sure you wish to undo?") }),
-  button({
-    className: "mainMenuButton",
-    innerText: "Restart",
-    onclick: () => {
-      if (!confirm("Are you sure you wish to restart?")) return;
-      restart();
-      window.location.reload();
-    },
-  }),
-  button({ className: "mainMenuButton", innerText: "Sync with Cloud..." }),
-];
-
-const getFlyout = () => document.getElementsByClassName("overlay")[0] as HTMLDivElement;
-const showFlyout = (e: MouseEvent) => {
-  e.stopPropagation();
-  getFlyout().style.display = "block";
-};
-const hideFlyout = (e: MouseEvent) => {
-  e.stopPropagation();
-  getFlyout().style.display = "none";
 };
 
 export function attachMainMenu() {
-  const mainmenuicon = button({ className: "mainmenuicon", innerText: "...", onclick: showFlyout });
-  const mainmenuflyout = element<HTMLDivElement>(
-    "nav",
-    { className: "mainmenuflyout", role: "dialog", ariaModal: "true", onclick: hideFlyout },
-    mainMenuItems
-  );
-  const overlay = div([mainmenuflyout], { className: "overlay", onclick: hideFlyout });
-  const cornerMenu = element<HTMLDivElement>("aside", { id: "cornerMenu" }, [mainmenuicon, overlay]);
-  document.body.insertBefore(cornerMenu, document.body.firstChild);
+  const getFlyout = () => document.getElementsByClassName("overlay")[0] as HTMLDivElement;
+  const showFlyout = (e: MouseEvent) => {
+    e.stopPropagation();
+    getFlyout().style.display = "block";
+  };
+  const hideFlyout = (e: MouseEvent) => {
+    e.stopPropagation();
+    getFlyout().style.display = "none";
+  };
+  document.getElementById("open-main-menu-btn")!.onclick = showFlyout;
+  document.getElementById("main-menu-flyout")!.onclick = hideFlyout;
+  document.getElementById("main-menu-overlay")!.onclick = hideFlyout;
+  document.getElementById("undo-btn")!.onclick = () => confirm("Are you sure you wish to undo?");
+  document.getElementById("sync-btn")!.onclick = () => {};
+  document.getElementById("restart-btn")!.onclick = () => {
+    if (!confirm("Are you sure you wish to restart?")) return;
+    restart();
+    window.location.reload();
+  };
 }

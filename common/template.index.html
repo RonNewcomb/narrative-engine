@@ -1,19 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
+  <head>
     <meta charset="utf-8" />
     <title>${title}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta property="ifiction:ifid" content="${ifid}" prefix="ifiction: http://babel.ifarchive.org/protocol/iFiction/" />
     <link rel="manifest" href="manifest.json" />
     <link rel="stylesheet" type="text/css" href="index.css" />
-</head>
+  </head>
 
-<body>
+  <body>
+    <aside id="cornerMenu">
+      <button class="mainmenuicon" id="open-main-menu-btn" type="button">...</button>
+      <div class="overlay" id="main-menu-overlay">
+        <nav class="mainmenuflyout" id="main-menu-flyout" role="dialog" aria-modal="true">
+          <button class="mainMenuButton" id="undo-btn" type="button">Undo</button>
+          <button class="mainMenuButton" id="restart-btn" type="button">Restart</button>
+          <button class="mainMenuButton" id="sync-btn" type="button">Sync with Cloud...</button>
+        </nav>
+      </div>
+    </aside>
     <main id="published"></main>
     <nav id="choices"></nav>
     <script src="./${appName}.js"></script>
-</body>
-
+  </body>
 </html>

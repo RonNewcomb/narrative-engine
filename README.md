@@ -115,6 +115,8 @@ so maybe,
 
 So, I need infinite loop protection and some kind of typing to make the error impossible. And a method to hunt down such problems that doesn't involve tracing the library.
 
+1. moved most of main menu to index.html
+
 ## How to Run
 
 ### Publish

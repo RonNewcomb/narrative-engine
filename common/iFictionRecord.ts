@@ -1,4 +1,4 @@
-export const AuthoringTool = "Tin Book";
+export const AuthoringTool = "Fireside";
 
 export interface iFictionRecord {
   story: {

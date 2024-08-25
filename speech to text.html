@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Voice to Text</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="manifest" href="manifest.json" />
+</head>
+<body>
+    <button id="startButton">Start Voice Input</button>
+   <button  onclick="onShare()">Share...</button>
+    <button onclick="copyText()">Copy...</button>
+    <div id="output"></div>
+
+    <script>
+        const startButton = document.getElementById('startButton');
+        const outputDiv = document.getElementById('output');
+let toggle;
+        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition || window.mozSpeechRecognition || window.msSpeechRecognition)();
+        recognition.lang = 'en-US';
+        recognition.continuous=true;
+
+        recognition.onstart = () => {
+            startButton.textContent = 'Listening...';
+        };
+
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            outputDiv.textContent += transcript+". ";
+        };
+
+        recognition.onend = () => {
+            startButton.textContent = 'Start Voice Input';
+        };
+        
+        startButton.addEventListener('click', () => {
+        if (! toggle )recognition.start();
+            else recognition.stop();
+            toggle=! toggle;
+     });
+
+        function onShare(){
+        if (navigator.share) {
+  navigator.share({
+    title: 'Voice to Text',
+    text: outputDiv.textContent,
+  })
+    .then(() => console.log('Successful share'))
+    .catch((error) => console.log('Error sharing', error));
+        };
+        };
+
+        function copyText() {
+            navigator.clipboard.writeText (outputDiv.textContent);
+        }
+    </script>
+</body>
+</html>

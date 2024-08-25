@@ -1,0 +1,115 @@
+@media (min-width: 320px) {
+  /* smartphones, iPhone, portrait 480x320 phones */
+  body {
+    margin-bottom: 10em;
+  }
+  .hidedebug {
+    display: none;
+  }
+}
+
+@media (min-width: 481px) {
+  /* portrait e-readers (Nook/Kindle), smaller tablets @ 600 or @ 640 wide. */
+}
+
+@media (min-width: 641px) {
+  /* portrait tablets, portrait iPad, landscape e-readers, landscape 800x480 or 854x480 phones */
+}
+
+@media (min-width: 961px) {
+  /* tablet, landscape iPad, lo-res laptops ands desktops */
+  #published {
+    max-width: 50em;
+  }
+}
+
+@media (min-width: 1025px) {
+  /* big landscape tablets, laptops, and desktops */
+}
+
+@media (min-width: 1281px) {
+  /* hi-res laptops and desktops */
+}
+
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6em;
+  background-color: tan;
+  color: #3e2723;
+}
+
+#published {
+  white-space: pre-wrap;
+}
+
+p {
+  margin: 0;
+  text-indent: 1.5em;
+}
+
+.b {
+  font-weight: bold;
+}
+
+.endscene {
+  margin: 1em 0;
+  text-align: center;
+}
+
+.endscene::after {
+  content: "~  ~  ~";
+}
+
+#open-main-menu-btn {
+  height: 40px;
+  width: 40px;
+  background-color: wheat;
+  position: fixed;
+  top: 0;
+  right: 0;
+  border-radius: 0 0 0 56%;
+  border: 0;
+  z-index: 10;
+  font-size: x-large;
+  color: rgba(0, 0, 0, 0.4);
+  padding: 0 0 11px 4px;
+}
+
+#main-menu-overlay {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  /* pointer-events: none; */
+  z-index: 20;
+  display: none;
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+#main-menu-flyout {
+  position: fixed;
+  overflow: auto;
+  display: flex;
+  flex-flow: column nowrap;
+  margin: auto;
+  max-width: calc(100% - 4em);
+  padding: 1em;
+  background-color: wheat;
+  border-radius: 5px;
+  text-align: right;
+  right: 0.5em;
+  top: 3em;
+  line-height: 3em;
+  box-shadow: tan 0px 0px 6px 2px;
+}
+
+.mainMenuButton {
+  line-height: initial;
+  margin: 1.7em 0;
+  border: none;
+  border-bottom: 1px solid #3e2723;
+  background-color: wheat;
+  color: #3e2723;
+  text-align: right;
+}

@@ -59,10 +59,7 @@ export function Use(rule: Rule): StateAdvanceFn {
   throw new Error("Invalid rule");
 }
 
-export function Ignore(
-  toIgnore: StateAdvanceFn | null,
-  rule: Rule
-): StateAdvanceFn {
+export function Ignore(toIgnore: StateAdvanceFn | null, rule: Rule): StateAdvanceFn {
   const stateAdvanceFn = Use(rule);
   if (toIgnore) toIgnore = Ignore(null, Plus(toIgnore));
 
@@ -148,11 +145,7 @@ export function Optional(rule: Rule): StateAdvanceFn {
 
 type NodeReturnValue = null | string | any;
 
-type ReducerFn = (
-  stack: string[],
-  old: ParseState,
-  next: ParseState
-) => NodeReturnValue;
+type ReducerFn = (stack: string[], old: ParseState, next: ParseState) => NodeReturnValue;
 
 type StateAdvanceFn = (old: ParseState) => ParseState;
 
@@ -202,9 +195,9 @@ export function Parser(Grammar, pos = 0, partial = false) {
       throw new Error(`Unexpected end of input`);
     } else if ($ === $next || (!partial && $next.pos < text.length)) {
       throw new Error(
-        `Unexpected token at ${$.lastSeen.line}:${
-          $.lastSeen.column
-        }. Remainder: ${text.slice($.lastSeen.pos)}`
+        `Unexpected token at ${$.lastSeen.line}:${$.lastSeen.column}. Remainder: ${text.slice(
+          $.lastSeen.pos
+        )}`
       );
     }
 

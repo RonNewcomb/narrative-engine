@@ -1,12 +1,12 @@
 {
   "prettier": {
-    "printWidth": 100,
+    "printWidth": 140,
     "arrowParens": "avoid"
   },
   "devDependencies": {
-    "@types/node": "^22.4.2"
-  },
-  "dependencies": {
+    "@types/node": "^22.5.0",
+    "typescript": "^5.5.4",
+    "bun-types": "latest",
     "rd-parse": "^3.4.0",
     "rd-parse-jsexpr": "^3.2.0"
   }

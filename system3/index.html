@@ -5,11 +5,7 @@
     <title>${title}</title>
     <meta name="description" content="${title}: ${headline} by ${author}" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta
-      property="ifiction:ifid"
-      content="${ifid}"
-      prefix="ifiction: http://babel.ifarchive.org/protocol/iFiction/"
-    />
+    <meta property="ifiction:ifid" content="${ifid}" prefix="ifiction: http://babel.ifarchive.org/protocol/iFiction/" />
     <link rel="manifest" href="manifest.json" />
     <link rel="stylesheet" href="index.css" async />
   </head>
@@ -68,10 +64,7 @@
       fetch("./system3.sample.txt")
         .then(r => r.text())
         .then(text => {
-          document.getElementById("published").innerHTML = text
-            .replaceAll("[", "<ul>")
-            .replaceAll("]", "</ul>")
-            .replaceAll("*", "<li>");
+          document.getElementById("published").innerHTML = text.replaceAll("[", "<ul>").replaceAll("]", "</ul>").replaceAll("*", "<li>");
         });
     </script>
 
@@ -79,12 +72,8 @@
     <script>
       function findLocalIp(logInfo = true) {
         return new Promise((resolve, reject) => {
-          window.RTCPeerConnection =
-            window.RTCPeerConnection ||
-            window.mozRTCPeerConnection ||
-            window.webkitRTCPeerConnection;
-          if (typeof window.RTCPeerConnection == "undefined")
-            return reject("WebRTC not supported by browser");
+          window.RTCPeerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
+          if (typeof window.RTCPeerConnection == "undefined") return reject("WebRTC not supported by browser");
 
           const pc = new RTCPeerConnection();
           const ips = [];
@@ -121,8 +110,8 @@
               port: port,
               type: type,
             };
-            console.log(obj);
-            console.log(event.candidate);
+            // console.log(obj);
+            // console.log(event.candidate);
           };
         });
       }
@@ -130,6 +119,8 @@
         .then(ips => {
           console.log(ips);
           if (!ips) return null;
+          ips = ips.filter(ip => ip && ip.match(/^\d+\.\d+\.\d+\.\d+$/));
+          if (!ips.length) return null;
           return new Promise(resolve => {
             const script = document.createElement("script");
             script.src = "https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js";
@@ -139,9 +130,10 @@
         })
         .then(ips => {
           if (!ips) return;
-          const ip = ips[0]; // '192.168.1.128'; // ips[0];
-          const addy = `${location.protocol}//${ip}:${location.port}`;
+          const ip = ips[0];
           if (!ip || !ip.match(/^\d+\.\d+\.\d+\.\d+$/)) return console.log("local ip " + addy);
+          const port = location.port ? `:${location.port}` : "";
+          const addy = `${location.protocol}//${ip}${port}`;
           document.getElementById("ip").innerText = addy;
           new QRCode(document.getElementById("qrcode"), {
             text: addy,

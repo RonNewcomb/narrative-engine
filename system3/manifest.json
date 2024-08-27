@@ -3,19 +3,9 @@
   "name": "${title}: ${headline} by ${author}",
   "icons": [
     {
-      "src": "/images/icons-vector.svg",
+      "src": "icon.svg",
       "type": "image/svg+xml",
-      "sizes": "512x512"
-    },
-    {
-      "src": "/images/icons-192.png",
-      "type": "image/png",
-      "sizes": "192x192"
-    },
-    {
-      "src": "/images/icons-512.png",
-      "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "any"
     }
   ],
   "id": "/?source=pwa",
@@ -24,14 +14,6 @@
   "display": "standalone",
   "scope": "/",
   "theme_color": "#3e2723",
-  "shortcuts": [
-    {
-      "short_name": "${title}",
-      "name": "${title}: ${headline} by ${author}",
-      "description": "${description}",
-      "url": "/today?source=pwa",
-      "icons": [{ "src": "/images/today.png", "sizes": "192x192" }]
-    }
-  ],
-  "description": "${description}"
+  "description": "${description}",
+  "orientation": "portrait"
 }

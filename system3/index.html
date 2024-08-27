@@ -8,6 +8,7 @@
     <meta property="ifiction:ifid" content="${ifid}" prefix="ifiction: http://babel.ifarchive.org/protocol/iFiction/" />
     <link rel="manifest" href="manifest.json" />
     <link rel="stylesheet" href="index.css" async />
+    <link rel="stylesheet" href="interface.css" async />
   </head>
 
   <!--  \narrative-engine\system3> npx http-server -o .    -->
@@ -64,7 +65,21 @@
       fetch("./system3.sample.txt")
         .then(r => r.text())
         .then(text => {
+          // ultra-hack
           document.getElementById("published").innerHTML = text.replaceAll("[", "<ul>").replaceAll("]", "</ul>").replaceAll("*", "<li>");
+          function click(btn, e) {
+            const ul = btn.closest("ul");
+            const chosen = document.createElement("b");
+            chosen.innerText = btn.innerText + "\n";
+            ul.parentElement.replaceChild(chosen, ul);
+          }
+          document.querySelectorAll("ul").forEach(ul => (ul.classList = "playerChoices"));
+          document.querySelectorAll("li").forEach(li => {
+            const button = document.createElement("button");
+            button.innerHTML = li.innerHTML;
+            button.onclick = e => click(button, e);
+            li.parentElement.replaceChild(button, li);
+          });
         });
     </script>
 

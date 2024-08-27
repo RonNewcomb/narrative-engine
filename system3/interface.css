@@ -1,0 +1,54 @@
+.playerChoices {
+  margin: auto;
+  margin-bottom: 1.5em;
+  margin-top: 1em;
+  width: calc(100% - 4em);
+  padding: 0em 1em 1em 1em;
+  background-color: wheat;
+  border-radius: 5px;
+  box-shadow: wheat 0 0 8px 11px;
+  overflow: hidden;
+
+  transition: all 0.2s ease-out;
+}
+
+.playerChoices.exit {
+  position: absolute; /* so the next text doesn't slide as this animates out */
+  max-height: 0;
+  opacity: 0.1;
+  transform: scale(0);
+}
+
+.playerChoices .title {
+  font-style: italic;
+}
+
+.playerChoices .slidingWindow {
+  display: flex;
+  flex-flow: row nowrap;
+  gap: 2em;
+  position: relative;
+  /*left: -0%;*/ /* this is set by javascript on prev/next */
+  transition: left 0.75s;
+}
+
+.playerChoices .slidepanel {
+  min-width: 100%;
+  width: 100%;
+  max-width: 100%;
+  text-align: center; /* easiest for fingers to reach */
+}
+
+.playerChoices button,
+.playerChoiceButton {
+  line-height: 2em;
+  margin-top: 1em;
+  margin-right: 2em;
+  border: 0;
+  font-family: sans-serif;
+  background-color: cadetblue;
+  color: white;
+  padding: 0.3em 1.2em;
+  border-radius: 13px;
+  width: 100%; /* easiest for fingers to reach */
+}

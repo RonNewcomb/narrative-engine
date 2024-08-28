@@ -14,5 +14,20 @@
   "display": "standalone",
   "theme_color": "#3e2723",
   "description": "${description}",
-  "orientation": "portrait"
+  "orientation": "portrait",
+  "screenshots": [
+    {
+      "src": "screenshot.png",
+      "sizes": "360x740",
+      "type": "image/png",
+      "label": "Application"
+    },
+    {
+      "src": "screenshot.png",
+      "sizes": "360x740",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Application"
+    }
+  ]
 }

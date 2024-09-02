@@ -3,6 +3,7 @@ import type { iFictionRecord } from "../common/iFictionRecord";
 import { exit } from "node:process";
 
 /**
+ *                           npm install -g bun
  * To install dependencies,  bun install
  * To run,                   bun publish.ts
  */
@@ -42,9 +43,13 @@ const ifid = new Date().toISOString();
 console.log("Build", appDir + appName + ".ts");
 const buildResult = await Bun.build({ entrypoints: [appDir + appName + ".ts"], outdir: buildDir, target: "browser" });
 
-const css = buildResult.outputs
-  .filter(f => f.kind == "asset" && f.path.endsWith(".css"))
-  .map(c => `    <link rel="stylesheet" href="${c.path.slice(1 + c.path.lastIndexOf("/"))}" />`);
+const makeStyletag = (path: string) =>
+  Bun.file(path)
+    .text()
+    .then(data => `  <style id="${path}">${data}</style>`);
+
+const indexCss = await makeStyletag(commonDir + "index.css");
+const css = await Promise.all(buildResult.outputs.filter(f => f.kind == "asset" && f.path.endsWith(".css")).map(c => makeStyletag(c.path)));
 
 const substitutions = Object.entries(<Record<string, string | number | boolean>>{
   "${appName}": appName,
@@ -55,21 +60,31 @@ const substitutions = Object.entries(<Record<string, string | number | boolean>>
   "${firstpublished}": about.firstpublished,
   "${language}": about.language || "en",
   "${description}": about.description || `${about.title}: ${about.headline} by ${about.author}`,
-  "</head>": css.join("\n") + "\n</head>",
+  '<link rel="stylesheet" href="index.css" />': "",
+  "</head>": indexCss + css.join("\n") + "\n</head>",
 });
 
-const templating = (contents: string): string => substitutions.reduce((text, [key, value]) => (text = text.replaceAll(key, value.toString())), contents);
+const templating = (contents: string): string =>
+  substitutions.reduce((text, [key, value]) => (text = text.replaceAll(key, value.toString())), contents);
 
 console.log("Create", buildDir + "manifest.json", "from", commonDir + "template.manifest.json");
 let manifestJson = await Bun.file(commonDir + "template.manifest.json").text();
 await Bun.write(buildDir + "manifest.json", templating(manifestJson));
 
 console.log("Create", buildDir + "index.html", "from", commonDir + "template.index.html");
+let indexJs = await Bun.file(buildDir + appName + ".js").text();
 let indexHtml = await Bun.file(commonDir + "template.index.html").text();
+indexHtml = indexHtml.replace('<script src="${appName}.js"></script>', `<script>${indexJs}</script>`);
 await Bun.write(buildDir + "index.html", templating(indexHtml));
 
-console.log("Copy", commonDir + "index.css", "to", buildDir + "index.css");
-copyFileSync(commonDir + "index.css", buildDir + "index.css");
+// console.log("Copy", commonDir + "index.css", "to", buildDir + "index.css");
+// copyFileSync(commonDir + "index.css", buildDir + "index.css");
+
+console.log("Copy", commonDir + "icon.svg", "to", buildDir + "icon.svg");
+copyFileSync(commonDir + "icon.svg", buildDir + "icon.svg");
+
+console.log("Copy", commonDir + "screenshot.png", "to", buildDir + "screenshot.png");
+copyFileSync(commonDir + "screenshot.png", buildDir + "screenshot.png");
 
 console.log(" ");
 console.log(buildResult.success ? "Success." : "Problem.");

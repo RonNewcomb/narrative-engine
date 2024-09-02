@@ -86,6 +86,9 @@ copyFileSync(commonDir + "icon.svg", buildDir + "icon.svg");
 console.log("Copy", commonDir + "screenshot.png", "to", buildDir + "screenshot.png");
 copyFileSync(commonDir + "screenshot.png", buildDir + "screenshot.png");
 
+console.log("Copy", commonDir + "favicon.ico", "to", buildDir + "favicon.ico");
+copyFileSync(commonDir + "favicon.ico", buildDir + "favicon.ico");
+
 console.log(" ");
 console.log(buildResult.success ? "Success." : "Problem.");
 console.log(buildResult.outputs.filter(f => f.kind == "entry-point").length, "entry points.");

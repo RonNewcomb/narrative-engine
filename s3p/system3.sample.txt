@@ -1,4 +1,5 @@
 
 
-Rose wanted to escape the confines of her birth. * Follow him * Return home * Continue with purchase ** Later that day, she left.
+Rose wanted to escape the confines of her birth. * Follow him * Return home * Continue with purchase ** Later that day, [if home]she left.[/if] 
 
+Zafra [did close]opened [if take key]and unlocked[/if] the door[/did] and left the room.

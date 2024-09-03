@@ -5,7 +5,7 @@ text "writing" = letters:[-a-zA-Z_ ,!?.\n\r]+                 { return letters.j
 
 prompt = responses:response+ endprompt                 { return ({ responses })}
 bang = "*"
-response = bang text 
+response = bang anything 
 endprompt = "*" " "* "*"                                              { return "**"; }
 
 code = did / didnt / if / unless

@@ -506,7 +506,7 @@ function peg$parse(input, options) {
     s0 = peg$currPos;
     s1 = peg$parsebang();
     if (s1 !== peg$FAILED) {
-      s2 = peg$parsetext();
+      s2 = peg$parseanything();
       if (s2 !== peg$FAILED) {
         s1 = [s1, s2];
         s0 = s1;

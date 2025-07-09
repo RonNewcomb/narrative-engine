@@ -4,7 +4,7 @@ System 3 implements some ideas from https://www.gamedeveloper.com/author/ron-new
 
 System 2 seemed so heavyweight even I started to be afraid to use it. Plus it seemed geared toward creating a perfect boardgame where no character was special.
 
-Trying to write something in all those little boxes seems daunting.
+Trying to write something in all those little boxes seems daunting. And so, you couldn't just _get started_.
 
 ## New Goals
 
@@ -18,27 +18,48 @@ Emphasize ease and speed of writing. Emphasize getting the writing from brain to
 
 Text-first, low-code. Deemphasize code and other fiddly bits. Avoid "filling in forms" style of creation.
 
-What advanced features would aid in next-generation intfic?
+#### What advanced features would aid in next-generation intfic?
 
 - prove agency, teach how to play, indulge player, convey gamestate
-- Foreshadowing to prove agency
-- dialogue, news, foreshadowing is the HUD to convey gamestate
+  - Foreshadowing to prove agency
+  - dialogue, news, foreshadowing is the HUD to convey gamestate
 - choice, consequence, closure
-- scene is an action, action is a planning tree, planning tree has could/would/should
-- planning tree with could/would/should becomes dialogue
-- ?argument map also dialogue?
+  - all responses remembered, can ask about later
+  - ?virtual responses - conditions on other responses - to remember what needs closure?
+  - schedule closure
 - characters are a bag of beliefs
-- belief is a _should_ statement
-- actions which break other's belief spur others to action
-- (beliefs are the push-buttons of plot)
-- interactive interiority is a dialogue with one's self; may amend beliefs
-- plot devices are deux-ex-machina push-buttons of plot
-- the "rules" of the story/genre are the setting's beliefs
-- tension: control vs empathy. target 2nd-order emotions
-- tension: believability vs playability. apply stress, foreshadowing, or alliance
-- tension: agency vs plot. A boardgame setup?
+  - belief is a _should_ statement
+  - actions which break other's belief spur others to action
+  - (beliefs are the push-buttons of plot)
+  - all characters have different beliefs, setting up a kind of pachinko boardgame
+- a scene is an action
+  - action is a planning tree
+  - a planning tree has could/would/should
+  - planning tree with could/would/should becomes dialogue
+  - ?argument map also dialogue?
+- amend beliefs
+  - interactive interiority is a dialogue with one's self
+  - challenged by others, dialogue
+  - witnessing
+- setting is a character
+  - the "rules" of the story/genre are the setting's beliefs?
+  - plot devices are deux-ex-machina push-buttons of plot
+  - the tin idiot (author-character) breaks deadlocks via plot devices
+  - therefore... plot devices are beliefs of setting? what?
+- problems
+  - control vs empathy. target 2nd-order emotions
+  - believability vs playability. apply stress, foreshadowing, or alliance
+  - agency vs plot. A boardgame setup?
 - ally, support, defuse, escalate, prolong, ignore
-- tin idiot (author-character) breaks deadlocks via plot devices
+- arc types
+  - mystery creates curiousity until the explanation
+  - conflict creates uncertainty until the decision
+  - tension creates anticipation until the fulfillment
+- speech acts
+  - explore, ask, get info, input
+  - exclaim, express, inform, output
+  - offer, negotiate, promise, pronounce, create/uncreate a binding
+  - challenge, probe, accuse; test a binding
 
 #### Advanced Maybes
 

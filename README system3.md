@@ -2,24 +2,33 @@
 
 System 3 implements some ideas from https://www.gamedeveloper.com/author/ron-newcomb
 
-System 2 seemed so heavyweight even I started to be afraid to use it. Plus it seemed geared toward creating a perfect boardgame where no character was special.
+System 2 seemed so heavyweight even I started to be afraid to use it. It was daunting, trying to write something in all those little boxes. I couldn't just _get started_.
 
-Trying to write something in all those little boxes seems daunting. And so, you couldn't just _get started_.
+Plus it seemed geared toward creating a perfect boardgame where no character was special. Although I still believe in the boardgame idea, let's not go overboard.
+
+As for fully structuring the whole work with character beliefs which become actions which become scenes which become MRU paragraphs, it might work better as a build-time tool, like writing prompts and the like, rather than something needed at runtime.
 
 ## New Goals
 
-Mobile-first. Play on mobile without needing parser typing nor lawnmowering a CYOA due to multipart responses.
+Mobile-first. Play on mobile without needing parser typing nor lawnmowering a CYOA due to multipart responses. Multi-part choices to construct sentences seem to be the right default.
 
-Emphasize always ready to publish. Smooth scale from no choice, to press any key, to a simple unused choice, to a simple used choice, to a multipart choice, to a used mulitpart choice, to... a board game.
+Emphasize always ready to publish. Smoothly scale from no choices, to a simple choice, to a multipart choice, to complex questions about multipart answers.
 
-Don't assume every response jumps somewhere else in the text. Instead, it flows linearly until a jump is requested. But, always and automatically remember every choice made and can answer what was chosen at any time.
+Responses are always remembered. The author needn't do anything special. Which answer was chosen can be retrieved just by asking.
 
-Emphasize ease and speed of writing. Emphasize getting the writing from brain to paper. Uses mobile to aid in authoring via speech-to-text. You cannot edit on mobile, only add more words. The inability to edit while on mobile is a feature.
+Responses aren't jumps. The writing flows linearly unless a jump-to-page-X is specifically requested.
 
-Text-first, low-code. Deemphasize code and other fiddly bits. Avoid "filling in forms" style of creation.
+Emphasize getting words from brain to paper. Use speech-to-text from mobile. By design, you cannot edit on mobile.
+
+Emphasize text-first and de-emphasize code. Avoid a "filling in forms" style of creation.
+
+Use System 2 as a build-time aid, not a runtime library. Given character beliefs, it creates plot outlines and from that it creates writing prompts for scenes, exchanges, paragraphs.
 
 #### What advanced features would aid in next-generation intfic?
 
+- ease of creation
+  - speech-to-text, on-the-go
+  - limited code or setup
 - prove agency, teach how to play, indulge player, convey gamestate
   - Foreshadowing to prove agency
   - dialogue, news, foreshadowing is the HUD to convey gamestate
@@ -32,6 +41,7 @@ Text-first, low-code. Deemphasize code and other fiddly bits. Avoid "filling in 
   - actions which break other's belief spur others to action
   - (beliefs are the push-buttons of plot)
   - all characters have different beliefs, setting up a kind of pachinko boardgame
+  - beliefs are also expressions of what a person _can't_ do
 - a scene is an action
   - action is a planning tree
   - a planning tree has could/would/should
@@ -41,16 +51,19 @@ Text-first, low-code. Deemphasize code and other fiddly bits. Avoid "filling in 
   - interactive interiority is a dialogue with one's self
   - challenged by others, dialogue
   - witnessing
+  - amend your own beliefs with reflective scenes
+  - amending beliefs changes the options menus
 - setting is a character
   - the "rules" of the story/genre are the setting's beliefs?
   - plot devices are deux-ex-machina push-buttons of plot
   - the tin idiot (author-character) breaks deadlocks via plot devices
   - therefore... plot devices are beliefs of setting? what?
 - problems
-  - control vs empathy. target 2nd-order emotions
-  - believability vs playability. apply stress, foreshadowing, or alliance
-  - agency vs plot. A boardgame setup?
-- ally, support, defuse, escalate, prolong, ignore
+  - control vs empathy? target second-order emotions
+  - believability vs playability? apply stress, foreshadowing, or alliance
+  - agency vs plot? A boardgame setup
+- relation to others' external conflict
+  - ally, support, defuse, escalate, prolong, ignore
 - arc types
   - mystery creates curiousity until the explanation
   - conflict creates uncertainty until the decision
@@ -60,10 +73,13 @@ Text-first, low-code. Deemphasize code and other fiddly bits. Avoid "filling in 
   - exclaim, express, inform, output
   - offer, negotiate, promise, pronounce, create/uncreate a binding
   - challenge, probe, accuse; test a binding
+- can system 2 be an "overlay" on system 3 as a writing aid?
+  - can create the outline from a few pieces
+  - can test for completeness
 
 #### Advanced Maybes
 
-A feature to check for :
+**Build-time checks**
 
 1. A response-check but it can't find the response.
 2. A response-check but it finds more than one response.
@@ -71,9 +87,15 @@ A feature to check for :
 4. A go-to but it finds too many passages that fit.
 5. An optional warning that a response isn't used at all.
 
-A feature to turn one response-check into a different one, or a response-check that is calculated from other response-checks. For example, if we took the pineapple from scene 2 and/or left the cigarette on the table, then a new checkable "response" is "Maria knows." Now we can check the virtual response "Maria knows" as shorthand for the others.
+**Inferences**: A feature to turn one response-check into a different one, or a response-check that is calculated from other response-checks. For example, if we took the pineapple from scene 2 and/or left the cigarette on the table, then a new checkable "response" is "Maria knows." Now we can check the virtual response "Maria knows" as shorthand for the others.
 
-Any features to double-check the author and highlight to-dos. Guardrails for novice writers. Dissuade dungeon crawls and rambling. It doesn't explicitly have objects, but partial responses and hashtags can be used as such. Algorithms? Board game, planner A.I., is finishable checking, hashtag rules checking, automatic TODO highlighters, sample-based passage linking.
+> [`infer` Maria knows `from` took the pineapple from scene 2 `or` left the cigarette on the table]
+
+**Plot Outline** is both guardrails and writing prompts (to-dos) and navigation aid.
+
+**World Model**: A distillation of past actions to the current state of the world. But any question that the current state can answer, the complete ordered list of responses can also answer. (This might however require NPCs that "choose responses" to also be recorded if there's conflicting actions.)
+
+**Pieces** of a board game. Comes with an algorithm to solve for. (Prolog?)
 
 #### Ideas Worth Considering
 
@@ -86,7 +108,9 @@ Plot derives from character.
 
 A scene is a little story centering around a character, a want, and some kind of action to fulfill it.
 
-## How to Use System 3
+# How to Use System 3
+
+## Inserting Choices with \*
 
 ### First choice
 
@@ -96,7 +120,7 @@ There is writing, and within are points like:
 
 This paints the prompt's menu and waits on the user. After choosing a response, the following text is painted no matter the choice. Nothing in the "code" directed control elsewhere. But, the chosen response is remembered.
 
-### Referencing a past choice
+## Referencing past choices with [did] or [didnt]
 
 Substitutions of the form `[did ...]` can ask which response was made at which prompt.
 
@@ -106,21 +130,25 @@ Substitutions of the form `[did ...]` can ask which response was made at which p
 
 It searches all possible responses for the match, highlighting it if it's not enough words to distinguish.
 
-### Conditional Responses
+### Combine them for Conditional Responses
 
 Wrap responses in the substitution to hide them. They can reference themselves so they can't be chosen multiple times.
 
-```
-He left.
-
-* Follow him
-* Return home
-[didnt continue with purchase]
-    * Continue with purchase
-[/didnt]
-
-Later that day, lorem ipsum
-```
+> He left.
+>
+> \* Follow him
+>
+> \* Return home
+>
+> [didnt continue with purchase]
+>
+> \* Continue with purchase
+>
+> [/didnt]
+>
+> \*\*
+>
+> Later that day, lorem ipsum
 
 ### Multipart Responses
 
@@ -128,17 +156,25 @@ A responses menu can have sub-menus. An ellipsis on a button tips off the reader
 
 > He left. \* Follow him \* Return ...[ \* home \* to the library ] \* Continue with purchase \*\* Later that day, ...
 
+## Marking Events with [plotpoint]
+
+Like a response without a menu, you can query if a [plotpoint] was hit.
+
+> [`plotpoint` Maria found out]
+
+## Jumping Pages with [goto]
+
 ### Changing Threads
 
 A choice can send the reader elsewhere entirely.
 
-> He left. \* Follow him [^ Pretending to stay put] \* Return home \* Continue with purchase \*\* Later that day, ...
+> He left. \* Follow him [goto Pretending to stay put] \* Return home \* Continue with purchase \*\* Later that day, ...
 >
 > ...lorem ipsum...
 >
 > Pretending to stay put, you wait until he's out of sight ...
 
-After the ^ caret symbol comes the first words of the linked passage.
+After the `goto` comes the first words of the linked passage.
 
 ### Finishing Threads
 
@@ -146,126 +182,85 @@ The redirect can be used unconditionally. We use this to close off a thread and 
 
 > Your purchase complete, you head home to prepare for the party.
 >
-> [^ Buried in wrapping paper]
+> [goto Buried in wrapping paper]
 
-## Hashtags
+## Scene Breaks with [scene]
 
-### Hashtags are names for passages and menus
+Much like a director yells ACTION or CUT, use this to indicate an explicit change in scene. Usually this means an abrupt change in time or place, or even viewpoint.
 
-There are hashtags written like #macguffin which are invisible to the reader. These can be used to reference a passage, prompt or response if using the text itself isn't working out.
+> [scene]
 
-Here is a tagged prompt.
+You can name the scene, for later use with `[goto]` or `[did]`.
 
-> He left. #afterArgument \* Follow him \* Return home \* Continue with purchase \*\* Later that day, ...
+> [scene The Candy Shop]
 
-And here is referencing that exact prompt, and then referencing one of the responses within that prompt.
+> [goto The Candy Shop]
 
-> He accepted the seat. [did #afterArgument continue purchase] And you bought it anyway, right? [/did]
+> [did The Candy Shop] \* offer some chocolate [/did]
 
-### Common Multipart Responses
+## Remember and Recall with [remember ... as] and [the]
 
-We can re-use a set of responses via tag to save some repetitive typing. The same choice can appear many times in many different prompts. It becomes an object in its own right.
+As the story progresses, you may find yourself needing to use more prose generation to handle all the possible situations that can come up. We use antecedents to do this.
 
-Tag the whole prompt. The prompt can be backstage.
+> [`remember` Charlotte `as` the person who got the truck]
 
-> [#usualLocations \* home \* to the library]
+> "But [`the` person who got the truck] couldn't have since she was getting the truck that day."
 
-Place the prompt within another prompt's ellipsis.
+## Re-usable menus with [new menu] and [menu]
 
-> He left. [ \* Follow him \* Return [... #usualLocations ] \* Continue with purchase ] Later that day, ...
+We can re-use a set of responses via tag to save some repetitive typing. The same choice can appear many times in many different prompts.
 
-### Changing Threads, Hashtag Example
+> [new menu usualLocations] \* home \* to the library
 
-If the passage is long or commonplace a tag can be used instead.
+Place the prompt wherever.
 
-First tag a passage.
+> He left. \* Follow him \* Return ...[menu usualLocations] \* Continue with purchase \*\* Later that day, ...
 
-> #sneakAfter Pretending to stay put, you wait until he's out of sight ...
+# Every Person is a Tower
 
-Reference the tag from one of the responses of this prompt.
+There's 4 speech acts, including "input" (requests for information) and "output" (answers and exclamations). We ignore some of Searle's speech acts because, like ritualistic acts, they're aren't interesting in an interactive context and are largely just glue.
 
-> He left. \* Follow him [^#sneakAfter] \* Return home \* Continue with purchase \*\* Later that day,
+So for every "input", question, there's an answer.
 
-### Tagging Select Text
+Answers can have locks on them. You need so much trust to ask the question and not get a rude stop, a deflection, or an evasion.
 
-You can select some text with the mouse and stick an annotation on it. It's a hashtag, but a hashtag that knows a beginning and end, rather than being a point.
+Questions can have locks on them too. Beliefs are walls that limit the ability to say certain things. Break the belief to unlock new menu options. Questions are more likely to have locks than answers, since unlocking beliefs to be a better person is the goal.
 
-## The Code Area
+Each person is a tower, with some doors open, some closed, and some locked. Beliefs are the walls. The keys are trust and might not even exist within the tower. Even if you want to invite someone in, if they see something they're unprepared for, they'll not only leave but lock you out of their own tower.
 
-Most of your file will be writing with some markup. But there is an area without text where you can define rules, import other files, and re-usable bits and bobs.
+Dialogue is exploring each other's towers. Don't do one-sided interviews. To build trust you have to give a little of yourself to get some of another.
 
-You can import other files from here, and specify which tags etc from the other files are in scope here.
+Dialogue is trying to understand someone else, or at least some part of someone else. You may know she doesn't like turtles, but you may need to get a story to see the full cause and effect of how a person gets from here to there. Slotting together all the "facts" in an unbroken chain of cause and effect is required for understanding. (Whether you like or agree with the full picture is another question entirely.)
 
-### Checks and Balances
+Finding some pieces of a chain can be done solo, with interactive interiority. It's a dialogue with one's self.
 
-You can map out your work, find things, and more using tags. But you can also create, combine, and sequence tags using other tags in the special section.
+A (character's little) story (which is "output") is a path, up and down, of a navigation of a why/how tree. The listener can navigate the story with a few metacommands.
 
-> #charlotte #maria #james are #people
+- continue, what happened next
+- backup, wait explain what led up to that / how did that come about
+- drilldown, tell me more about that point
+- introspect, think about it, dialogue with self. This might return to the same options or cause the character to break the story and defend their beliefs.
+- change subject ("output")
+- share, a similar situation. This can flip who the storyteller is and who the listener is.
 
-It often comes up that in a given passage you can't remember or even know if the reader knows something yet. Use a tag to mark all the places where that something is shared with the reader, and another tag marking where that something needs to be known.
+The continue and explain move linearly along the character's story's path, while drilldown pauses there and fills in a bit more.
 
-Then create a check.
+Understanding a person is understanding their path through a why/how tree? Well, in many stories things just happen, so it's not really a problem-solving situation. Or is it?
 
-> #learnSecret #magicLamp precedes #useSecret #magicLamp
+Outside of listening to a story.... Remarking on something. Express opinions. Drilldown into why that opinion.
 
-You can define stretches of time with a pair of hashtags. You can use an ellipses to mean the rest of the tags in that combination.
+If a character has a lot of stories, place them in the editor in another file, with markup to show what starts/ends where and goto's and the other mechanical bits. These stories maybe aren't tailored much to the particular listener?
 
-> #start #scene ... must precede #end #scene ...
+These characters aren't special, and also live in a lower-middle class neighborhood with sidewalks so cracked that they're becoming gravel. Some of the struggles and negative emotions in this world have wormed their way into their personalities. This game is about recognizing and somewhat undoing the damage, wherein two people make each other better people, and create something more than themselves.
 
-### Multiple Viewpoint Characters
+This game is about those negative experiences, the causes of such, the exhuming of feelings, and the breakdown of unhelpful beliefs that limit their potential. About how stories and experiences crystallize into belief.
 
-The system remembers which response the reader chose for any prompt, but if your story has muliple viewpoint characters it might be important to know which character's viewpoint the reader was within when the response was made.
+Change a belief through witness, through another demonstrating contradiction, through self-reflection.
 
-This might be because the reader chooses differently if they're aware of whom they're following, or it might be because a choice gets "used up" so can only be made by one character.
+Mechanic: quoting earlier sections during reflection. Quoting earlier reponse menus, to show new or old options. This implies the response menus are at least a little bit in-world, as a person can reflect on their choices. If I show a new option added to an old menu, it is a good way to show exploration matters.
 
-You can explicitly define the viewpoint characters backstage with a check.
+If a breaking belief unlocks a new option, then, is there a cause-and-effect chain leading to it? If I believe X then Y can't possibly be, so what use is action Z. Therefore Z is never a response. Until dialogue turns that way to highlight the pieces. Even if the character changes the subject at that point in time, reflection is coming.
 
-> #charlotte is viewpoint
->
-> #jacob are alternate viewpoints
+The characters pass through a series of increasingly private settings. The bus stop is first, then chatting on the bus, then the neighborhood park, then the movie theater, finally in someone's home. The movie is great because the movie can just say hints that the reader needs to hear to finish the game. But the initial bus stop conversation is the most important. Taken from real life, how would a young man talk to a young woman, a stranger, in that scenario, without the threat of the interaction going sour, or possibly worse, going nowhere at all? So the categories of responses after the initial information exchange, and the subcategories of how to go about it, are taken from real life advice. It is by far the widest choicepoint in the entire game, even though a good deal of its unused threads comes up in later conversations as grist.
 
-Then the did/didn't is written slightly differently, using a preceding if.
-
-```
-He left.
-
-* Follow him
-* Return home
-[if #charlotte didnt continue purchase:
-* Continue with purchase
-]
-
-Later that day, lorem ipsum
-```
-
-If no viewpoint is specified then it belongs to the default viewpoint, if specified. The default viewpoint is assumed to NOT be any of the alternate viewpoints.
-
-### Responsive NPCs
-
-One method to characterize a viewpoint character is having _them_ respond to prompts instead of the reader.
-
-If an option contains a `chooses` with a viewpoint then the prompt doesn't appear but everything else acts as if it had and that option was chosen.
-
-```
-He left.
-
-* Follow him
-* Return home [#jacob chooses]
-* Continue with purchase
-
-Later that day, lorem ipsum
-```
-
-It's straightforward to hide a response or even a whole prompt with a `[did ...]` or `[is ...]` or `[if ...]`.
-
-### Board Game Character
-
-Let's use a board game analogy: they are at the table playing a board game with you. Each character has things they want or don't want, and actions that can affect how and where things move or what other characters do.
-
-(How does desires, props, actions to change/move props, action-as-scene, and action scenes scheduling reaction scenes all fit into this?)
-
-Beliefs hide behind the things they do or don't want. Beliefs are goals, even if it is to maintain the status quo. Actions are more concrete. An action can be small or can comprise an entire scene or story.
-
-With responses and tags we don't really know what's an in-game prop, what's an action or at least a verb. We don't know what the result of any choice will be since it is, frankly, the entire rest of the story.
-
-We will need a backstage rule to define when and what kind of prompt a character auto-responds.
+Some thought was given to how rude the characters are allowed to be to each other, and how they each deal with said rudeness. We don't want the story to fly apart, but we also don't want it to be unbelievable. The recurring captive setting of the bus helps smooth over some spots -- literally no one can walk away. But the rudeness comes from sore spots in their psyches that are exactly target for the story's magic. We need to show the disease so the cure can be appreciated.

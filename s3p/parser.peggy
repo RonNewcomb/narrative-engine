@@ -8,8 +8,8 @@ text "writing" = letters:[-a-zA-Z_ ,!?.\n\r]+                 { return letters.j
 
 prompt = responses:response+                   { return ({ responses })}
 bang = "*"
+endprompt = bang _ bang                                               { return ""; }
 response = endprompt / ( bang option:anythingelse                     { return option; }     )                 
-endprompt = "*" _ "*"                                               { return ""; }
 
 code = did / didnt / if / unless
 did =    "[did "i    _ match:text "]" wrap:anything "[/did]"i       { return ({op:'did'   , match, wrap})}

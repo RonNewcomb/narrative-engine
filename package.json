@@ -1,17 +1,20 @@
 {
+  "type": "module",
   "prettier": {
     "printWidth": 140,
     "arrowParens": "avoid"
   },
   "devDependencies": {
     "@types/node": "^22.5.0",
-    "bun-types": "latest",
     "peggy": "^4.0.3",
     "rd-parse": "^3.4.0",
     "rd-parse-jsexpr": "^3.2.0",
-    "typescript": "^5.5.4"
+    "typescript": "^5.5.4",
+    "tsx": "^4.0.0",
+    "vite": "^5.0.0"
   },
   "scripts": {
+    "publish": "cd publishing && tsx publish.ts && cd ..",
     "parser": "cd s3p && peggy --format es -o parser.mjs parser.peggy && tsc compile.mts --module nodenext && node compile.mjs"
   }
 }

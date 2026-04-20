@@ -1,11 +1,13 @@
-import { copyFileSync, existsSync, mkdirSync, readdirSync, rmSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import type { iFictionRecord } from "../common/iFictionRecord";
 import { exit } from "node:process";
+import { build } from "vite";
+import { resolve } from "node:path";
 
 /**
- *                           npm install -g bun
- * To install dependencies,  bun install
- * To run,                   bun publish.ts
+ * To run,                   npm run publish
+ *                           or: node --loader ts-node/esm publish.ts
+ *                           or: tsx publish.ts
  */
 
 const argTypes: Record<string, string> = {
@@ -17,7 +19,7 @@ const argTypes: Record<string, string> = {
 };
 
 const parsedargs: Record<string, string | undefined> = {};
-for (let args = Bun.argv.slice(2); args.length; true) {
+for (let args = process.argv.slice(2); args.length; true) {
   const paramSwitch = argTypes[args.shift() || ""];
   if (!paramSwitch) {
     console.log(JSON.stringify(argTypes, undefined, 2));
@@ -37,19 +39,36 @@ if (existsSync(buildDir)) rmSync(buildDir, { recursive: true, force: true });
 if (!existsSync(buildDir)) mkdirSync(buildDir);
 
 console.log("Read", appDir + "bibliographic.json");
-const about: iFictionRecord["story"]["bibliographic"] = await Bun.file(appDir + "bibliographic.json").json();
+const about: iFictionRecord["story"]["bibliographic"] = JSON.parse(readFileSync(appDir + "bibliographic.json", "utf-8"));
 const ifid = new Date().toISOString();
 
 console.log("Build", appDir + appName + ".ts");
-const buildResult = await Bun.build({ entrypoints: [appDir + appName + ".ts"], outdir: buildDir, target: "browser" });
+const buildResult = await build({
+  build: {
+    lib: {
+      entry: resolve(appDir + appName + ".ts"),
+      formats: ["es"],
+      fileName: () => appName + ".js",
+    },
+    outDir: buildDir,
+    emptyOutDir: false,
+    cssCodeSplit: false,
+    rollupOptions: {
+      output: {
+        assetFileNames: "[name].[ext]",
+      },
+    },
+  },
+});
 
-const makeStyletag = (path: string) =>
-  Bun.file(path)
-    .text()
-    .then(data => `  <style id="${path}">${data}</style>`);
+const makeStyletag = async (path: string) => {
+  const data = readFileSync(path, "utf-8");
+  return `  <style id="${path}">${data}</style>`;
+};
 
 const indexCss = await makeStyletag(commonDir + "index.css");
-const css = await Promise.all(buildResult.outputs.filter(f => f.kind == "asset" && f.path.endsWith(".css")).map(c => makeStyletag(c.path)));
+const cssFiles = readdirSync(buildDir).filter(f => f.endsWith(".css"));
+const css = await Promise.all(cssFiles.map(f => makeStyletag(buildDir + f)));
 
 const substitutions = Object.entries(<Record<string, string | number | boolean>>{
   "${appName}": appName,
@@ -68,14 +87,14 @@ const templating = (contents: string): string =>
   substitutions.reduce((text, [key, value]) => (text = text.replaceAll(key, value.toString())), contents);
 
 console.log("Create", buildDir + "manifest.json", "from", commonDir + "template.manifest.json");
-let manifestJson = await Bun.file(commonDir + "template.manifest.json").text();
-await Bun.write(buildDir + "manifest.json", templating(manifestJson));
+let manifestJson = readFileSync(commonDir + "template.manifest.json", "utf-8");
+writeFileSync(buildDir + "manifest.json", templating(manifestJson));
 
 console.log("Create", buildDir + "index.html", "from", commonDir + "template.index.html");
-let indexJs = await Bun.file(buildDir + appName + ".js").text();
-let indexHtml = await Bun.file(commonDir + "template.index.html").text();
+let indexJs = readFileSync(buildDir + appName + ".js", "utf-8");
+let indexHtml = readFileSync(commonDir + "template.index.html", "utf-8");
 indexHtml = indexHtml.replace('<script src="${appName}.js"></script>', `<script>${indexJs}</script>`);
-await Bun.write(buildDir + "index.html", templating(indexHtml));
+writeFileSync(buildDir + "index.html", templating(indexHtml));
 
 // console.log("Copy", commonDir + "index.css", "to", buildDir + "index.css");
 // copyFileSync(commonDir + "index.css", buildDir + "index.css");
@@ -90,10 +109,10 @@ console.log("Copy", commonDir + "favicon.ico", "to", buildDir + "favicon.ico");
 copyFileSync(commonDir + "favicon.ico", buildDir + "favicon.ico");
 
 console.log(" ");
-console.log(buildResult.success ? "Success." : "Problem.");
-console.log(buildResult.outputs.filter(f => f.kind == "entry-point").length, "entry points.");
-console.log(buildResult.outputs.filter(f => f.kind == "chunk").length, "chunks.");
-console.log(buildResult.outputs.filter(f => f.kind == "asset").length, "assets imported from javascript.");
+console.log("Build completed successfully.");
+const buildFiles = readdirSync(buildDir);
+console.log(buildFiles.filter(f => f.endsWith(".js")).length, "JavaScript files.");
+console.log(buildFiles.filter(f => f.endsWith(".css")).length, "CSS files.");
 console.log(css.length, "css assets copied to", buildDir, "and referenced by", buildDir + "index.html");
 console.log(" ");
 

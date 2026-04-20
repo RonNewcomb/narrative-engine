@@ -209,8 +209,8 @@ function peg$parse(input, options) {
 
   var peg$f0 = function(letters) { return letters.join(""); };
   var peg$f1 = function(responses) { return ({ responses })};
-  var peg$f2 = function(option) { return option; };
-  var peg$f3 = function() { return ""; };
+  var peg$f2 = function() { return ""; };
+  var peg$f3 = function(option) { return option; };
   var peg$f4 = function(match, wrap) { return ({op:'did'   , match, wrap})};
   var peg$f5 = function(match, wrap) { return ({op:'didnt' , match, wrap})};
   var peg$f6 = function(match, wrap) { return ({op:'if'    , match, wrap})};
@@ -541,6 +541,29 @@ function peg$parse(input, options) {
     return s0;
   }
 
+  function peg$parseendprompt() {
+    var s0, s1, s2, s3;
+
+    s0 = peg$currPos;
+    s1 = peg$parsebang();
+    if (s1 !== peg$FAILED) {
+      s2 = peg$parse_();
+      s3 = peg$parsebang();
+      if (s3 !== peg$FAILED) {
+        peg$savedPos = s0;
+        s0 = peg$f2();
+      } else {
+        peg$currPos = s0;
+        s0 = peg$FAILED;
+      }
+    } else {
+      peg$currPos = s0;
+      s0 = peg$FAILED;
+    }
+
+    return s0;
+  }
+
   function peg$parseresponse() {
     var s0, s1, s2;
 
@@ -552,7 +575,7 @@ function peg$parse(input, options) {
         s2 = peg$parseanythingelse();
         if (s2 !== peg$FAILED) {
           peg$savedPos = s0;
-          s0 = peg$f2(s2);
+          s0 = peg$f3(s2);
         } else {
           peg$currPos = s0;
           s0 = peg$FAILED;
@@ -561,41 +584,6 @@ function peg$parse(input, options) {
         peg$currPos = s0;
         s0 = peg$FAILED;
       }
-    }
-
-    return s0;
-  }
-
-  function peg$parseendprompt() {
-    var s0, s1, s2, s3;
-
-    s0 = peg$currPos;
-    if (input.charCodeAt(peg$currPos) === 42) {
-      s1 = peg$c0;
-      peg$currPos++;
-    } else {
-      s1 = peg$FAILED;
-      if (peg$silentFails === 0) { peg$fail(peg$e3); }
-    }
-    if (s1 !== peg$FAILED) {
-      s2 = peg$parse_();
-      if (input.charCodeAt(peg$currPos) === 42) {
-        s3 = peg$c0;
-        peg$currPos++;
-      } else {
-        s3 = peg$FAILED;
-        if (peg$silentFails === 0) { peg$fail(peg$e3); }
-      }
-      if (s3 !== peg$FAILED) {
-        peg$savedPos = s0;
-        s0 = peg$f3();
-      } else {
-        peg$currPos = s0;
-        s0 = peg$FAILED;
-      }
-    } else {
-      peg$currPos = s0;
-      s0 = peg$FAILED;
     }
 
     return s0;

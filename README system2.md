@@ -107,48 +107,8 @@ So, I need infinite loop protection and some kind of typing to make the error im
 
 ## How to Run
 
-With typescript and rollup both installed globally.
-
-```
-npm install --global typescript
-npm install --global tslib
-npm install --global rollup
-npm install --global @rollup/plugin-json
-npm install --global @types/node
-```
-
-Compile and bundle.
-
-`tsc && rollup --file build.js build/app/story1.js `
-
-Pull up index.html in the browser, view F12 console.
-
-Can also use `--watch` on both commands in 2 different windows.
-
-### Publish
-
-Publishing is a special build pipeline requiring Bun (an alternative to NodeJS). It outputs to `/build` a set of files ready for a web server to serve.
-
 ```bash
-cd publishing
-bun run publish.ts
+npm run publish
 ```
 
-### Run
-
-Publish first. Running locally using either the Bun runner:
-
-```bash
-bun build ./app/story1.ts  --outfile story1.js --outdir build --watch
-```
-
-## without bun
-
-no longer works.
-
-Build and rollup in-place and point a browser to it:
-
-```bash
-tsc -p common/tsconfig.json && tsc -p src/tsconfig.json && tsc -p app/tsconfig.json
-rollup --file build/build.js build/app/story1.js  --plugin json
-```
+This creates a `/build` folder with the compiled files, including an `index.html` file that can be opened in a browser.

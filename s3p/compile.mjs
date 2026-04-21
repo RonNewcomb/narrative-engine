@@ -1,5 +1,4 @@
-// tsc compile.mts --module nodenext
-// or just  npm run parser  from parent folder
+// npm run parser3
 import { readFile, writeFile } from "fs/promises";
 import { parse, SyntaxError } from "./parser.mjs";
 const storyFilename = "system3.sample";

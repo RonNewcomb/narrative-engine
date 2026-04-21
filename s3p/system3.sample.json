@@ -1,0 +1,66 @@
+[
+    "Rose wanted to escape the confines of her birth. ",
+    {
+        "responses": [
+            [
+                " Follow him "
+            ],
+            [
+                " Return home "
+            ],
+            [
+                " Continue with purchase "
+            ],
+            ""
+        ]
+    },
+    " Later that day, ",
+    {
+        "op": "if",
+        "match": "home",
+        "wrap": [
+            "she left."
+        ]
+    },
+    " \n\nZafra ",
+    {
+        "op": "did",
+        "match": "close",
+        "wrap": [
+            "opened ",
+            {
+                "op": "if",
+                "match": "take key",
+                "wrap": [
+                    "and unlocked"
+                ]
+            },
+            " the door"
+        ]
+    },
+    " and left the room.\n\n\nRose ",
+    {
+        "responses": [
+            [
+                " left ",
+                {
+                    "op": "did",
+                    "match": "arrive",
+                    "wrap": [
+                        " ",
+                        {
+                            "responses": [
+                                [
+                                    " returned to "
+                                ]
+                            ]
+                        }
+                    ]
+                },
+                " the room. "
+            ],
+            ""
+        ]
+    },
+    " The end."
+]

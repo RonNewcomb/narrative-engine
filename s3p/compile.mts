@@ -1,12 +1,15 @@
-// tsc compile.mts --module nodenext
-// or just  npm run parser  from parent folder
-import { readFile } from "fs/promises";
+// npm run parser3
+import { readFile, writeFile } from "fs/promises";
 import { parse, SyntaxError } from "./parser.mjs";
 
-const source = await readFile("./system3.sample.txt").then(x => x.toString().trim());
+const storyFilename = "system3.sample";
+
+const source = await readFile(`./${storyFilename}.txt`).then(x => x.toString().trim());
 try {
   const ast = parse(source);
-  console.log(JSON.stringify(ast, undefined, 4));
+  const json = JSON.stringify(ast, undefined, 4);
+  console.log(json);
+  await writeFile(`./${storyFilename}.json`, json);
 } catch (e) {
   if (e instanceof SyntaxError) {
     // @ts-ignore

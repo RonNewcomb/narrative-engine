@@ -208,14 +208,14 @@ function peg$parse(input, options) {
   var peg$e14 = peg$literalExpectation("[/menu]", true);
 
   var peg$f0 = function(letters) { return letters.join(""); };
-  var peg$f1 = function(responses) { return ({ responses })};
-  var peg$f2 = function() { return ""; };
+  var peg$f1 = function(responses) { return ({op:'menu', responses})};
+  var peg$f2 = function() { return 0;};
   var peg$f3 = function(option) { return option; };
   var peg$f4 = function(match, wrap) { return ({op:'did'   , match, wrap})};
   var peg$f5 = function(match, wrap) { return ({op:'didnt' , match, wrap})};
   var peg$f6 = function(match, wrap) { return ({op:'if'    , match, wrap})};
   var peg$f7 = function(match, wrap) { return ({op:'unless', match, wrap})};
-  var peg$f8 = function(wrap) { return ({op:'menu'  , wrap})};
+  var peg$f8 = function(responses) { return ({op:'menu'  , responses})};
   var peg$currPos = options.peg$currPos | 0;
   var peg$savedPos = peg$currPos;
   var peg$posDetailsCache = [{ line: 1, column: 1 }];

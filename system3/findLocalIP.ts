@@ -38,7 +38,7 @@ function findLocalIp(logInfo = true) {
         port: port,
         type: type,
       };
-      console.log(obj);
+      // console.log(obj);
       // console.log(event.candidate);
     };
   });

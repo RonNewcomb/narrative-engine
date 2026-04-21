@@ -1,6 +1,7 @@
 [
     "Rose wanted to escape the confines of her birth. ",
     {
+        "op": "menu",
         "responses": [
             [
                 " Follow him "
@@ -11,7 +12,7 @@
             [
                 " Continue with purchase "
             ],
-            ""
+            0
         ]
     },
     " Later that day, ",
@@ -40,6 +41,7 @@
     },
     " and left the room.\n\n\nRose ",
     {
+        "op": "menu",
         "responses": [
             [
                 " left ",
@@ -49,6 +51,7 @@
                     "wrap": [
                         " ",
                         {
+                            "op": "menu",
                             "responses": [
                                 [
                                     " returned to "
@@ -59,7 +62,7 @@
                 },
                 " the room. "
             ],
-            ""
+            0
         ]
     },
     " The end."

@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="index.css" />
     <link rel="stylesheet" href="interface.css" />
     <script>
-      if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
+      // if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
     </script>
   </head>
 
@@ -19,15 +19,11 @@
 
     <!-- story file load & execute -->
     <script>
-      function loadStory() {
+      window.addEventListener("layoutReady", () =>
         fetch("./system3.sample.json")
           .then(r => r.json())
-          .then(story => {
-            interpret(story, document.getElementById("published"));
-          });
-      }
-
-      window.addEventListener("layoutReady", loadStory);
+          .then(interpret),
+      );
     </script>
 
     <script src="./layout.ts"></script>

@@ -15,27 +15,15 @@
   </head>
 
   <body>
+    <script src="./interpreter.ts"></script>
+
     <!-- story file placeholder -->
     <script>
       function loadStory() {
-        fetch("./system3.sample.txt")
-          .then(r => r.text())
-          .then(text => {
-            // ultra-hack
-            document.getElementById("published").innerHTML = text.replaceAll("[", "<ul>").replaceAll("]", "</ul>").replaceAll("*", "<li>");
-            function click(btn, e) {
-              const ul = btn.closest("ul");
-              const chosen = document.createElement("b");
-              chosen.innerText = btn.innerText + "\n";
-              ul.parentElement.replaceChild(chosen, ul);
-            }
-            document.querySelectorAll("ul").forEach(ul => (ul.classList = "playerChoices"));
-            document.querySelectorAll("li").forEach(li => {
-              const button = document.createElement("button");
-              button.innerHTML = li.innerHTML;
-              button.onclick = e => click(button, e);
-              li.parentElement.replaceChild(button, li);
-            });
+        fetch("./system3.sample.json")
+          .then(r => r.json())
+          .then(story => {
+            interpret(story, document.getElementById("published"));
           });
       }
 

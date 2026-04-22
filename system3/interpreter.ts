@@ -6,9 +6,11 @@ type StoryOperation = {
   wrap: StoryNode[];
 };
 
+type StoryResponse = StoryNode[];
+
 type StoryResponses = {
   op: "menu";
-  responses: StoryNode[][];
+  responses: StoryResponse[];
 };
 
 type Story = StoryNode[];
@@ -42,7 +44,7 @@ function renderStoryNodeResponses(node: StoryResponses, el: HTMLElement) {
   if (!Array.isArray(node.responses)) throw new Error("Expected responses to be an array");
   const responsesContainer = renderNewMenu();
   node.responses.forEach(response => {
-    if (!response) return;
+    if (!response || typeof response === "string") return;
     const button = document.createElement("button");
     button.onclick = onChoice;
     responsesContainer.appendChild(button);

@@ -9,11 +9,13 @@ text "writing" = letters:[-a-zA-Z_ ,!?.\n\r]+                 { return letters.j
 prompt = responses:response+                                        { return ({op:'menu', responses})}
 bang = "*"
 endprompt = bang _ bang                                             { return 0;} 
-response = endprompt / ( bang option:anythingelse                   { return option; }     )                 
+subresponse = _ bang option:anythingelse                              { return option; }     
+response = endprompt / subresponse
 
-code = did / didnt / if / unless
+
+code = did / didnt / if / unless / menu
 did =    "[did "i    _ match:text "]" wrap:anything "[/did]"i       { return ({op:'did'   , match, wrap})}
 didnt =  "[didnt "i  _ match:text "]" wrap:anything "[/didnt]"i     { return ({op:'didnt' , match, wrap})}
 if =     "[if "i     _ match:text "]" wrap:anything "[/if]"i        { return ({op:'if'    , match, wrap})}
 unless = "[unless "i _ match:text "]" wrap:anything "[/unless]"i    { return ({op:'unless', match, wrap})}
-menu =   "[menu "i   _ "]" responses:anything "[/menu]"i            { return ({op:'menu'  , responses})}
+menu =   "[menu"i    _ "]" responses:subresponse+   "[/menu]"i      { return ({op:'menu'  , responses})}

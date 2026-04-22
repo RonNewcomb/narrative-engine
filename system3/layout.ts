@@ -1,3 +1,30 @@
+type Attributes<T extends HTMLElement> = Partial<Omit<T, "style">> & { style?: Partial<CSSStyleDeclaration> };
+
+function div(children?: HTMLElement[], attrs?: Attributes<HTMLDivElement>): HTMLDivElement {
+  return element("div", attrs, children) as HTMLDivElement;
+}
+
+function paragraph(children?: HTMLElement[], attrs?: Attributes<HTMLParagraphElement>): HTMLParagraphElement {
+  return element("p", attrs, children) as HTMLParagraphElement;
+}
+
+function buttonMake(
+  label: any,
+  onclick: (e: Event) => void,
+  children?: HTMLElement[],
+  attrs?: Attributes<HTMLButtonElement>,
+): HTMLButtonElement {
+  return element("button", { ...attrs, onclick, innerText: label, type: "button" }, children) as HTMLButtonElement;
+}
+
+function element<T extends HTMLElement>(tagName: string, attrs?: Attributes<T>, children?: HTMLElement[]): T {
+  const el = document.createElement(tagName) as T;
+  if (attrs) (Object.keys(attrs) as (keyof T)[]).forEach(attr => (el[attr] = (attrs as any)[attr]));
+  if (attrs && attrs.style) Object.keys(attrs.style).forEach(css => (el.style[css as any] = (attrs.style as any)[css]));
+  if (children) children.forEach(child => el.appendChild(child));
+  return el;
+}
+
 const layout = `
 <aside id="cornerMenu">
     <button id="open-main-menu-btn" type="button">...</button>

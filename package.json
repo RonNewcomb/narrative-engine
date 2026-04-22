@@ -16,7 +16,7 @@
   },
   "scripts": {
     "publish": "cd publishing && tsx publish.ts && cd ..",
-    "parser3": "cd s3p && peggy --format es -o parser.mjs parser.peggy && tsc compile.mts --module nodenext && node compile.mjs",
+    "parser3": "cd s3p && peggy --format es -o parser.mjs parser.peggy && tsc compile.mts --module nodenext && node compile.mjs system3.sample.txt",
     "system3": "cd system3 && vite serve"
   }
 }

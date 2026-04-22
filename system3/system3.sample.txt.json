@@ -39,7 +39,35 @@
             " the door"
         ]
     },
-    " and left the room.\n\n\nRose ",
+    " and left the room.\n\n\nCorey wanted to ",
+    {
+        "op": "menu",
+        "responses": [
+            [
+                " walk "
+            ],
+            [
+                " drive ",
+                {
+                    "op": "menu",
+                    "responses": [
+                        [
+                            " the car "
+                        ],
+                        [
+                            " the bike "
+                        ]
+                    ]
+                },
+                " "
+            ],
+            [
+                " run "
+            ],
+            0
+        ]
+    },
+    ".\n\nRose ",
     {
         "op": "menu",
         "responses": [

@@ -1,15 +1,16 @@
 // npm run parser3
+// or: node compile.mjs [filename]
 import { readFile, writeFile } from "fs/promises";
 import { parse, SyntaxError } from "./parser.mjs";
 
-const storyFilename = "system3.sample";
+const storyFilename = process.argv[2] || "FILE_NOT_SPECIFIED";
 
-const source = await readFile(`./${storyFilename}.txt`).then(x => x.toString().trim());
+const source = await readFile(storyFilename).then(x => x.toString().trim());
 try {
   const ast = parse(source);
   const json = JSON.stringify(ast, undefined, 4);
   console.log(json);
-  await writeFile(`./${storyFilename}.json`, json);
+  await writeFile(`../system3/${storyFilename}.json`, json);
 } catch (e) {
   if (e instanceof SyntaxError) {
     // @ts-ignore

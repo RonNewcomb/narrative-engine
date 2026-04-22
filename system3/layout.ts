@@ -39,7 +39,8 @@ const layout = `
     </div>
 </aside>
 <main id="published"></main>
-<nav id="choices"></nav>`;
+<div id="choices"></div>
+<style>nav nav { display: none; }</style>`;
 
 document.body.insertAdjacentHTML("beforeend", layout);
 

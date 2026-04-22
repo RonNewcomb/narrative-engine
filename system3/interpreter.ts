@@ -35,7 +35,7 @@ function renderNewMenu() {
   return nav;
 }
 
-function renderStoryNodeString(node: string, el: HTMLElement) {
+function renderStoryNodeString(node: string, el: HTMLElement): false {
   el.appendChild(document.createTextNode(node));
   return false;
 }
@@ -45,47 +45,42 @@ function renderStoryNodeResponses(node: StoryResponses, el: HTMLElement) {
   const responsesContainer = renderNewMenu();
   node.responses.forEach(response => {
     if (!response || typeof response === "string") return;
+    const wrapper = div(undefined, { className: "response" });
     const button = document.createElement("button");
     button.onclick = onChoice;
-    responsesContainer.appendChild(button);
+    wrapper.appendChild(button);
+    responsesContainer.appendChild(wrapper);
     response.forEach(n => renderStoryNode(n, button));
+    // move nav elements out of button's children to wrapper's children so .innerText on button is useful
+    for (let i = 0; i < button.children.length; i++) {
+      const child = button.children[i];
+      if (child.tagName == "NAV") wrapper.appendChild(button.replaceChild(document.createElement("sub-menu"), child));
+    }
   });
   el.appendChild(responsesContainer);
-  menus.pop();
-  return menus.length == 0;
+  const lastMenu = menus.pop();
+  return menus.length == 0 ? lastMenu : false;
 }
 
-function renderStoryNodes(nodes: StoryNode[], el: HTMLElement) {
+function renderStoryNodes(nodes: StoryNode[], el: HTMLElement): false {
   nodes.forEach(node => renderStoryNode(node, el));
   return false;
 }
 
 function renderStoryNodeOperationIf(node: StoryOperation, el: HTMLElement) {
-  if (state.chosen.some(oldChoice => oldChoice.includes(node.match))) {
-    return renderStoryNodes(node.wrap, el);
-  }
-  return false;
+  return state.chosen.some(oldChoice => oldChoice.includes(node.match)) ? renderStoryNodes(node.wrap, el) : false;
 }
 
 function renderStoryNodeOperationDid(node: StoryOperation, el: HTMLElement) {
-  if (state.chosen.some(oldChoice => oldChoice.includes(node.match))) {
-    return renderStoryNodes(node.wrap, el);
-  }
-  return false;
+  return state.chosen.some(oldChoice => oldChoice.includes(node.match)) ? renderStoryNodes(node.wrap, el) : false;
 }
 
 function renderStoryNodeOperationIfnot(node: StoryOperation, el: HTMLElement) {
-  if (!state.chosen.some(oldChoice => oldChoice.includes(node.match))) {
-    return renderStoryNodes(node.wrap, el);
-  }
-  return false;
+  return !state.chosen.some(oldChoice => oldChoice.includes(node.match)) ? renderStoryNodes(node.wrap, el) : false;
 }
 
 function renderStoryNodeOperationDidnot(node: StoryOperation, el: HTMLElement) {
-  if (!state.chosen.some(oldChoice => oldChoice.includes(node.match))) {
-    return renderStoryNodes(node.wrap, el);
-  }
-  return false;
+  return !state.chosen.some(oldChoice => oldChoice.includes(node.match)) ? renderStoryNodes(node.wrap, el) : false;
 }
 
 function renderStoryNode(node: StoryNode, el: HTMLElement) {
@@ -100,12 +95,13 @@ function renderStoryNode(node: StoryNode, el: HTMLElement) {
 
 // render the current turn, but leaves turn pointer to next turn, assuming no gotos
 function renderCurrentTurn() {
-  let stopForInput = false;
+  let stopForInput: ReturnType<typeof renderStoryNode> = false;
   do {
     state.current++;
     const node = state.story[state.current];
     stopForInput = renderStoryNode(node, publishedElement);
   } while (!stopForInput && state.current < state.story.length);
+  if (stopForInput) animate(stopForInput);
 }
 
 //////////////////////

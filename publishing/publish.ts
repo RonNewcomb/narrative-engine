@@ -70,7 +70,7 @@ const indexCss = await makeStyletag(commonDir + "index.css");
 const cssFiles = readdirSync(buildDir).filter(f => f.endsWith(".css"));
 const css = await Promise.all(cssFiles.map(f => makeStyletag(buildDir + f)));
 
-const substitutions = Object.entries(<Record<string, string | number | boolean>>{
+const substitutions = Object.entries({
   "${appName}": appName,
   "${ifid}": ifid,
   "${title}": about.title,
@@ -81,7 +81,7 @@ const substitutions = Object.entries(<Record<string, string | number | boolean>>
   "${description}": about.description || `${about.title}: ${about.headline} by ${about.author}`,
   '<link rel="stylesheet" href="index.css" />': "",
   "</head>": indexCss + css.join("\n") + "\n</head>",
-});
+} satisfies Record<string, string | number | boolean>);
 
 const templating = (contents: string): string =>
   substitutions.reduce((text, [key, value]) => (text = text.replaceAll(key, value.toString())), contents);

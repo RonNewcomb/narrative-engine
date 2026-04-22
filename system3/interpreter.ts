@@ -40,6 +40,10 @@ function renderStoryNodeString(node: string, el: HTMLElement): false {
   return false;
 }
 
+function renderTheEnd() {
+  document.getElementById("choices")!.appendChild(document.createElement("hr"));
+}
+
 function renderStoryNodeResponses(node: StoryResponses, el: HTMLElement) {
   if (!Array.isArray(node.responses)) throw new Error("Expected responses to be an array");
   const responsesContainer = renderNewMenu();
@@ -98,6 +102,7 @@ function renderCurrentTurn() {
   do {
     state.current++;
     const node = state.story[state.current];
+    if (!node) break;
     stopForInput = renderStoryNode(node, publishedElement);
   } while (!stopForInput && state.current < state.story.length);
   if (stopForInput)
@@ -106,6 +111,7 @@ function renderCurrentTurn() {
       renderStoryNodeString(response, publishedElement);
       renderCurrentTurn();
     });
+  else renderTheEnd();
 }
 
 //////////////////////

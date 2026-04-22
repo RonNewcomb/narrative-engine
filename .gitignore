@@ -1,4 +1,3 @@
 build
 /build.js
 node_modules
-/s3p/compile.mjs

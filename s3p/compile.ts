@@ -1,7 +1,7 @@
-// npm run parser3
-// or: node compile.mjs [filename]
+// run: npm run parser3
+// or : node compile.ts [filename]
 import { readFile, writeFile } from "fs/promises";
-import { parse, SyntaxError } from "./parser.mjs";
+import { parse, SyntaxError } from "./parser.js";
 
 const storyFilename = process.argv[2] || "FILE_NOT_SPECIFIED";
 

@@ -112,21 +112,13 @@ A scene is a little story centering around a character, a want, and some kind of
 
 The parser-generator is in the `s3p` folder and it's currently a multi-step build process. The following command performs these steps.
 
-```bash
-npm run parse
-```
-
-It does the following.
-
+0. `npm run parse3` runs the parser-generator.
 1. It uses Peggy (a parser generator) to create the system-3 parser from the `parser.peggy` description file that describes the syntax this README describes.
-2. The resulting parser is in file `parser.mjs`.
-3. We then run `compile.mts` to combine the sample author work `system3.sample.txt` with the `parser.mjs`.
-4. The above resulted in `compile.mjs` which `node` runs directly.
-5. This produces and prints an AST of the author's work.
-
-To run a system3 story in the browser:
-
-Run `npm run system3` to serve `./system3/index.html` to browsers as a PWA.
+2. The resulting parser is in file `parser.js`.
+3. We then run `compile.ts` to combine the sample author work `system3.sample.txt` with the `parser.js`.
+4. The above results in an AST of the author's work in `system3.sample.txt.json`, which is placed in the `/system3` folder.
+5. To run said json story in the browser:
+6. Run `npm run system3` and serve `./system3/index.html` to browsers.
 
 ## Inserting Choices with \*
 

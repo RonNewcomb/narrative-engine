@@ -38,7 +38,8 @@ async function animate(navElement: HTMLElement): Promise<string> {
       return Array.from(slidingWindow.children)
         .map(panel => {
           const responseWrapperDiv = panel.getElementsByClassName("selected")[0];
-          return responseWrapperDiv?.children?.[1]?.textContent || "";
+          const button = responseWrapperDiv?.children?.[0];
+          return button?.textContent || "";
         })
         .join("");
     }
@@ -51,10 +52,12 @@ async function animate(navElement: HTMLElement): Promise<string> {
       });
 
       // make new slide
-      const i = currentSlide + 1;
       const newNavElement = responseWrapperDiv.children?.[1]?.cloneNode(true) as HTMLElement | undefined;
       if (!newNavElement) return whenFinished();
-      slidingWindow.children[i] = prepareNav(newNavElement);
+      console.log("slidingwindows", slidingWindow.children.length, "panesls", slidingWindow.children[0]);
+      slidingWindow.replaceChildren(...Array.from(slidingWindow.children).slice(0, currentSlide + 1));
+      slidingWindow.appendChild(prepareNav(newNavElement));
+      console.log("slidingwindows", slidingWindow.children.length, "panesls");
 
       title.innerText = getTitle();
 

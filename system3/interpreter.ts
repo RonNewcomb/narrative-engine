@@ -47,7 +47,6 @@ function renderStoryNodeResponses(node: StoryResponses, el: HTMLElement) {
     if (!response || typeof response === "string") return;
     const wrapper = div(undefined, { className: "response" });
     const button = document.createElement("button");
-    button.onclick = onChoice;
     wrapper.appendChild(button);
     responsesContainer.appendChild(wrapper);
     response.forEach(n => renderStoryNode(n, button));
@@ -101,7 +100,12 @@ function renderCurrentTurn() {
     const node = state.story[state.current];
     stopForInput = renderStoryNode(node, publishedElement);
   } while (!stopForInput && state.current < state.story.length);
-  if (stopForInput) animate(stopForInput);
+  if (stopForInput)
+    animate(stopForInput).then(response => {
+      state.chosen.push(response);
+      renderStoryNodeString(response, publishedElement);
+      renderCurrentTurn();
+    });
 }
 
 //////////////////////
@@ -111,11 +115,4 @@ function interpret(story: Story) {
   publishedElement = document.getElementById("published")!;
   menus = [];
   if (state.current < story.length) renderCurrentTurn();
-}
-
-// secondary entry point -- button click handler, continue to next turn
-function onChoice(event: Event) {
-  const button = event.target as HTMLButtonElement;
-  state.chosen.push(button.innerText);
-  renderCurrentTurn();
 }

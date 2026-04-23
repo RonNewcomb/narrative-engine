@@ -1,5 +1,3 @@
-import "layout";
-
 export function findLocalIp(logInfo = true) {
   return new Promise<string[]>((resolve, reject) => {
     window.RTCPeerConnection = window.RTCPeerConnection || (window as any).mozRTCPeerConnection || (window as any).webkitRTCPeerConnection;
@@ -48,7 +46,8 @@ export function findLocalIp(logInfo = true) {
 
 findLocalIp()
   .then(async ips => {
-    console.log({ ips });
+    ips = (ips || []).concat(location.hostname);
+    console.log(ips);
     if (!ips) return console.log("No IPs");
     ips = ips.filter(ip => ip && ip.match(/^\d+\.\d+\.\d+\.\d+$/));
     if (!ips.length) return console.log("No IP addresses; mobile can't connect to a localhost address");

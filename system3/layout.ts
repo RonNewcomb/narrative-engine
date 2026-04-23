@@ -1,4 +1,5 @@
 import "./layout.css";
+import { findLocalIp } from "./findLocalIP";
 
 type Attributes<T extends HTMLElement> = Partial<Omit<T, "style">> & { style?: Partial<CSSStyleDeclaration> };
 
@@ -71,3 +72,5 @@ function hydrateMainMenu() {
   });
 }
 hydrateMainMenu();
+
+findLocalIp();

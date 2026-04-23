@@ -31,9 +31,10 @@ let menus: HTMLElement[] = [];
 
 // rendering
 
-function renderNewMenu() {
+function createNewMenu(children: HTMLElement[] = []) {
   const nav = document.createElement("nav");
   nav.classList = "playerChoices";
+  nav.replaceChildren(...children);
   menus.push(nav);
   return nav;
 }
@@ -43,27 +44,33 @@ function renderStoryNodeString(node: string, el: HTMLElement): false {
   return false;
 }
 
+function renderStoryNodeCommand(command: string, el: HTMLElement) {
+  const span = document.createElement("span");
+  span.innerText = command;
+  span.className = "command";
+  el.appendChild(span);
+}
+
 function renderTheEnd() {
   document.getElementById("choices")!.appendChild(document.createElement("hr"));
 }
 
 function renderStoryNodeResponses(node: StoryResponses, el: HTMLElement) {
   if (!Array.isArray(node.responses)) throw new Error("Expected responses to be an array");
-  const responsesContainer = renderNewMenu();
-  node.responses.forEach(response => {
-    if (!response || typeof response === "string") return;
-    const wrapper = div(undefined, { className: "response" });
-    const button = document.createElement("button");
-    wrapper.appendChild(button);
-    responsesContainer.appendChild(wrapper);
-    response.forEach(n => renderStoryNode(n, button));
-    // move nav elements out of button's children to wrapper's children so .innerText on button is useful
-    for (let i = 0; i < button.children.length; i++) {
-      const child = button.children[i];
-      if (child.tagName == "NAV") wrapper.appendChild(button.replaceChild(document.createElement("sub-menu"), child));
-    }
-  });
-  el.appendChild(responsesContainer);
+  const responseWrappers = node.responses
+    .filter(response => response && typeof response !== "string")
+    .map(response => {
+      const button = document.createElement("button");
+      response.forEach(segment => renderStoryNode(segment, button));
+      const responseWrapper = div([button], { className: "response" });
+      // move nav elements out of button's children to wrapper's children so .innerText on button is useful
+      for (let i = 0; i < button.children.length; i++) {
+        const child = button.children[i];
+        if (child.tagName == "NAV") responseWrapper.appendChild(button.replaceChild(document.createElement("sub-menu"), child));
+      }
+      return responseWrapper;
+    });
+  el.appendChild(createNewMenu(responseWrappers));
   const lastMenu = menus.pop();
   return menus.length == 0 ? lastMenu : false;
 }
@@ -100,7 +107,7 @@ function renderStoryNode(node: StoryNode, el: HTMLElement) {
 }
 
 // render the current turn, but leaves turn pointer to next turn, assuming no gotos
-function renderCurrentTurn() {
+async function renderCurrentTurn() {
   let stopForInput: ReturnType<typeof renderStoryNode> = false;
   do {
     state.current++;
@@ -109,9 +116,9 @@ function renderCurrentTurn() {
     stopForInput = renderStoryNode(node, publishedElement);
   } while (!stopForInput && state.current < state.story.length);
   if (stopForInput)
-    animate(stopForInput).then(response => {
+    return animate(stopForInput).then(response => {
       state.chosen.push(response);
-      renderStoryNodeString(response, publishedElement);
+      renderStoryNodeCommand(response, publishedElement);
       renderCurrentTurn();
     });
   else renderTheEnd();
@@ -119,13 +126,13 @@ function renderCurrentTurn() {
 
 //////////////////////
 // main entry point
-export async function interpret(filename: string) {
+export async function interpret(filename: string, pwa = false) {
+  if (pwa && "serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
   const story: Story = await fetch(filename).then(r => r.json());
   state = { story, current: -1, chosen: [] };
   publishedElement = document.getElementById("published")!;
   menus = [];
-  if (state.current < story.length) renderCurrentTurn();
+  return renderCurrentTurn();
 }
 
 (window as any).interpret = interpret;
-// if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");

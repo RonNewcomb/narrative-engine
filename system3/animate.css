@@ -3,7 +3,7 @@
   margin-bottom: 1.5em;
   margin-top: 1em;
   width: calc(100% - 4em);
-  padding: 0em 1em 1em 1em;
+  /* padding: 0em 1em 1em 1em; */
   background-color: wheat;
   border-radius: 5px;
   box-shadow: wheat 0 0 8px 11px;
@@ -51,4 +51,8 @@
   padding: 0.3em 1.2em;
   border-radius: 13px;
   width: 100%; /* easiest for fingers to reach */
+}
+
+.command {
+  font-weight: bold;
 }

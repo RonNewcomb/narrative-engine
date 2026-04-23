@@ -42,9 +42,9 @@ export async function animate(navElement: HTMLElement): Promise<string> {
         .map(panel => {
           const responseWrapperDiv = panel.getElementsByClassName("selected")[0];
           const button = responseWrapperDiv?.children?.[0];
-          return button?.textContent || "";
+          return button?.textContent.trim() || "";
         })
-        .join("");
+        .join(" ");
     }
 
     function choose(event: Event, responseWrapperDiv: Element, navElement: HTMLElement) {
@@ -56,9 +56,11 @@ export async function animate(navElement: HTMLElement): Promise<string> {
 
       // make new slide
       const newNavElement = responseWrapperDiv.children?.[1]?.cloneNode(true) as HTMLElement | undefined;
-      if (!newNavElement) return whenFinished();
-      slidingWindow.replaceChildren(...Array.from(slidingWindow.children).slice(0, currentSlide + 1));
-      slidingWindow.appendChild(prepareNav(newNavElement));
+      if (!newNavElement) return finished();
+      const slides = Array.from(slidingWindow.children)
+        .slice(0, currentSlide + 1)
+        .concat(prepareNav(newNavElement));
+      slidingWindow.replaceChildren(...slides);
 
       title.innerText = getTitle();
 
@@ -66,7 +68,7 @@ export async function animate(navElement: HTMLElement): Promise<string> {
       nextSlide();
     }
 
-    function whenFinished() {
+    function finished() {
       const title = getTitle();
       console.log({ title });
       resolve(title);

@@ -14,9 +14,10 @@ export interface ResponseButtonElement extends Omit<HTMLButtonElement, "children
 
 export async function animate(topMenu: MenuElement): Promise<string> {
   return new Promise(resolve => {
-    const panels = [createPanelFromMenuTemplate(topMenu)];
-    const slidingWindow = div(panels, { className: "slidingWindow" });
-    const title = paragraph([], { className: "title", innerText: "" });
+    document.getElementById("published")!.removeChild(topMenu);
+
+    const slidingWindow = div([createPanelFromMenuTemplate(topMenu)], { id: "slidingWindow", className: "slidingWindow" });
+    const title = paragraph([], { className: "title", innerText: " " });
     const container = element<HTMLDivElement>("section", { className: "playerChoices" }, [title, slidingWindow]);
     const choicesLandingSpot = document.getElementById("choices")!;
     choicesLandingSpot.appendChild(container);
@@ -56,22 +57,31 @@ export async function animate(topMenu: MenuElement): Promise<string> {
       slidingWindow.replaceChildren(...slides);
     }
 
-    let shouldTitle = " ";
+    function getTitle(panels: MenuPanelElement[]): string {
+      if (!panels || panels.length === 0) return " ";
+      const retval: string[] = [];
+      for (const panel of panels) {
+        const pushedButton = Array.from(panel.childNodes).find(button => button.classList.contains("selected"));
+        if (!pushedButton) break;
+        for (const child of pushedButton.childNodes) {
+          if (child.nodeType == Node.TEXT_NODE) {
+            const words = child as Text;
+            retval.push(words.textContent || "");
+          }
+        }
+      }
+      return retval.join("");
+    }
+
     function shouldDisplay(menu: MenuPanelElement): MenuElement | false {
       if (!menu) return false;
       const pushed = Array.from(menu.childNodes).find(button => button.classList.contains("selected"));
       if (!pushed) return menu;
       for (const child of pushed.childNodes) {
-        switch (child.nodeType) {
-          case Node.TEXT_NODE:
-            const words = child as Text;
-            shouldTitle += words.textContent || "";
-            break;
-          case Node.ELEMENT_NODE:
-            const submenu = child as MenuElement;
-            const subsubmenu = shouldDisplay(submenu);
-            if (subsubmenu) return subsubmenu;
-            break;
+        if (child.nodeType == Node.ELEMENT_NODE) {
+          const submenu = child as MenuElement;
+          const menuToDisplay = shouldDisplay(submenu);
+          if (menuToDisplay) return menuToDisplay;
         }
       }
       return false;
@@ -91,16 +101,19 @@ export async function animate(topMenu: MenuElement): Promise<string> {
       const pushedButton = event.currentTarget as ResponseButtonElement;
       selectReponse(pushedButton);
 
+      const panels = Array.from(document.getElementById("slidingWindow")!.childNodes) as MenuPanelElement[];
+      title.innerText = getTitle(panels);
+
       const nextMenu = shouldDisplay(panels[currentSlide]);
-      title.innerText = shouldTitle;
       if (!nextMenu) return finished();
       displayMenu(nextMenu);
       nextSlide();
     }
 
     function finished() {
-      console.log({ shouldTitle });
-      resolve(shouldTitle);
+      const chosen = title.innerText;
+      console.log({ chosen });
+      resolve(chosen);
 
       container.classList.add("exit");
       setTimeout(() => {

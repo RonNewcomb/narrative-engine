@@ -1,19 +1,20 @@
 import { div, paragraph, element } from "./layout";
 import "./animate.css";
 
-export async function animate(navElement: HTMLElement): Promise<string> {
-  return new Promise(resolve => {
-    function prepareNav(navElement: HTMLElement) {
-      navElement.classList.add("slidepanel");
-      for (let i = 0; i < navElement.children.length; i++) {
-        const responseWrapperDiv = navElement.children[i];
-        const button = responseWrapperDiv.children[0];
-        button.addEventListener("click", ev => choose(ev, responseWrapperDiv, navElement));
-      }
-      return navElement;
-    }
+export interface MenuElement extends HTMLDivElement {
+  childNodes: NodeListOf<ResponseButtonElement>;
+}
 
-    const panels = [prepareNav(navElement)];
+export interface MenuPanelElement extends MenuElement {}
+
+export interface ResponseButtonElement extends Omit<HTMLButtonElement, "children"> {
+  parentElement: MenuElement;
+  childNodes: NodeListOf<Text | MenuElement>;
+}
+
+export async function animate(topMenu: MenuElement): Promise<string> {
+  return new Promise(resolve => {
+    const panels = [createPanelFromMenuTemplate(topMenu)];
     const slidingWindow = div(panels, { className: "slidingWindow" });
     const title = paragraph([], { className: "title", innerText: "" });
     const container = element<HTMLDivElement>("section", { className: "playerChoices" }, [title, slidingWindow]);
@@ -37,41 +38,69 @@ export async function animate(navElement: HTMLElement): Promise<string> {
     setSlide();
     swipeNotify = (dir: "next" | "prev") => (dir == "prev" ? prevSlide() : undefined);
 
-    function getTitle() {
-      return Array.from(slidingWindow.children)
-        .map(panel => {
-          const responseWrapperDiv = panel.getElementsByClassName("selected")[0];
-          const button = responseWrapperDiv?.children?.[0];
-          return button?.textContent.trim() || "";
-        })
-        .join(" ");
+    function createPanelFromMenuTemplate(menu: MenuElement): MenuPanelElement {
+      const panel = menu.cloneNode(true) as MenuPanelElement;
+      panel.classList.add("slidepanel");
+      for (const button of panel.childNodes) {
+        button.addEventListener("click", choose);
+        button.classList.remove("selected");
+      }
+      return panel;
     }
 
-    function choose(event: Event, responseWrapperDiv: Element, navElement: HTMLElement) {
-      event.preventDefault();
-      Array.from(navElement.children).forEach(child => {
-        if (child !== responseWrapperDiv) child.classList.remove("selected");
-        else child.classList.add("selected");
-      });
-
-      // make new slide
-      const newNavElement = responseWrapperDiv.children?.[1]?.cloneNode(true) as HTMLElement | undefined;
-      if (!newNavElement) return finished();
+    function displayMenu(menu: MenuElement) {
+      const panel = createPanelFromMenuTemplate(menu);
       const slides = Array.from(slidingWindow.children)
         .slice(0, currentSlide + 1)
-        .concat(prepareNav(newNavElement));
+        .concat(panel);
       slidingWindow.replaceChildren(...slides);
+    }
 
-      title.innerText = getTitle();
+    let shouldTitle = " ";
+    function shouldDisplay(menu: MenuPanelElement): MenuElement | false {
+      if (!menu) return false;
+      const pushed = Array.from(menu.childNodes).find(button => button.classList.contains("selected"));
+      if (!pushed) return menu;
+      for (const child of pushed.childNodes) {
+        switch (child.nodeType) {
+          case Node.TEXT_NODE:
+            const words = child as Text;
+            shouldTitle += words.textContent || "";
+            break;
+          case Node.ELEMENT_NODE:
+            const submenu = child as MenuElement;
+            const subsubmenu = shouldDisplay(submenu);
+            if (subsubmenu) return subsubmenu;
+            break;
+        }
+      }
+      return false;
+    }
 
-      // nav to new slide
+    function selectReponse(pushedButton: ResponseButtonElement) {
+      const allButtons = pushedButton.parentElement!;
+      for (const button of allButtons.childNodes) button.classList.remove("selected");
+      pushedButton.classList.add("selected");
+    }
+
+    function choose(event: Event) {
+      event.preventDefault();
+
+      // .currentTarget is what's in front of .addEventListener
+      // .target is a child of currentTarget (or same) which actually got clicked
+      const pushedButton = event.currentTarget as ResponseButtonElement;
+      selectReponse(pushedButton);
+
+      const nextMenu = shouldDisplay(panels[currentSlide]);
+      title.innerText = shouldTitle;
+      if (!nextMenu) return finished();
+      displayMenu(nextMenu);
       nextSlide();
     }
 
     function finished() {
-      const title = getTitle();
-      console.log({ title });
-      resolve(title);
+      console.log({ shouldTitle });
+      resolve(shouldTitle);
 
       container.classList.add("exit");
       setTimeout(() => {

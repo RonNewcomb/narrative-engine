@@ -1,5 +1,4 @@
-import { animate } from "./animate";
-import { div } from "./layout";
+import { animate, type MenuElement } from "./animate";
 
 type StoryNode = string | StoryOperation | StoryResponses;
 
@@ -27,12 +26,12 @@ let state = {
 
 // helpers
 let publishedElement = document.getElementById("published")!;
-let menus: HTMLElement[] = [];
+let menus: MenuElement[] = [];
 
 // rendering
 
-function createNewMenu(children: HTMLElement[] = []) {
-  const nav = document.createElement("nav");
+function createNewMenu(children: HTMLElement[] = []): MenuElement {
+  const nav = document.createElement("nav") as MenuElement;
   nav.classList = "playerChoices";
   nav.replaceChildren(...children);
   menus.push(nav);
@@ -44,59 +43,53 @@ function renderStoryNodeString(node: string, el: HTMLElement): false {
   return false;
 }
 
-function renderStoryNodeCommand(command: string, el: HTMLElement) {
+function renderStoryNodeCommand(command: string, el: HTMLElement): void {
   const span = document.createElement("span");
   span.innerText = command;
   span.className = "command";
   el.appendChild(span);
 }
 
-function renderTheEnd() {
+function renderTheEnd(): void {
   document.getElementById("choices")!.appendChild(document.createElement("hr"));
 }
 
-function renderStoryNodeResponses(node: StoryResponses, el: HTMLElement) {
+function renderStoryNodeResponses(node: StoryResponses, el: HTMLElement): MenuElement | false {
   if (!Array.isArray(node.responses)) throw new Error("Expected responses to be an array");
-  const responseWrappers = node.responses
+  const buttons = node.responses
     .filter(response => response && typeof response !== "string")
     .map(response => {
       const button = document.createElement("button");
       response.forEach(segment => renderStoryNode(segment, button));
-      const responseWrapper = div([button], { className: "response" });
-      // move nav elements out of button's children to wrapper's children so .innerText on button is useful
-      for (let i = 0; i < button.children.length; i++) {
-        const child = button.children[i];
-        if (child.tagName == "NAV") responseWrapper.appendChild(button.replaceChild(document.createElement("sub-menu"), child));
-      }
-      return responseWrapper;
+      return button;
     });
-  el.appendChild(createNewMenu(responseWrappers));
+  el.appendChild(createNewMenu(buttons));
   const lastMenu = menus.pop();
-  return menus.length == 0 ? lastMenu : false;
+  return lastMenu && menus.length == 0 ? lastMenu : false;
 }
 
-function renderStoryNodes(nodes: StoryNode[], el: HTMLElement): false {
-  nodes.forEach(node => renderStoryNode(node, el));
-  return false;
+function renderStoryNodes(nodes: StoryNode[], el: HTMLElement): false | MenuElement {
+  const returns = nodes.map(node => renderStoryNode(node, el));
+  return returns.filter(x => !!x)[0] || false;
 }
 
-function renderStoryNodeOperationIf(node: StoryOperation, el: HTMLElement) {
+function renderStoryNodeOperationIf(node: StoryOperation, el: HTMLElement): false | MenuElement {
   return state.chosen.some(oldChoice => oldChoice.includes(node.match)) ? renderStoryNodes(node.wrap, el) : false;
 }
 
-function renderStoryNodeOperationDid(node: StoryOperation, el: HTMLElement) {
+function renderStoryNodeOperationDid(node: StoryOperation, el: HTMLElement): false | MenuElement {
   return state.chosen.some(oldChoice => oldChoice.includes(node.match)) ? renderStoryNodes(node.wrap, el) : false;
 }
 
-function renderStoryNodeOperationIfnot(node: StoryOperation, el: HTMLElement) {
+function renderStoryNodeOperationIfnot(node: StoryOperation, el: HTMLElement): false | MenuElement {
   return !state.chosen.some(oldChoice => oldChoice.includes(node.match)) ? renderStoryNodes(node.wrap, el) : false;
 }
 
-function renderStoryNodeOperationDidnot(node: StoryOperation, el: HTMLElement) {
+function renderStoryNodeOperationDidnot(node: StoryOperation, el: HTMLElement): false | MenuElement {
   return !state.chosen.some(oldChoice => oldChoice.includes(node.match)) ? renderStoryNodes(node.wrap, el) : false;
 }
 
-function renderStoryNode(node: StoryNode, el: HTMLElement) {
+function renderStoryNode(node: StoryNode, el: HTMLElement): false | MenuElement {
   if (typeof node === "string") return renderStoryNodeString(node, el);
   if (node.op == "menu") return renderStoryNodeResponses(node, el);
   if (node.op == "if") return renderStoryNodeOperationIf(node, el);

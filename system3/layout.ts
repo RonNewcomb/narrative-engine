@@ -1,14 +1,16 @@
+import "./layout.css";
+
 type Attributes<T extends HTMLElement> = Partial<Omit<T, "style">> & { style?: Partial<CSSStyleDeclaration> };
 
-function div(children?: HTMLElement[], attrs?: Attributes<HTMLDivElement>): HTMLDivElement {
+export function div(children?: HTMLElement[], attrs?: Attributes<HTMLDivElement>): HTMLDivElement {
   return element("div", attrs, children) as HTMLDivElement;
 }
 
-function paragraph(children?: HTMLElement[], attrs?: Attributes<HTMLParagraphElement>): HTMLParagraphElement {
+export function paragraph(children?: HTMLElement[], attrs?: Attributes<HTMLParagraphElement>): HTMLParagraphElement {
   return element("p", attrs, children) as HTMLParagraphElement;
 }
 
-function buttonMake(
+export function buttonMake(
   label: any,
   onclick: (e: Event) => void,
   children?: HTMLElement[],
@@ -17,7 +19,7 @@ function buttonMake(
   return element("button", { ...attrs, onclick, innerText: label, type: "button" }, children) as HTMLButtonElement;
 }
 
-function element<T extends HTMLElement>(tagName: string, attrs?: Attributes<T>, children?: HTMLElement[]): T {
+export function element<T extends HTMLElement>(tagName: string, attrs?: Attributes<T>, children?: HTMLElement[]): T {
   const el = document.createElement(tagName) as T;
   if (attrs) (Object.keys(attrs) as (keyof T)[]).forEach(attr => (el[attr] = (attrs as any)[attr]));
   if (attrs && attrs.style) Object.keys(attrs.style).forEach(css => (el.style[css as any] = (attrs.style as any)[css]));
@@ -69,6 +71,3 @@ function hydrateMainMenu() {
   });
 }
 hydrateMainMenu();
-
-// Signal that layout is ready
-window.dispatchEvent(new Event("layoutReady"));

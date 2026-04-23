@@ -1,4 +1,6 @@
-function findLocalIp(logInfo = true) {
+import "layout";
+
+export function findLocalIp(logInfo = true) {
   return new Promise<string[]>((resolve, reject) => {
     window.RTCPeerConnection = window.RTCPeerConnection || (window as any).mozRTCPeerConnection || (window as any).webkitRTCPeerConnection;
     if (typeof window.RTCPeerConnection == "undefined") return reject("WebRTC not supported by browser");
@@ -43,6 +45,7 @@ function findLocalIp(logInfo = true) {
     };
   });
 }
+
 findLocalIp()
   .then(async ips => {
     console.log({ ips });

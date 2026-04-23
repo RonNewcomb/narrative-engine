@@ -1,3 +1,6 @@
+import { animate } from "./animate";
+import { div } from "./layout";
+
 type StoryNode = string | StoryOperation | StoryResponses;
 
 type StoryOperation = {
@@ -116,9 +119,13 @@ function renderCurrentTurn() {
 
 //////////////////////
 // main entry point
-function interpret(story: Story) {
+export async function interpret(filename: string) {
+  const story: Story = await fetch(filename).then(r => r.json());
   state = { story, current: -1, chosen: [] };
   publishedElement = document.getElementById("published")!;
   menus = [];
   if (state.current < story.length) renderCurrentTurn();
 }
+
+(window as any).interpret = interpret;
+// if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");

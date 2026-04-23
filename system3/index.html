@@ -7,29 +7,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta property="ifiction:ifid" content="${ifid}" prefix="ifiction: http://babel.ifarchive.org/protocol/iFiction/" />
     <link rel="manifest" href="manifest.json" />
-    <link rel="stylesheet" href="index.css" />
-    <link rel="stylesheet" href="interface.css" />
-    <script>
-      // if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
-    </script>
   </head>
 
   <body>
-    <script src="./animate.ts"></script>
-    <script src="./interpreter.ts"></script>
-
-    <!-- story file load & execute -->
     <script>
-      window.addEventListener("layoutReady", () =>
-        fetch("./system3.sample.txt.json")
-          .then(r => r.json())
-          .then(interpret),
-      );
+      import("./interpreter.ts").then(({ interpret }) => interpret("./system3.sample.txt.json"));
     </script>
-
-    <script src="./layout.ts"></script>
-
-    <!-- find local ip, hopefully, and QR code it -->
-    <script src="./findLocalIP.ts"></script>
   </body>
 </html>

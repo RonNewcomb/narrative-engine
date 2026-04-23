@@ -1,4 +1,7 @@
-async function animate(navElement: HTMLElement): Promise<string> {
+import { div, paragraph, element } from "./layout";
+import "./animate.css";
+
+export async function animate(navElement: HTMLElement): Promise<string> {
   return new Promise(resolve => {
     function prepareNav(navElement: HTMLElement) {
       navElement.classList.add("slidepanel");
@@ -54,10 +57,8 @@ async function animate(navElement: HTMLElement): Promise<string> {
       // make new slide
       const newNavElement = responseWrapperDiv.children?.[1]?.cloneNode(true) as HTMLElement | undefined;
       if (!newNavElement) return whenFinished();
-      console.log("slidingwindows", slidingWindow.children.length, "panesls", slidingWindow.children[0]);
       slidingWindow.replaceChildren(...Array.from(slidingWindow.children).slice(0, currentSlide + 1));
       slidingWindow.appendChild(prepareNav(newNavElement));
-      console.log("slidingwindows", slidingWindow.children.length, "panesls");
 
       title.innerText = getTitle();
 

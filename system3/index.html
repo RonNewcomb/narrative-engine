@@ -10,8 +10,9 @@
   </head>
 
   <body>
+    <script src="./interpreter.ts" type="module"></script>
     <script>
-      import("./interpreter.ts").then(({ interpret }) => interpret("./system3.sample.txt.json"));
+      document.addEventListener("interpreter", () => interpreter("./system3.sample.txt.json"));
     </script>
   </body>
 </html>

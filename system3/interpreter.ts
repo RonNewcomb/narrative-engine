@@ -119,7 +119,7 @@ async function renderCurrentTurn() {
 
 //////////////////////
 // main entry point
-export async function interpret(filename: string, pwa = false) {
+export async function interpreter(filename: string, pwa = false) {
   if (pwa && "serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
   const story: Story = await fetch(filename).then(r => r.json());
   state = { story, current: -1, chosen: [] };
@@ -128,4 +128,5 @@ export async function interpret(filename: string, pwa = false) {
   return renderCurrentTurn();
 }
 
-(window as any).interpret = interpret;
+(window as any).interpreter = interpreter;
+document.dispatchEvent(new Event("interpreter"));

@@ -115,12 +115,26 @@ The parser-generator is in the `s3p` folder and it's currently a multi-step buil
 0. `npm run parse3` runs the parser-generator.
 1. It uses Peggy (a parser generator) to create the system-3 parser from the `parser.peggy` description file that describes the syntax this README describes.
 2. The resulting parser is in file `parser.js`.
-3. We then run `compile.ts` to combine the sample author work `system3.sample.txt` with the `parser.js`.
-4. The above results in an AST of the author's work in `system3.sample.txt.json`, which is placed in the `/system3` folder.
-5. To run said json story in the browser:
-6. Run `npm run system3` and serve `./system3/index.html` to browsers.
 
-## Inserting Choices with \*
+This finishes creating the system-3 compiler. We run the compiler on an author's work so the story can be run in the browser.
+
+3. We run `compile.ts` (which uses `parser.js`) to distill the sample author work `system3.sample.txt` into an AST file.
+4. The AST is named `system3.sample.txt.json` and is placed in the `/system3` folder.
+
+That effective publishes the author's completed work. For the reader to play it in the browser:
+
+6. Run `npm run system3` and serve `./system3/index.html` to browsers.
+7. The `index.html` file must both load the `interpreter.ts` file and the AST file `system3.sample.txt.json`.
+8. Once both are loaded, it feeds the latter into the former and we're off.
+
+The `index.html` file is preferably served off of a local IP address beginning with `192.168`, which means it should be visible to other devices on the same network (i.e., your home wifi). The top-right corner menu of the running work will, if it detects this, display a QR code that other devices on the same network can scan to also play the work.
+
+This makes it easy to author a work on a PC or laptop, but then play the work on a mobile phone, which is the intended method of enjoyment.
+
+9. When it's working again, the work in `index.html` is served as a PWA - a Progressive Web App. This means that it can be installed locally on a mobile phone, and once installed, the PC is no longer needed to play the work.
+10. But if the author then needs to update the work, this requires re-publishing the work from the PC, and then reinstalling the PWA on the mobile phone.
+
+## Creating a Menu of Choices
 
 ### First choice
 
@@ -130,7 +144,13 @@ There is writing, and within are points like:
 
 This paints the prompt's menu and waits on the user. After choosing a response, the following text is painted no matter the choice. Nothing in the "code" directed control elsewhere. But, the chosen response is remembered.
 
-## Referencing past choices with [did] or [didnt]
+### Ending the menu
+
+A group of possible choices is called a menu. Since a lone \* ends the text flow and begins a menu with its first possible choice, we need a way to indicate the end of the menu where the text flow will pick up again after the reader makes a choice. We do that with \*\* two astericks in a row.
+
+## Referencing past choices
+
+### With [did] or [didnt]
 
 Substitutions of the form `[did ...]` can ask which response was made at which prompt.
 
@@ -140,9 +160,31 @@ Substitutions of the form `[did ...]` can ask which response was made at which p
 
 It searches all possible responses for the match, highlighting it if it's not enough words to distinguish.
 
-### Combine them for Conditional Responses
+### With [if] and [unless]
 
-Wrap responses in the substitution to hide them. They can reference themselves so they can't be chosen multiple times.
+Depending on how choices are written, "did" may not read very smoothly. Instead we can use `[if]`. Similarly for `[unless]` in place of `[didnt]`.
+
+> He accepted the seat. [if continue purchase] And you bought it anyway, right? [/if]
+>
+> He accepted the seat. [unless continue purchase] If we had gotten it it would've helped. [/unless]
+
+There's no functional difference between the synonyms. Choose whichever reads more smoothly in context.
+
+### Hidden Words with #Hashtags
+
+Many times the same choice will appear in different parts of the story but with identical wording. In order to reference the correct one you can place hidden words within the response using hashtags. These tags aren't shown to the reader but when you reference reponses with `[did]` or the like, the hidden hashtags can make it unambiguous which response was intended.
+
+Example:
+
+> He left. \* Follow him. \* Investigate. #museum \*\*
+
+The word "museum" will be hidden from the reader but will still be available for queries like `[did Investigate. #museum]` so that no other response that says "Investigate" would be referenced by mistake.
+
+Hashtags are written without spaces, and without any other punctuation marks besides apostrophes and hyphens. If you need additional context, you can either use multiple hashtags, or just smoosh words together in one big hashtag.
+
+## Conditional Options
+
+You can hide and show different choices in a menu based on previous selections by wrapping the response in a reference. A choice can also reference themselves so it can't be chosen multiple times.
 
 > He left.
 >
@@ -158,43 +200,65 @@ Wrap responses in the substitution to hide them. They can reference themselves s
 >
 > \*\*
 >
-> Later that day, lorem ipsum
+> Lorem ipsum...
 
-### Multipart Responses
+The above shows a menu with either two or three possible options. The third option appears until it has been chosen, then it never appears again.
 
-A responses menu can have sub-menus. An ellipsis on a button tips off the reader that they can explore, so an ellipsis after an opening bracket is how to write it.
+### Multipart Responses with [menu]
 
-> He left. \* Follow him \* Return ...[ \* home \* to the library ] \* Continue with purchase \*\* Later that day, ...
+In addition to making a simple list of possible reponses like a choose-your-own-adventure book, any given response can have multiple parts. When the reader chooses one of these responses, the menu slides aside to reveal a secondary menu with the next part of that response.
 
-## Marking Events with [plotpoint]
+How to write it is a little different. Since the \* asterisk by itself simply adds another reponse to the first menu, we need to use the `[menu]` and `[/menu]` tags within the response to group its pieces together.
 
-Like a response without a menu, you can query if a [plotpoint] was hit.
+Example:
 
-> [`plotpoint` Maria found out]
+> He left. \* Follow him \* Return [menu] \* home \* to the library [/menu] \* Continue with purchase \*\* Later that day, ...
+
+This makes an initial menu with three options: follow, return, and continue. If follow or continue is chosen, the story continues normally. If return is chosen, the menu slides aside to reveal a secondary menu with home and library.
+
+While the second menu is shown, the reader can swipe right to return to the first menu. Otherwise, choosing home or library from that menu will complete the response, and the story continues.
+
+When asking what the user chose with `[did]` or `[didnt]`, the system will check as if there was only a single menu with all the options: `[did return to the library]`, for instance. You can query if either of the "return" options was chosen with simply `[did return]` as the text in a `did` or `didnt` doesn't need to be a complete match. As long as an option contains that text it will match. If this references unrelated options that include the word "return" a hashtag can be used between "return" and "[menu]".
+
+Secondary menus can have tertiary menus by also using `[menu]` and `[/menu]` similarly. Multiple responses can have secondary menus, and the secondaries are distinct from one another. You can create a rich heirarchy of multipart responses if you wish. There's no limit to how many menus deep a response can go other than good taste.
 
 ## Jumping Pages with [goto]
 
-### Changing Threads
+### Redirecting Threads
 
-A choice can send the reader elsewhere entirely.
+A choice can send the reader elsewhere in the work rather than just the next paragraph. This is how printed choose-your-own-adventure books usually work. "If you took the shield, turn to page 57."
 
-> He left. \* Follow him [goto Pretending to stay put] \* Return home \* Continue with purchase \*\* Later that day, ...
->
-> ...lorem ipsum...
->
-> Pretending to stay put, you wait until he's out of sight ...
-
-After the `goto` comes the first words of the linked passage.
-
-### Finishing Threads
-
-The redirect can be used unconditionally. We use this to close off a thread and return to the main thread.
+Instead of page numbers, we use the first words of the passage to identify where to go.
 
 > Your purchase complete, you head home to prepare for the party.
 >
 > [goto Buried in wrapping paper]
 
-## Scene Breaks with [scene]
+Here, "Buried in wrapping paper" is the first words of the passage to jump to. Even if that passage was part of a larger passage, the portions before "Buried in wrapping paper" won't display themselves.
+
+Similarly, any passages after the [goto] aren't displayed.
+
+### Turn to Page 57
+
+Perhaps it's obvious, but when you place the [goto] within a response, the goto doesn't take effect unless that response is chosen.
+
+> He left. \* Follow him [goto Pretending to stay put] \* Return home \* Continue with purchase \*\* Later that day, ...
+>
+> ...somewhere else in the work...
+>
+> Pretending to stay put, you wait until he's out of sight.
+
+## Marking Events and Time
+
+### Marking Events with [plot ...]
+
+Sometimes an important plot point can be reached through multiple paths. In these cases, you can use `[plot]` to mark the event as having occurred, and then query it later.
+
+> [plot Maria found out]
+
+You would put that declaration in each of those multiple paths, so now you can simply ask `[if Maria found out]` to check if the event occurred.
+
+### Marking Durations of Time with [scene]
 
 Much like a director yells ACTION or CUT, use this to indicate an explicit change in scene. Usually this means an abrupt change in time or place, or even viewpoint.
 
@@ -208,23 +272,25 @@ You can name the scene, for later use with `[goto]` or `[did]`.
 
 > [did The Candy Shop] \* offer some chocolate [/did]
 
-## Remember and Recall with [remember ... as] and [the]
+## Remember and Recall with [the]
+
+### Antecedents
+
+You may find yourself wanting to re-print a chosen response. If so, you might find yourself writing each on a case-by-case basis like so.
+
+> [did follow him] follow him [/did]
+>
+> [did return home] return home [/did]
+
+Here, antecedents of the form "the..."
+
+### Remembering with [remember ... as ...]
 
 As the story progresses, you may find yourself needing to use more prose generation to handle all the possible situations that can come up. We use antecedents to do this.
 
 > [`remember` Charlotte `as` the person who got the truck]
 
 > "But [`the` person who got the truck] couldn't have since she was getting the truck that day."
-
-## Re-usable menus with [new menu] and [menu]
-
-We can re-use a set of responses via tag to save some repetitive typing. The same choice can appear many times in many different prompts.
-
-> [new menu usualLocations] \* home \* to the library
-
-Place the prompt wherever.
-
-> He left. \* Follow him \* Return ...[menu usualLocations] \* Continue with purchase \*\* Later that day, ...
 
 # Every Person is a Tower
 

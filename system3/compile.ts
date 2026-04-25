@@ -2,6 +2,7 @@
 // or : node compile.ts [filename]
 // or : import and call compileStory()
 import { readFile, writeFile } from "fs/promises";
+import { dirname } from "path";
 import { parse, SyntaxError } from "./parser.js";
 
 if (import.meta.url === `file://${process.argv[1]}`) {
@@ -10,14 +11,12 @@ if (import.meta.url === `file://${process.argv[1]}`) {
 }
 
 export async function compileStory(storyFilename: string, outputPath?: string): Promise<string> {
+  let json = "";
   const source = await readFile(storyFilename).then(x => x.toString().trim());
+
   try {
     const ast = parse(source);
-    const json = JSON.stringify(ast, undefined, 4);
-    console.log(json);
-    const outputFile = outputPath || `./${storyFilename}.json`;
-    await writeFile(outputFile, json);
-    return json;
+    json = JSON.stringify(ast, undefined, 4);
   } catch (e) {
     if (e instanceof SyntaxError) {
       // @ts-ignore
@@ -30,4 +29,9 @@ export async function compileStory(storyFilename: string, outputPath?: string): 
     }
     throw e;
   }
+
+  // console.log(json);
+  const outputFile = outputPath || dirname(storyFilename) + `/dist/story.json`;
+  await writeFile(outputFile, json);
+  return json;
 }

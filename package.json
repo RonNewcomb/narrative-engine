@@ -14,9 +14,9 @@
     "vite": "^6.4.2"
   },
   "scripts": {
-    "publish": "cd publishing && node publish.ts && cd ..",
-    "parser3": "cd s3p && peggy --format es -o parser.js parser.peggy && node compile.ts system3.sample.txt",
-    "publish3": "cd system3 && node publish.ts && cd ..",
-    "system3": "cd system3 && vite serve --host"
+    "publish2": "cd publishing && node publish.ts && cd ..",
+    "parser": "cd system3 && peggy --format es -o parser.js parser.peggy && node compile.ts ../app3/system3.sample.txt",
+    "publish": "cd app3 && node ../system3/publish.ts system3.sample.txt && cd ..",
+    "serve": "cd app3/build && vite serve --host"
   }
 }

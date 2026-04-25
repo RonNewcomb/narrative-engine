@@ -110,29 +110,33 @@ A scene is a little story centering around a character, a want, and some kind of
 
 # How to Use System 3
 
-The parser-generator is in the `s3p` folder and it's currently a multi-step build process. The following command performs these steps.
+The parser-generator is in the `system3` folder and it's currently a multi-step build process. The following command performs these steps.
 
-0. `npm run parse3` runs the parser-generator.
+0. `npm run parse` runs the parser-generator.
 1. It uses Peggy (a parser generator) to create the system-3 parser from the `parser.peggy` description file that describes the syntax this README describes.
 2. The resulting parser is in file `parser.js`.
 
-This finishes creating the system-3 compiler. We run the compiler on an author's work so the story can be run in the browser.
+This finishes creating the system-3 compiler. We run the compiler (only) on an author's work to test the parser.
 
 3. We run `compile.ts` (which uses `parser.js`) to distill the sample author work `system3.sample.txt` into an AST file.
-4. The AST is named `system3.sample.txt.json` and is placed in the `/system3` folder.
+4. The AST is named `story.json` and is placed in a `dist` subfolder.
 
-That effective publishes the author's completed work. For the reader to play it in the browser:
+To publish the work runs the compiler, asset juggler, ifiction record substitution, and creates a `dist` folder full of stuff ready to go.
 
-6. Run `npm run system3` and serve `./system3/index.html` to browsers.
-7. The `index.html` file must both load the `interpreter.ts` file and the AST file `system3.sample.txt.json`.
-8. Once both are loaded, it feeds the latter into the former and we're off.
+6. Run `npm run publish`
+
+Once built/published, it can be served to browsers.
+
+7. Run `npm run serve` to serve the published work from `dist` and serve it to browsers as `./dist/index.html`.
+8. The `index.html` file must both load the `interpreter.ts` file and the AST file `story.json`.
+9. Once both are loaded, it feeds the latter into the former and we're off.
 
 The `index.html` file is preferably served off of a local IP address beginning with `192.168`, which means it should be visible to other devices on the same network (i.e., your home wifi). The top-right corner menu of the running work will, if it detects this, display a QR code that other devices on the same network can scan to also play the work.
 
 This makes it easy to author a work on a PC or laptop, but then play the work on a mobile phone, which is the intended method of enjoyment.
 
-9. When it's working again, the work in `index.html` is served as a PWA - a Progressive Web App. This means that it can be installed locally on a mobile phone, and once installed, the PC is no longer needed to play the work.
-10. But if the author then needs to update the work, this requires re-publishing the work from the PC, and then reinstalling the PWA on the mobile phone.
+10. When it's working again, the work in `index.html` is served as a PWA - a Progressive Web App. This means that it can be installed locally on a mobile phone, and once installed, the PC is no longer needed to play the work.
+11. But if the author then needs to update the work, this requires re-publishing the work from the PC, and then reinstalling the PWA on the mobile phone.
 
 ## Creating a Menu of Choices
 

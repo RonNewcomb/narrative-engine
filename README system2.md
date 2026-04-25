@@ -108,7 +108,7 @@ So, I need infinite loop protection and some kind of typing to make the error im
 ## How to Run
 
 ```bash
-npm run publish
+npm run publish2
 ```
 
 This creates a `/build` folder with the compiled files, including an `index.html` file that can be opened in a browser.

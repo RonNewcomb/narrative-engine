@@ -39,7 +39,12 @@
             " the door"
         ]
     },
-    " and left the room.\n\n\nCorey wanted to ",
+    " and left the room.\n\n",
+    {
+        "op": "plot",
+        "match": "Zafra knows Rose is in the room"
+    },
+    "\n\nCorey wanted to ",
     {
         "op": "menu",
         "responses": [

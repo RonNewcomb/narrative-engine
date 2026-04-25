@@ -4,6 +4,7 @@ Rose wanted to escape the confines of her birth. * Follow him * Return home * Co
 
 Zafra [did close]opened [if take key]and unlocked[/if] the door[/did] and left the room.
 
+[plot Zafra knows Rose is in the room]
 
 Corey wanted to * walk * drive [menu] * the car * the bike [/menu] * run #at-corey's-leisure **.
 

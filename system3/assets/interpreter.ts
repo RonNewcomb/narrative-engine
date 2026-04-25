@@ -1,10 +1,15 @@
 import { animate, type MenuElement } from "./animate";
 
-type StoryNode = string | StoryOperation | StoryResponses | StoryHashtag;
+type StoryNode = string | StoryOperation | StoryResponses | StoryHashtag | StoryPlotpoint;
 
 type StoryHashtag = {
   op: "hashtag";
   tag: string;
+};
+
+type StoryPlotpoint = {
+  op: "plot";
+  match: string;
 };
 
 type StoryOperation = {
@@ -55,6 +60,12 @@ function renderStoryNodeHashtag(node: StoryHashtag, el: HTMLElement): false {
   return false;
 }
 
+function renderStoryNodePlotpoint(node: StoryPlotpoint): false {
+  state.chosen.push(node.match);
+  console.log("Plot point:", node.match);
+  return false;
+}
+
 function renderTheEnd(): void {
   document.getElementById("choices")!.appendChild(document.createElement("hr"));
 }
@@ -97,6 +108,7 @@ function renderStoryNodeOperationDidnot(node: StoryOperation, el: HTMLElement): 
 function renderStoryNode(node: StoryNode, el: HTMLElement): false | MenuElement {
   if (typeof node === "string") return renderStoryNodeString(node, el);
   if (node.op == "hashtag") return renderStoryNodeHashtag(node, el);
+  if (node.op == "plot") return renderStoryNodePlotpoint(node);
   if (node.op == "menu") return renderStoryNodeResponses(node, el);
   if (node.op == "if") return renderStoryNodeOperationIf(node, el);
   if (node.op == "did") return renderStoryNodeOperationDid(node, el);

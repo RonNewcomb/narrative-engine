@@ -45,6 +45,7 @@ p {
 
 #published {
   white-space: pre-wrap;
+  padding-top: 2em; /* so first line isn't under the system menu */
 }
 
 #open-main-menu-btn {

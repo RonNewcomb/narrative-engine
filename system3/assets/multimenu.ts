@@ -35,6 +35,7 @@ export async function multimenu(topMenu: MenuElement): Promise<Result> {
     onSwipe = function (n: number) {
       currentSlide = Math.max(0, Math.min(currentSlide + n, slidingWindow.childElementCount - 1));
       slidingWindow.style.left = `calc(-${currentSlide * 100}% - ${currentSlide * 2}em)`; // 2em is the flex-gap
+      (slidingWindow.children[currentSlide]?.firstElementChild as HTMLElement)?.focus();
     };
     onSwipe(currentSlide); // init
 
@@ -111,8 +112,8 @@ function createPanelFromMenuTemplate(menu: MenuElement, choose: EventListener): 
   const panel = menu.cloneNode(true) as MenuPanelElement;
   panel.classList.add("menu-panel");
   for (const button of panel.childNodes) {
-    button.addEventListener("click", choose);
     button.classList.remove("selected");
+    button.addEventListener("click", choose);
   }
   return panel;
 }

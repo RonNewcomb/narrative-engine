@@ -1,10 +1,11 @@
 start = anything
-anything = ( text / prompt / code )+
-anythingelse = ( text / code )+
+anything = ( text / prompt / code / hashtag )+
+anythingelse = ( text / code / hashtag )+
 
 _ = [ \t]*
 
-text "writing" = letters:[-a-zA-Z_ ,!?.\n\r]+                 { return letters.join(""); }
+text "writing" = letters:[^\*\[\]]+                 { return letters.join(""); }
+hashtag = "#" letters:[-A-Za-z0-9']+                { return ({op:'hashtag', value: letters.join("")}); }
 
 prompt = responses:response+                                        { return ({op:'menu', responses})}
 bang = "*"

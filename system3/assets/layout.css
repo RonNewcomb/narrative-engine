@@ -42,6 +42,10 @@ body {
   white-space: pre-wrap;
 }
 
+hash-tag {
+  display: none;
+}
+
 p {
   margin: 0;
   text-indent: 1.5em;

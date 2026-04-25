@@ -1,4 +1,5 @@
 build
-dist
+app3/dist/*
 node_modules
 system3/assets/story.json
+!app3/dist/story.json

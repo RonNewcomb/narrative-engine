@@ -39,7 +39,7 @@ function createNewMenu(children: HTMLElement[] = []): MenuElement {
 }
 
 function renderStoryNodeString(node: string, el: HTMLElement): false {
-  el.appendChild(document.createTextNode(node));
+  el.appendChild(document.createTextNode(node.replaceAll(/(\#[-A-Za-z0-9']+)/g, "<hash-tag>$1</hash-tag>")));
   return false;
 }
 

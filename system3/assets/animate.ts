@@ -1,5 +1,5 @@
-import { div, paragraph, element } from "./layout";
 import "./animate.css";
+import { div, element, paragraph } from "./layout";
 
 export interface MenuElement extends HTMLDivElement {
   childNodes: NodeListOf<ResponseButtonElement>;

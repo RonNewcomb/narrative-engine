@@ -57,7 +57,7 @@ export async function animate(topMenu: MenuElement): Promise<string> {
       slidingWindow.replaceChildren(...slides);
     }
 
-    function getTitle(panels: MenuPanelElement[]): string {
+    function getTitle(panels: MenuPanelElement[], withHashtags = false): string {
       if (!panels || panels.length === 0) return " ";
       const retval: string[] = [];
       for (const panel of panels) {
@@ -67,6 +67,10 @@ export async function animate(topMenu: MenuElement): Promise<string> {
           if (child.nodeType == Node.TEXT_NODE) {
             const words = child as Text;
             retval.push(words.textContent || "");
+          }
+          if (withHashtags && child.nodeType == Node.ELEMENT_NODE && (child as Element).tagName === "HASH-TAG") {
+            const hashtag = child as Element;
+            retval.push(hashtag.textContent || "");
           }
         }
       }
@@ -78,7 +82,7 @@ export async function animate(topMenu: MenuElement): Promise<string> {
       const pushed = Array.from(menu.childNodes).find(button => button.classList.contains("selected"));
       if (!pushed) return menu;
       for (const child of pushed.childNodes) {
-        if (child.nodeType == Node.ELEMENT_NODE) {
+        if (child.nodeType == Node.ELEMENT_NODE && (child as Element).tagName === "NAV") {
           const submenu = child as MenuElement;
           const menuToDisplay = shouldDisplay(submenu);
           if (menuToDisplay) return menuToDisplay;
@@ -105,13 +109,14 @@ export async function animate(topMenu: MenuElement): Promise<string> {
       title.innerText = getTitle(panels);
 
       const nextMenu = shouldDisplay(panels[currentSlide]);
-      if (!nextMenu) return finished();
+      if (!nextMenu) return finished(panels);
       displayMenu(nextMenu);
       nextSlide();
     }
 
-    function finished() {
-      const chosen = title.innerText;
+    function finished(panels: MenuPanelElement[]) {
+      renderStoryNodeCommand(title.innerText, document.getElementById("published")!);
+      const chosen = getTitle(panels, true);
       console.log({ chosen });
       resolve(chosen);
 
@@ -121,6 +126,12 @@ export async function animate(topMenu: MenuElement): Promise<string> {
       }, 200); // match transition time in interface.CSS, .playerChoices, transition
     }
   });
+}
+
+function renderStoryNodeCommand(command: string, el: HTMLElement): void {
+  const cmd = document.createElement("past-choice");
+  cmd.innerText = command;
+  el.appendChild(cmd);
 }
 
 // touch swipe support

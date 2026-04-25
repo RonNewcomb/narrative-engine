@@ -4,8 +4,8 @@ anythingelse = ( text / code / hashtag )+
 
 _ = [ \t]*
 
-text "writing" = letters:[^\*\[\]]+                 { return letters.join(""); }
-hashtag = "#" letters:[-A-Za-z0-9']+                { return ({op:'hashtag', value: letters.join("")}); }
+text    = letters:[^\*\[\]\#]+                      { return letters.join(""); }
+hashtag = "#" tag:[-A-Za-z0-9']+                { return ({op:'hashtag', tag: "#"+tag.join("")}); }
 
 prompt = responses:response+                                        { return ({op:'menu', responses})}
 bang = "*"

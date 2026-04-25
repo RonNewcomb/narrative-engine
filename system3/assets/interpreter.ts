@@ -1,6 +1,11 @@
 import { animate, type MenuElement } from "./animate";
 
-type StoryNode = string | StoryOperation | StoryResponses;
+type StoryNode = string | StoryOperation | StoryResponses | StoryHashtag;
+
+type StoryHashtag = {
+  op: "hashtag";
+  tag: string;
+};
 
 type StoryOperation = {
   op: "if" | "did" | "didnt" | "unless";
@@ -39,15 +44,15 @@ function createNewMenu(children: HTMLElement[] = []): MenuElement {
 }
 
 function renderStoryNodeString(node: string, el: HTMLElement): false {
-  el.appendChild(document.createTextNode(node.replaceAll(/(\#[-A-Za-z0-9']+)/g, "<hash-tag>$1</hash-tag>")));
+  el.appendChild(document.createTextNode(node));
   return false;
 }
 
-function renderStoryNodeCommand(command: string, el: HTMLElement): void {
-  const span = document.createElement("span");
-  span.innerText = command;
-  span.className = "command";
-  el.appendChild(span);
+function renderStoryNodeHashtag(node: StoryHashtag, el: HTMLElement): false {
+  const hashtag = document.createElement("hash-tag");
+  hashtag.innerText = node.tag;
+  el.appendChild(hashtag);
+  return false;
 }
 
 function renderTheEnd(): void {
@@ -91,6 +96,7 @@ function renderStoryNodeOperationDidnot(node: StoryOperation, el: HTMLElement): 
 
 function renderStoryNode(node: StoryNode, el: HTMLElement): false | MenuElement {
   if (typeof node === "string") return renderStoryNodeString(node, el);
+  if (node.op == "hashtag") return renderStoryNodeHashtag(node, el);
   if (node.op == "menu") return renderStoryNodeResponses(node, el);
   if (node.op == "if") return renderStoryNodeOperationIf(node, el);
   if (node.op == "did") return renderStoryNodeOperationDid(node, el);
@@ -111,7 +117,6 @@ async function renderCurrentTurn() {
   if (stopForInput)
     return animate(stopForInput).then(response => {
       state.chosen.push(response);
-      renderStoryNodeCommand(response, publishedElement);
       renderCurrentTurn();
     });
   else renderTheEnd();

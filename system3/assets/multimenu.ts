@@ -1,5 +1,5 @@
-import "./animate.css";
-import { div, element, paragraph } from "./layout";
+import { element } from "./layout";
+import "./multimenu.css";
 
 export interface MenuElement extends HTMLDivElement {
   childNodes: NodeListOf<ResponseButtonElement>;
@@ -17,53 +17,28 @@ export interface Result {
   goingTo?: string;
 }
 
-export async function animate(topMenu: MenuElement): Promise<Result> {
+export async function multimenu(topMenu: MenuElement): Promise<Result> {
   return new Promise(resolve => {
-    document.getElementById("published")!.removeChild(topMenu);
+    const publishedElement = document.getElementById("published")!;
+    publishedElement.removeChild(topMenu);
 
-    const slidingWindow = div([createPanelFromMenuTemplate(topMenu)], { id: "slidingWindow", className: "slidingWindow" });
-    const title = paragraph([], { className: "title", innerText: " " });
-    const container = element<HTMLDivElement>("section", { className: "playerChoices" }, [title, slidingWindow]);
-    const choicesLandingSpot = document.getElementById("choices")!;
-    choicesLandingSpot.appendChild(container);
+    const command = element<HTMLDivElement>("past-choice", { innerText: " " });
+    publishedElement.appendChild(command);
+
+    const slidingWindow = element<HTMLDivElement>("sliding-window", {}, [createPanelFromMenuTemplate(topMenu, choose)]);
+    const container = element<HTMLDivElement>("container-menus", {}, [slidingWindow]);
+    publishedElement.appendChild(container);
 
     let goingTo = "";
     let currentSlide = 0;
-    const setSlide = () => (slidingWindow.style.left = `calc(-${currentSlide * 100}% - ${currentSlide * 2}em)`); // 2em is the flex-gap
 
-    function nextSlide() {
-      currentSlide++;
-      setSlide();
-    }
+    onSwipe = function (n: number) {
+      currentSlide = Math.max(currentSlide + n, slidingWindow.childElementCount - 1);
+      slidingWindow.style.left = `calc(-${currentSlide * 100}% - ${currentSlide * 2}em)`; // 2em is the flex-gap
+    };
+    onSwipe(currentSlide); // init
 
-    function prevSlide() {
-      if (currentSlide == 0) return;
-      currentSlide--;
-      setSlide();
-    }
-
-    setSlide();
-    swipeNotify = (dir: "next" | "prev") => (dir == "prev" ? prevSlide() : undefined);
-
-    function createPanelFromMenuTemplate(menu: MenuElement): MenuPanelElement {
-      const panel = menu.cloneNode(true) as MenuPanelElement;
-      panel.classList.add("slidepanel");
-      for (const button of panel.childNodes) {
-        button.addEventListener("click", choose);
-        button.classList.remove("selected");
-      }
-      return panel;
-    }
-
-    function displayMenu(menu: MenuElement) {
-      const panel = createPanelFromMenuTemplate(menu);
-      const slides = Array.from(slidingWindow.children)
-        .slice(0, currentSlide + 1)
-        .concat(panel);
-      slidingWindow.replaceChildren(...slides);
-    }
-
-    function getTitle(panels: MenuPanelElement[], withHashtags = false): string {
+    function getCommand(panels: MenuPanelElement[], withHashtags = false): string {
       if (!panels || panels.length === 0) return " ";
       const retval: string[] = [];
       for (const panel of panels) {
@@ -86,67 +61,66 @@ export async function animate(topMenu: MenuElement): Promise<Result> {
       return retval.join("");
     }
 
-    function shouldDisplay(menu: MenuPanelElement): MenuElement | false {
+    function shouldDisplayMenu(menu: MenuPanelElement): MenuElement | false {
       if (!menu) return false;
       const pushed = Array.from(menu.childNodes).find(button => button.classList.contains("selected"));
       if (!pushed) return menu;
       for (const child of pushed.childNodes) {
         if (child.nodeType == Node.ELEMENT_NODE && (child as Element).tagName === "NAV") {
           const submenu = child as MenuElement;
-          const menuToDisplay = shouldDisplay(submenu);
+          const menuToDisplay = shouldDisplayMenu(submenu);
           if (menuToDisplay) return menuToDisplay;
         }
       }
       return false;
     }
 
-    function selectReponse(pushedButton: ResponseButtonElement) {
-      const allButtons = pushedButton.parentElement!;
-      for (const button of allButtons.childNodes) button.classList.remove("selected");
-      pushedButton.classList.add("selected");
+    function displayMenu(menu: MenuElement) {
+      const panel = createPanelFromMenuTemplate(menu, choose);
+      const slides = Array.from(slidingWindow.children)
+        .slice(0, currentSlide + 1)
+        .concat(panel);
+      slidingWindow.replaceChildren(...slides);
+      onSwipe(+1);
     }
 
     function choose(event: Event) {
       event.preventDefault();
 
-      // .currentTarget is what's in front of .addEventListener
-      // .target is a child of currentTarget (or same) which actually got clicked
       const pushedButton = event.currentTarget as ResponseButtonElement;
-      selectReponse(pushedButton);
+      for (const button of pushedButton.parentElement!.childNodes) button.classList.remove("selected");
+      pushedButton.classList.add("selected");
 
-      const panels = Array.from(document.getElementById("slidingWindow")!.childNodes) as MenuPanelElement[];
-      title.innerText = getTitle(panels);
+      const panels = Array.from(container.childNodes[0]!.childNodes) as MenuPanelElement[];
+      command.innerText = getCommand(panels).trim();
 
-      const nextMenu = shouldDisplay(panels[currentSlide]);
-      if (!nextMenu) return finished(panels);
-      displayMenu(nextMenu);
-      nextSlide();
-    }
+      const nextMenu = shouldDisplayMenu(panels[currentSlide]);
+      if (nextMenu) return displayMenu(nextMenu);
 
-    function finished(panels: MenuPanelElement[]) {
-      renderStoryNodeCommand(title.innerText, document.getElementById("published")!);
-      const chosen = getTitle(panels, true);
+      const chosen = getCommand(panels, true);
       console.log({ chosen, goingTo });
       resolve({ chosen, goingTo });
 
       container.classList.add("exit");
-      setTimeout(() => {
-        choicesLandingSpot.removeChild(container);
-      }, 200); // match transition time in interface.CSS, .playerChoices, transition
+      setTimeout(() => publishedElement.removeChild(container), 200); // match transition time in CSS for container
     }
   });
 }
 
-function renderStoryNodeCommand(command: string, el: HTMLElement): void {
-  const cmd = document.createElement("past-choice");
-  cmd.innerText = command;
-  el.appendChild(cmd);
+function createPanelFromMenuTemplate(menu: MenuElement, choose: EventListener): MenuPanelElement {
+  const panel = menu.cloneNode(true) as MenuPanelElement;
+  panel.classList.add("menu-panel");
+  for (const button of panel.childNodes) {
+    button.addEventListener("click", choose);
+    button.classList.remove("selected");
+  }
+  return panel;
 }
 
 // touch swipe support
 
 let touchstartX = 0;
-let swipeNotify = (dir: "next" | "prev") => {};
+let onSwipe: (dir: number) => void;
 
 document.addEventListener("touchstart", e => (touchstartX = e.changedTouches[0].screenX));
 
@@ -155,5 +129,5 @@ document.addEventListener("touchend", e => {
   const diff = touchendX - touchstartX;
   touchstartX = 0;
   if (Math.abs(diff) < 40) return;
-  swipeNotify(diff < 0 ? "next" : "prev");
+  onSwipe?.(diff < 0 ? +1 : -1);
 });

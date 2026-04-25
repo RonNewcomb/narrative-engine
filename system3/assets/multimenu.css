@@ -1,9 +1,10 @@
-.playerChoices {
+container-menus {
+  display: block;
   margin: auto;
   margin-bottom: 1.5em;
   margin-top: 1em;
   width: calc(100% - 4em);
-  /* padding: 0em 1em 1em 1em; */
+
   background-color: wheat;
   border-radius: 5px;
   box-shadow: wheat 0 0 8px 11px;
@@ -12,18 +13,14 @@
   transition: all 0.2s ease-out;
 }
 
-.playerChoices.exit {
+container-menus.exit {
   position: absolute; /* so the next text doesn't slide as this animates out */
   max-height: 0;
   opacity: 0.1;
   transform: scale(0);
 }
 
-.playerChoices .title {
-  font-style: italic;
-}
-
-.playerChoices .slidingWindow {
+container-menus sliding-window {
   display: flex;
   flex-flow: row nowrap;
   gap: 2em;
@@ -32,27 +29,38 @@
   transition: left 0.75s;
 }
 
-.playerChoices .slidepanel {
+container-menus sliding-window .menu-panel {
+  display: flex;
+  flex-flow: column nowrap;
+  gap: 0.8em;
   min-width: 100%;
   width: 100%;
   max-width: 100%;
   text-align: center; /* easiest for fingers to reach */
 }
 
-.playerChoices button,
-.playerChoiceButton {
+container-menus sliding-window .menu-panel button {
   line-height: 2em;
-  margin-top: 1em;
-  margin-right: 2em;
   border: 0;
   font-family: sans-serif;
   background-color: #497d7e;
   color: white;
-  padding: 0.3em 1.2em;
   border-radius: 13px;
   width: 100%; /* easiest for fingers to reach */
 }
 
 past-choice {
   font-weight: bold;
+}
+
+hash-tag {
+  display: none;
+}
+
+go-to {
+  display: none;
+}
+
+nav nav {
+  display: none;
 }

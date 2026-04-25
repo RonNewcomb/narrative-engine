@@ -1,4 +1,4 @@
-import { animate, type MenuElement } from "./animate";
+import { multimenu, type MenuElement } from "./multimenu";
 
 type StoryNode = string | StoryOperation | StoryResponses | StoryHashtag | StoryMatchpoint;
 
@@ -42,7 +42,6 @@ let menus: MenuElement[] = [];
 
 function createNewMenu(children: HTMLElement[] = []): MenuElement {
   const nav = document.createElement("nav") as MenuElement;
-  nav.classList = "playerChoices";
   nav.replaceChildren(...children);
   menus.push(nav);
   return nav;
@@ -93,7 +92,7 @@ function renderStoryNodeGoto(node: StoryMatchpoint, el: HTMLElement): false {
 }
 
 function renderTheEnd(): void {
-  document.getElementById("choices")!.appendChild(document.createElement("hr"));
+  publishedElement.appendChild(document.createElement("hr"));
 }
 
 function renderStoryNodeResponses(node: StoryResponses, el: HTMLElement): MenuElement | false {
@@ -155,7 +154,7 @@ async function renderCurrentTurn() {
     stopForInput = renderStoryNode(node, publishedElement);
   } while (!stopForInput && state.current < state.story.length);
   if (stopForInput)
-    return animate(stopForInput).then(({ chosen, goingTo }) => {
+    return multimenu(stopForInput).then(({ chosen, goingTo }) => {
       if (chosen) state.chosen.push(chosen);
       if (goingTo) performGoto(goingTo);
       renderCurrentTurn();

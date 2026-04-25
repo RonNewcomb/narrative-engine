@@ -38,38 +38,13 @@ body {
   color: #3e2723;
 }
 
-#published {
-  white-space: pre-wrap;
-}
-
-hash-tag {
-  display: none;
-}
-
-go-to {
-  display: none;
-}
-
-nav nav {
-  display: none;
-}
-
 p {
   margin: 0;
   text-indent: 1.5em;
 }
 
-.b {
-  font-weight: bold;
-}
-
-.endscene {
-  margin: 1em 0;
-  text-align: center;
-}
-
-.endscene::after {
-  content: "~  ~  ~";
+#published {
+  white-space: pre-wrap;
 }
 
 #open-main-menu-btn {
@@ -124,4 +99,10 @@ p {
   background-color: wheat;
   color: #3e2723;
   text-align: right;
+}
+
+#ip {
+  font-size: x-small;
+  opacity: 0.6;
+  line-height: 1.6em;
 }

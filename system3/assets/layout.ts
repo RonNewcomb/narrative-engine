@@ -30,19 +30,18 @@ export function element<T extends HTMLElement>(tagName: string, attrs?: Attribut
 
 const layout = `
 <aside id="cornerMenu">
-    <button id="open-main-menu-btn" type="button">...</button>
-    <div id="main-menu-overlay">
+  <button id="open-main-menu-btn" type="button">...</button>
+  <div id="main-menu-overlay">
     <nav id="main-menu-flyout" role="dialog" aria-modal="true">
-        <button class="mainMenuButton" id="undo-btn" type="button">Undo</button>
-        <button class="mainMenuButton" id="restart-btn" type="button">Restart</button>
-        <button class="mainMenuButton" id="sync-btn" type="button">Sync with Cloud...</button>
-        <div><span id="ip"></span></div>
-        <div id="qrcode"></div>
+      <button class="mainMenuButton" id="undo-btn" type="button">Undo</button>
+      <button class="mainMenuButton" id="restart-btn" type="button">Restart</button>
+      <button class="mainMenuButton" id="sync-btn" type="button">Sync with Cloud...</button>
+      <div id="qrcode"></div>
+      <div id="ip"></div>
     </nav>
-    </div>
+  </div>
 </aside>
-<main id="published"></main>
-<div id="choices"></div>`;
+<main id="published"></main>`;
 
 document.body.insertAdjacentHTML("beforeend", layout);
 

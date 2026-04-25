@@ -1,14 +1,14 @@
 import { animate, type MenuElement } from "./animate";
 
-type StoryNode = string | StoryOperation | StoryResponses | StoryHashtag | StoryPlotpoint;
+type StoryNode = string | StoryOperation | StoryResponses | StoryHashtag | StoryMatchpoint;
 
 type StoryHashtag = {
   op: "hashtag";
   tag: string;
 };
 
-type StoryPlotpoint = {
-  op: "plot";
+type StoryMatchpoint = {
+  op: "plot" | "goto";
   match: string;
 };
 
@@ -60,9 +60,21 @@ function renderStoryNodeHashtag(node: StoryHashtag, el: HTMLElement): false {
   return false;
 }
 
-function renderStoryNodePlotpoint(node: StoryPlotpoint): false {
+function renderStoryNodePlotpoint(node: StoryMatchpoint): false {
   state.chosen.push(node.match);
-  console.log("Plot point:", node.match);
+  console.log("PLOT", node.match);
+  return false;
+}
+
+function renderStoryNodeGoto(node: StoryMatchpoint): false {
+  const newPlace = state.story.findIndex(n => typeof n === "string" && n.includes(node.match));
+  if (newPlace >= 0) {
+    const passage = state.story[newPlace] as string;
+    const i = passage.indexOf(node.match);
+    renderStoryNodeString(passage.slice(i), publishedElement);
+    state.current = newPlace + 1;
+  }
+  console.log("GOTO", newPlace, node.match);
   return false;
 }
 
@@ -109,6 +121,7 @@ function renderStoryNode(node: StoryNode, el: HTMLElement): false | MenuElement 
   if (typeof node === "string") return renderStoryNodeString(node, el);
   if (node.op == "hashtag") return renderStoryNodeHashtag(node, el);
   if (node.op == "plot") return renderStoryNodePlotpoint(node);
+  if (node.op == "goto") return renderStoryNodeGoto(node);
   if (node.op == "menu") return renderStoryNodeResponses(node, el);
   if (node.op == "if") return renderStoryNodeOperationIf(node, el);
   if (node.op == "did") return renderStoryNodeOperationDid(node, el);

@@ -33,7 +33,7 @@ export async function multimenu(topMenu: MenuElement): Promise<Result> {
     let currentSlide = 0;
 
     onSwipe = function (n: number) {
-      currentSlide = Math.max(currentSlide + n, slidingWindow.childElementCount - 1);
+      currentSlide = Math.max(0, Math.min(currentSlide + n, slidingWindow.childElementCount - 1));
       slidingWindow.style.left = `calc(-${currentSlide * 100}% - ${currentSlide * 2}em)`; // 2em is the flex-gap
     };
     onSwipe(currentSlide); // init

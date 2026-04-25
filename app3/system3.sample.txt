@@ -2,6 +2,8 @@ It's a sunny day. Rose wanted to escape the confines of her birth. * Follow him 
 
 Zafra [did close]opened [if take key]and unlocked[/if] the door[/did] and left the room. [plot Zafra knows Rose is in the room]
 
+You can use the \\ backslash to escape characters such as \[ \] \* and \#.
+
 Corey wanted to * walk * drive [menu] * the car * the bike [/menu] * run #at-corey's-leisure **.
 
 Rose * left [did arrive] * returned to [/did] the room. * started over. [goto Rose wanted to escape] ** The end.

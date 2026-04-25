@@ -44,7 +44,17 @@
         "op": "plot",
         "match": "Zafra knows Rose is in the room"
     },
-    "\n\nCorey wanted to ",
+    "\n\nZafra had an ",
+    "*",
+    " idea! To use ",
+    "\\",
+    " to escape characters such as ",
+    "[",
+    " ",
+    "]",
+    " and ",
+    "#",
+    ".\n\nCorey wanted to ",
     {
         "op": "menu",
         "responses": [

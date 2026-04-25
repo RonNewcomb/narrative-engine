@@ -1,5 +1,5 @@
-import "./layout.css";
 import { findLocalIp } from "./findLocalIP";
+import "./layout.css";
 
 type Attributes<T extends HTMLElement> = Partial<Omit<T, "style">> & { style?: Partial<CSSStyleDeclaration> };
 
@@ -42,8 +42,7 @@ const layout = `
     </div>
 </aside>
 <main id="published"></main>
-<div id="choices"></div>
-<style>nav nav { display: none; }</style>`;
+<div id="choices"></div>`;
 
 document.body.insertAdjacentHTML("beforeend", layout);
 

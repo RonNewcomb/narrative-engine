@@ -46,6 +46,14 @@ hash-tag {
   display: none;
 }
 
+go-to {
+  display: none;
+}
+
+nav nav {
+  display: none;
+}
+
 p {
   margin: 0;
   text-indent: 1.5em;

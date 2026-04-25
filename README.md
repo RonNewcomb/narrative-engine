@@ -252,49 +252,36 @@ Perhaps it's obvious, but when you place the [goto] within a response, the goto 
 >
 > Pretending to stay put, you wait until he's out of sight.
 
-## Marking Events and Time
-
 ### Marking Events with [plot ...]
 
-Sometimes an important plot point can be reached through multiple paths. In these cases, you can use `[plot]` to mark the event as having occurred, and then query it later.
+Now that `[goto]` makes multiple branching paths possible, a new wrinkle appears. Sometimes an important plot point can be reached through multiple alternative paths. This makes asking `[if]` tricky. In these cases, you can use `[plot]` to mark the event as having occurred, and then query it later.
 
 > [plot Maria found out]
 
-You would put that declaration in each of those multiple paths, so now you can simply ask `[if Maria found out]` to check if the event occurred.
+You would put that declaration in each of those multiple paths, so now you can simply ask `[if Maria found out]` to check if the event occurred regardless of how the reader got there.
 
-### Marking Durations of Time with [scene]
+## Considered Features
 
-Much like a director yells ACTION or CUT, use this to indicate an explicit change in scene. Usually this means an abrupt change in time or place, or even viewpoint.
+- Marking Durations of Time with [scene]
+- Marking Durations for things that became true and then become false again later
+- Antecedents with [the ...]
+- [remember ... as ...]
 
-> [scene]
+## Discarded Features
 
-You can name the scene, for later use with `[goto]` or `[did]`.
+### Rewriting the chosen response
 
-> [scene The Candy Shop]
+When the reader chooses a response, we could allow the author to rewrite it on the fly. Sure, once the response is entered into the text we could improve the flow a bit. The problem with this feature is in trying to prevent the author from rewriting the choice to something completely different. Although this could serve a narrative purpose with a reluctant player-character, please consider the effect the rewrite has on the reader. The reader, after reading all options and choosing one, would then be forced to re-read their choice to ensure it actually happened and scan for critical new information. This gets tiresome after awhile and it only takes one or two such instances to tip off the reader that this is something that needs constant attention, because the reader doesn't know when it may happen again.
 
-> [goto The Candy Shop]
+As for why responses are and remain highlighted in the text after a choice was made, there's a small bookmarking aspect. After responding, the reader needs to start reading the text again from somewhere. If there was no indication of where that is, it can become tiresome to find where they left off each time. So the response is placed directly into the text, bolded, to indicate to the reader where they left off. Since the response text is exactly what was displayed in the menu, the reader knows they can always begin reading directly after the bolded text.
 
-> [did The Candy Shop] \* offer some chocolate [/did]
+Furthermore, if the reader ever wants to scroll back to see what they had chosen earlier or to double-check some information before responding, each bolded response serves as a landmark that catches the eye during rapid scrolling, aiding the reader in orientating themself as they skim the previous text.
 
-## Remember and Recall with [the]
+### Counting anything
 
-### Antecedents
+It's trivial for a computer to count things including the number of times a reader read a passage or made a particular choice. It's also trivial for an author to gate a story based on a statistic or a particular action being done a number of times. But repetition is generally not the kind of experience a reader is looking for in a story. Although gameplay loops are usually about "number go up" or a skill in timing, fiction is generally about interiority and the progression of feelings, so its interactive variant should probably lean toward exploration and discovery via dialogue both external and internal.
 
-You may find yourself wanting to re-print a chosen response. If so, you might find yourself writing each on a case-by-case basis like so.
-
-> [did follow him] follow him [/did]
->
-> [did return home] return home [/did]
-
-Here, antecedents of the form "the..."
-
-### Remembering with [remember ... as ...]
-
-As the story progresses, you may find yourself needing to use more prose generation to handle all the possible situations that can come up. We use antecedents to do this.
-
-> [`remember` Charlotte `as` the person who got the truck]
-
-> "But [`the` person who got the truck] couldn't have since she was getting the truck that day."
+Dialogue, too, is a game of fencing. A movie actress can use timing and delivery to convey meaning beyond the spoken words but in written media interiority is a necessary and more direct method. One person explores another like charting unknown lands, but the directions on their compass are why, what then, what next, what if, and the guiding star, how do you feel.
 
 # Every Person is a Tower
 

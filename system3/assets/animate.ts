@@ -12,7 +12,12 @@ export interface ResponseButtonElement extends Omit<HTMLButtonElement, "children
   childNodes: NodeListOf<Text | MenuElement>;
 }
 
-export async function animate(topMenu: MenuElement): Promise<string> {
+export interface Result {
+  chosen: string;
+  goingTo?: string;
+}
+
+export async function animate(topMenu: MenuElement): Promise<Result> {
   return new Promise(resolve => {
     document.getElementById("published")!.removeChild(topMenu);
 
@@ -22,6 +27,7 @@ export async function animate(topMenu: MenuElement): Promise<string> {
     const choicesLandingSpot = document.getElementById("choices")!;
     choicesLandingSpot.appendChild(container);
 
+    let goingTo = "";
     let currentSlide = 0;
     const setSlide = () => (slidingWindow.style.left = `calc(-${currentSlide * 100}% - ${currentSlide * 2}em)`); // 2em is the flex-gap
 
@@ -72,6 +78,9 @@ export async function animate(topMenu: MenuElement): Promise<string> {
             const hashtag = child as Element;
             retval.push(hashtag.textContent || "");
           }
+          if (withHashtags && child.nodeType == Node.ELEMENT_NODE && (child as Element).tagName === "GO-TO") {
+            goingTo = child.textContent;
+          }
         }
       }
       return retval.join("");
@@ -117,8 +126,8 @@ export async function animate(topMenu: MenuElement): Promise<string> {
     function finished(panels: MenuPanelElement[]) {
       renderStoryNodeCommand(title.innerText, document.getElementById("published")!);
       const chosen = getTitle(panels, true);
-      console.log({ chosen });
-      resolve(chosen);
+      console.log({ chosen, goingTo });
+      resolve({ chosen, goingTo });
 
       container.classList.add("exit");
       setTimeout(() => {

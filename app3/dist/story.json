@@ -1,5 +1,5 @@
 [
-    "Rose wanted to escape the confines of her birth. ",
+    "It's a sunny day. Rose wanted to escape the confines of her birth. ",
     {
         "op": "menu",
         "responses": [
@@ -20,7 +20,7 @@
         "op": "if",
         "match": "home",
         "wrap": [
-            "she left."
+            "she left home."
         ]
     },
     " \n\nZafra ",
@@ -39,7 +39,7 @@
             " the door"
         ]
     },
-    " and left the room.\n\n",
+    " and left the room. ",
     {
         "op": "plot",
         "match": "Zafra knows Rose is in the room"
@@ -99,6 +99,14 @@
                     ]
                 },
                 " the room. "
+            ],
+            [
+                " started over. ",
+                {
+                    "op": "goto",
+                    "match": "Rose wanted to escape"
+                },
+                " "
             ],
             0
         ]

@@ -262,7 +262,8 @@ You would put that declaration in each of those multiple paths, so now you can s
 - Marking Durations for things that became true and then become false again later
 - Antecedents with [the ...]
 - [remember ... as ...]
-- create new checkables with [infer] and [and/or]
+- create new checkables with [infer] and [and] [or] [before] [after]
+- named menus create antecedents and allow reuse
 
 ## Discarded Features
 

@@ -87,10 +87,6 @@ Use System 2 as a build-time aid, not a runtime library. Given character beliefs
 4. A go-to but it finds too many passages that fit.
 5. An optional warning that a response isn't used at all.
 
-**Inferences**: A feature to turn one response-check into a different one, or a response-check that is calculated from other response-checks. For example, if we took the pineapple from scene 2 and/or left the cigarette on the table, then a new checkable "response" is "Maria knows." Now we can check the virtual response "Maria knows" as shorthand for the others.
-
-> [`infer` Maria knows `from` took the pineapple from scene 2 `or` left the cigarette on the table]
-
 **Plot Outline** is both guardrails and writing prompts (to-dos) and navigation aid.
 
 **World Model**: A distillation of past actions to the current state of the world. But any question that the current state can answer, the complete ordered list of responses can also answer. (This might however require NPCs that "choose responses" to also be recorded if there's conflicting actions.)
@@ -266,6 +262,7 @@ You would put that declaration in each of those multiple paths, so now you can s
 - Marking Durations for things that became true and then become false again later
 - Antecedents with [the ...]
 - [remember ... as ...]
+- create new checkables with [infer] and [and/or]
 
 ## Discarded Features
 

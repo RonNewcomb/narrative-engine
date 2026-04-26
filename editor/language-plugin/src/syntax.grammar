@@ -1,75 +1,75 @@
 @top Program { anything }
 
-prompt {
-  response+ endprompt
+Prompt {
+  Response+ Endprompt
 }
 
-endprompt {
+Endprompt {
   "*"   "*"
 }
 
-response {
+Response {
   "*"   anythingelse
 }
 
 code {
-  did |
-  didnt |
-  if |
-  unless |
-  menu |
-  plot |
-  goto
+  Did |
+  Didnt |
+  If |
+  Unless |
+  Menu |
+  Plot |
+  Goto
 }
 
-did {
-  "[did" onespace text "]" anything "[/did]"
+Did {
+  "[did" onespace Text "]" anything "[/did]"
 }
 
-didnt {
-  "[didnt" onespace text "]" anything "[/didnt]"
+Didnt {
+  "[didnt" onespace Text "]" anything "[/didnt]"
 }
 
-if {
-  "[if" onespace text "]" anything "[/if]"
+If {
+  "[if" onespace Text "]" anything "[/if]"
 }
 
-unless {
-  "[unless" onespace text "]" anything "[/unless]"
+Unless {
+  "[unless" onespace Text "]" anything "[/unless]"
 }
 
-menu {
-  "[menu" space? "]" response+ "[/menu]"
+Menu {
+  "[menu" space? "]" Response+ "[/menu]"
 }
 
-plot {
-  "[plot" onespace text "]"
+Plot {
+  "[plot" onespace Text "]"
 }
 
-goto {
-  "[goto" onespace text "]"
+Goto {
+  "[goto" onespace Text "]"
 }
 
-hashtag {
-  "#" hashtagText
+Hashtag {
+  "#" HashtagText
 }
 
 escaped {
-  "\\" escapedChar
+  "\\" EscapedChar
 }
 
 anything {
-  (text | escaped | prompt | code | hashtag)+
+  (Text | escaped | Prompt | code | Hashtag)+
 }
 
 anythingelse {
-  (text | escaped | code | hashtag)+
+  (Text | escaped | code | Hashtag)+
 }
 
 @tokens {
   onespace { $[ \t\n\r] }
   space { $[ \t\n\r]+ }
-  text { ![\*\[\]\#\\]+ }
-  hashtagText { $[-A-Za-z0-9']+ }
-  escapedChar { $[\*\[\]\#\\] }  
+  Text { ![\*\[\]\#\\]+ }
+  HashtagText { $[-A-Za-z0-9']+ }
+  EscapedChar { $[\*\[\]\#\\] }  
 }

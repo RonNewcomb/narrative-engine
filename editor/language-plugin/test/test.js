@@ -1,9 +1,9 @@
 import { fileTests } from "@lezer/generator/dist/test";
-import { EXAMPLELanguage } from "../dist/index.js";
+import * as fs from "node:fs";
+import * as path from "node:path";
+import { fileURLToPath } from "node:url";
+import { System3MirrorwaysLanguage } from "../dist/index.js";
 
-import * as fs from "fs";
-import * as path from "path";
-import { fileURLToPath } from "url";
 let caseDir = path.dirname(fileURLToPath(import.meta.url));
 
 for (let file of fs.readdirSync(caseDir)) {
@@ -12,6 +12,6 @@ for (let file of fs.readdirSync(caseDir)) {
   let name = /^[^\.]*/.exec(file)[0];
   describe(name, () => {
     for (let { name, run } of fileTests(fs.readFileSync(path.join(caseDir, file), "utf8"), file))
-      it(name, () => run(EXAMPLELanguage.parser));
+      it(name, () => run(System3MirrorwaysLanguage.parser));
   });
 }

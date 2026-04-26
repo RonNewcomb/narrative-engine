@@ -6,3 +6,6 @@ Hello World.
 #hello-world
 ==> Program(Hashtag(HashtagText))
 
+# prompt menu
+* Option 1 * Option 2 **
+==> Program(Prompt(Response(Text), Response(Text), Endprompt))

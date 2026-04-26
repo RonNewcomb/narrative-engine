@@ -7,7 +7,7 @@ import { drawSelection, dropCursor, EditorView, highlightSpecialChars, keymap } 
 import { System3Mirrorways } from "./language-plugin/dist/index";
 
 const view = new EditorView({
-  doc: "Start document",
+  doc: "Start documentlkj * Option 1 * Option 2 ** [plot sldkfj] Of course! #hello-world Continuing...",
   parent: document.getElementById("editor")!,
   extensions: [
     // System3Mirrorways language support

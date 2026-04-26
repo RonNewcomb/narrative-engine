@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "dev": "cd language-plugin && npm run prepare && cd .. && vite serve"
+    "dev": "cd language-plugin && npm run prepare && cd .. && vite serve",
+    "test": "cd language-plugin && npm run test && cd .."
   },
   "dependencies": {
     "@codemirror/autocomplete": "^6.20.1",

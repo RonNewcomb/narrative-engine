@@ -12,7 +12,7 @@ Response {
   "*"   anythingelse
 }
 
-code {
+Code {
   Did |
   Didnt |
   If |
@@ -59,11 +59,11 @@ escaped {
 }
 
 anything {
-  (Text | escaped | Prompt | code | Hashtag)+
+  (Text | escaped | Prompt | Code | Hashtag)+
 }
 
 anythingelse {
-  (Text | escaped | code | Hashtag)+
+  (Text | escaped | Code | Hashtag)+
 }
 
 @tokens {

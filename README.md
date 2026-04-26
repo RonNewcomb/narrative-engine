@@ -133,10 +133,10 @@ Once built/published, it can be served to browsers.
 
 The `index.html` file is preferably served off of a local IP address beginning with `192.168`, which means it should be visible to other devices on the same network (i.e., your home wifi). The top-right corner menu of the running work will, if it detects this, display a QR code that other devices on the same network can scan to also play the work.
 
-This makes it easy to author a work on a PC or laptop, but then play the work on a mobile phone, which is the intended method of enjoyment.
+This makes it easy to author a work on a PC or laptop, but then play the work on a phone, which is the intended method of enjoyment.
 
-10. When it's working again, the work in `index.html` is served as a PWA - a Progressive Web App. This means that it can be installed locally on a mobile phone, and once installed, the PC is no longer needed to play the work.
-11. But if the author then needs to update the work, this requires re-publishing the work from the PC, and then reinstalling the PWA on the mobile phone.
+10. When it's working again, the work in `index.html` is served as a PWA - a Progressive Web App. This means the reader can install it "as an app" on their phone and won't need the PC to play the work.
+11. But if the author then needs to update the work, this requires re-publishing the work from the PC, and then reinstalling the PWA on the phone.
 
 ## Creating a Menu of Choices
 
@@ -146,7 +146,7 @@ There is writing, and within are points like:
 
 > He left. \* Follow him \* Return home \* Continue with purchase \*\* Later that day, ...
 
-This paints the prompt's menu and waits on the user. After choosing a response, the following text is painted no matter the choice. Nothing in the "code" directed control elsewhere. But, the chosen response is remembered.
+This paints the prompt's menu and waits on the reader. After they choose a response, the following text is painted no matter the choice. Nothing in the "code" directed control elsewhere. But, the chosen response is remembered.
 
 ### Ending the menu
 
@@ -176,7 +176,7 @@ There's no functional difference between the synonyms. Choose whichever reads mo
 
 ### Hidden Words with #Hashtags
 
-Many times the same choice will appear in different parts of the story but with identical wording. In order to reference the correct one you can place hidden words within the response using hashtags. These tags aren't shown to the reader but when you reference reponses with `[did]` or the like, the hidden hashtags can make it unambiguous which response was intended.
+Many times the same choice will appear in different parts of the story but with identical wording. In order to reference the correct one you can place hidden words within the response using hashtags. The reader cannot see these tags but when you reference reponses with `[did]` or the like, the hidden hashtags can make it unambiguous which response you intended.
 
 Example:
 
@@ -206,7 +206,7 @@ You can hide and show different choices in a menu based on previous selections b
 >
 > Lorem ipsum...
 
-The above shows a menu with either two or three possible options. The third option appears until it has been chosen, then it never appears again.
+The above shows a menu with either two or three possible options. The third option appears until the reader chooses it, then it never appears again.
 
 ### Multipart Responses with [menu]
 
@@ -237,14 +237,14 @@ Instead of page numbers, we use the first words of the passage to identify where
 > Your purchase complete, you head home to prepare for the party.
 >
 > [goto Buried in wrapping paper]
+>
+> Sitting down for dinner,
 
-Here, "Buried in wrapping paper" is the first words of the passage to jump to. Even if that passage was part of a larger passage, the portions before "Buried in wrapping paper" won't display themselves.
-
-Similarly, any passages after the [goto] aren't displayed.
+Here, "Buried in wrapping paper" is the first words of the passage to jump to. Passages after the [goto] such as "Sitting down for dinner" aren't displayed. Similarly, even if "Buried" is found in the middle of a larger passage, the portions before "Buried" won't display. The text will continue from there as usual.
 
 ### Turn to Page 57
 
-Perhaps it's obvious, but when you place the [goto] within a response, the goto doesn't take effect unless that response is chosen.
+Perhaps it's obvious, but when you place the [goto] within a response, the goto doesn't take effect unless the reader chooses that response.
 
 > He left. \* Follow him [goto Pretending to stay put] \* Return home \* Continue with purchase \*\* Later that day, ...
 >
@@ -271,17 +271,17 @@ You would put that declaration in each of those multiple paths, so now you can s
 
 ### Rewriting the chosen response
 
-When the reader chooses a response, we could allow the author to rewrite it on the fly. Sure, once the response is entered into the text we could improve the flow a bit. The problem with this feature is in trying to prevent the author from rewriting the choice to something completely different. Although this could serve a narrative purpose with a reluctant player-character, please consider the effect the rewrite has on the reader. The reader, after reading all options and choosing one, would then be forced to re-read their choice to ensure it actually happened and scan for critical new information. This gets tiresome after awhile and it only takes one or two such instances to tip off the reader that this is something that needs constant attention, because the reader doesn't know when it may happen again.
+When the reader chooses a response, we could allow the author to rewrite it on the fly. Sure, once the response is entered into the text the author could improve the flow a bit. The problem with this feature is in trying to prevent the author from rewriting the choice to something quite different. Although this could serve a narrative purpose with a reluctant player-character, please consider the effect the rewrite has on the reader. The reader, after reading all options and choosing one, would then be forced to re-read their choice to ensure it actually happened and scan for critical new information. This gets tiresome after awhile and it only takes one or two such instances to tip off the reader that this is something that needs constant attention, because the reader doesn't know when it may happen again.
 
-As for why responses are and remain highlighted in the text after a choice was made, there's a small bookmarking aspect. After responding, the reader needs to start reading the text again from somewhere. If there was no indication of where that is, it can become tiresome to find where they left off each time. So the response is placed directly into the text, bolded, to indicate to the reader where they left off. Since the response text is exactly what was displayed in the menu, the reader knows they can always begin reading directly after the bolded text.
+As for why responses are and remain highlighted in the text after a choice was made, there's a small bookmarking aspect. After responding, the reader needs to start reading the text again from somewhere. If there was no indication of where that is, it can become tiresome to find where they left off each time. So the response appears directly in the text, bolded, to indicate to the reader where they left off. Since the response text is exactly what was displayed in the menu, the reader knows they can always begin reading directly after the bolded text.
 
-Furthermore, if the reader ever wants to scroll back to see what they had chosen earlier or to double-check some information before responding, each bolded response serves as a landmark that catches the eye during rapid scrolling, aiding the reader in orientating themself as they skim the previous text.
+Furthermore, if the reader ever wants to scroll back to see what they chose earlier or to double-check some information before responding, each bolded response serves as a landmark that catches the eye during rapid scrolling, aiding the reader in orientating themself as they skim the previous text.
 
 ### Counting anything
 
 It's trivial for a computer to count things including the number of times a reader read a passage or made a particular choice. It's also trivial for an author to gate a story based on a statistic or a particular action being done a number of times. But repetition is generally not the kind of experience a reader is looking for in a story. Although gameplay loops are usually about "number go up" or a skill in timing, fiction is generally about interiority and the progression of feelings, so its interactive variant should probably lean toward exploration and discovery via dialogue both external and internal.
 
-Dialogue, too, is a game of fencing. A movie actress can use timing and delivery to convey meaning beyond the spoken words but in written media interiority is a necessary and more direct method. One person explores another like charting unknown lands, but the directions on their compass are why, what then, what next, what if, and the guiding star, how do you feel.
+Dialogue, too, can be a game of fencing. A movie actress can use timing and delivery to convey meaning beyond the spoken words but in written media interiority is a necessary and more direct method. One person explores another like charting unknown lands, but the directions on their compass are why, what then, what next, what if, and, the guiding star, how do you feel.
 
 # Every Person is a Tower
 

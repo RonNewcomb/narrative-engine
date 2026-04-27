@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
     <title>Voice to Text</title>
@@ -6,7 +6,7 @@
     <link rel="manifest" href="manifest.json" />
   </head>
   <body>
-    <button id="startButton">Start Voice Input</button>
+    <button id="startButton">Listen.</button>
     <button onclick="onShare()">Share...</button>
     <button onclick="copyText()">Copy to clipboard...</button>
     <div id="output"></div>
@@ -17,10 +17,12 @@
 
       let toggle;
 
-      const recognition = new (window.SpeechRecognition ||
+      const recognition = new (
+        window.SpeechRecognition ||
         window.webkitSpeechRecognition ||
         window.mozSpeechRecognition ||
-        window.msSpeechRecognition)();
+        window.msSpeechRecognition
+      )();
       recognition.lang = "en-US";
       recognition.continuous = true;
 
@@ -34,7 +36,7 @@
       };
 
       recognition.onend = () => {
-        startButton.textContent = "Start Voice Input";
+        startButton.textContent = "Listen.";
       };
 
       startButton.addEventListener("click", () => {
@@ -47,7 +49,7 @@
         if (!navigator.share) return;
         navigator
           .share({
-            title: "Voice to Text",
+            title: "Speech to Text",
             text: outputDiv.textContent,
           })
           .then(() => console.log("Successful share"))

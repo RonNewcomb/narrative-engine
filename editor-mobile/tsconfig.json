@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "lib": ["ESNext", "dom"],
+    "module": "esnext",
+    "target": "esnext",
+    "outDir": "./build",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "allowJs": false,
+    "esModuleInterop": true,
+    "resolveJsonModule": true
+  },
+  "include": ["*.ts"]
+}

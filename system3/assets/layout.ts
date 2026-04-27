@@ -36,8 +36,7 @@ const layout = `
       <button class="mainMenuButton" id="undo-btn" type="button">Undo</button>
       <button class="mainMenuButton" id="restart-btn" type="button">Restart</button>
       <button class="mainMenuButton" id="sync-btn" type="button">Sync with Cloud...</button>
-      <div id="qrcode"></div>
-      <div id="ip"></div>
+      <div id="qr"></div>
     </nav>
   </div>
 </aside>
@@ -71,4 +70,4 @@ function hydrateMainMenu() {
 }
 hydrateMainMenu();
 
-findLocalIp();
+findLocalIp(document.getElementById("qr")!);

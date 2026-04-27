@@ -6,17 +6,20 @@
     "arrowParens": "avoid"
   },
   "devDependencies": {
+    "@types/dom-speech-recognition": "^0.0.9",
     "@types/node": "^22.5.0",
+    "@vitejs/plugin-basic-ssl": "^2.3.0",
     "peggy": "^4.0.3",
     "rd-parse": "^3.4.0",
     "rd-parse-jsexpr": "^3.2.0",
-    "typescript": "^5.5.4",
+    "typescript": "^6.0.3",
     "vite": "^6.4.2"
   },
   "scripts": {
     "publish2": "cd system2/publishing && node publish.ts && cd ../..",
     "parser": "cd system3 && peggy --format es -o parser.js parser.peggy && node compile.ts ../app3/system3.sample.txt",
     "publish": "cd app3 && node ../system3/publish.ts system3.sample.txt && cd ..",
-    "serve": "cd app3/dist && vite serve --host"
+    "serve": "cd app3/dist && vite serve --host",
+    "speak": "cd editor-mobile && vite serve --host"
   }
 }

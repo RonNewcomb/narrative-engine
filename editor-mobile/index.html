@@ -1,0 +1,28 @@
+<html>
+  <head>
+    <style>
+      .pulse {
+        animation: pulse 1s infinite;
+      }
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.1);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="qr"></div>
+    <button id="startButton">Listen.</button>
+    <button id="shareButton">Share...</button>
+    <button id="copyButton">Copy to clipboard...</button>
+    <div id="output"></div>
+    <script src="./index.ts" type="module"></script>
+  </body>
+</html>

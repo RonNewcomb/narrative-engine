@@ -1,6 +1,6 @@
 import { multimenu, type MenuElement } from "./multimenu";
 
-type StoryNode = string | StoryOperation | StoryResponses | StoryHashtag | StoryMatchpoint;
+type StoryNode = string | StoryOperation | StoryResponses | StoryHashtag | StoryMatchpoint | StoryLoneResponse;
 
 type StoryHashtag = {
   op: "hashtag";
@@ -19,6 +19,11 @@ type StoryOperation = {
 };
 
 type StoryResponse = StoryNode[];
+
+type StoryLoneResponse = {
+  op: "*";
+  option: StoryResponse;
+};
 
 type StoryResponses = {
   op: "menu";
@@ -47,8 +52,9 @@ function createNewMenu(children: HTMLElement[] = []): MenuElement {
   return nav;
 }
 
-function addChildrenToMenu(menu: MenuElement, children: HTMLElement[]): MenuElement {
-  menu.replaceChildren(...children);
+function addResponseToMenu(button: HTMLButtonElement, menu: MenuElement = menus[menus.length - 1]): MenuElement {
+  if (!menu) menu = createNewMenu();
+  menu.appendChild(button);
   return menu;
 }
 
@@ -95,17 +101,32 @@ function renderTheEnd(): void {
   publishedElement.appendChild(document.createElement("hr"));
 }
 
+function renderStoryNodeLoneResponse(option: StoryResponse): false {
+  const button = document.createElement("button");
+  addResponseToMenu(button);
+  option.forEach(segment => renderStoryNode(segment, button));
+  return false;
+}
+
 function renderStoryNodeResponses(node: StoryResponses, el: HTMLElement): MenuElement | false {
   if (!Array.isArray(node.responses)) throw new Error("Expected responses to be an array");
   const menu = createNewMenu(); // do this here so GOTO immediately knows if it's conditional or not
-  const buttons = node.responses
-    .filter(response => response && typeof response !== "string")
-    .map(response => {
-      const button = document.createElement("button");
-      response.forEach(segment => renderStoryNode(segment, button));
-      return button;
-    });
-  el.appendChild(addChildrenToMenu(menu, buttons));
+  for (let response of node.responses) {
+    if (!response || typeof response === "string") continue;
+    renderStoryNodeLoneResponse(response);
+    // const button = document.createElement("button");
+    // addResponseToMenu(button, menu);
+    // response.forEach(segment => renderStoryNode(segment, button));
+  }
+  el.appendChild(menu);
+  // const buttons = node.responses
+  //   .filter(response => response && typeof response !== "string")
+  //   .map(response => {
+  //     const button = document.createElement("button");
+  //     response.forEach(segment => renderStoryNode(segment, button));
+  //     return button;
+  //   });
+  // el.appendChild(addChildrenToMenu(menu, buttons));
   const outermostMenu = menus.pop();
   return outermostMenu && menus.length == 0 ? outermostMenu : false;
 }
@@ -137,6 +158,7 @@ function renderStoryNode(node: StoryNode, el: HTMLElement): false | MenuElement 
   if (node.op == "plot") return renderStoryNodePlotpoint(node);
   if (node.op == "goto") return renderStoryNodeGoto(node, el);
   if (node.op == "menu") return renderStoryNodeResponses(node, el);
+  if (node.op == "*") return renderStoryNodeLoneResponse(node.option);
   if (node.op == "if") return renderStoryNodeOperationIf(node, el);
   if (node.op == "did") return renderStoryNodeOperationDid(node, el);
   if (node.op == "unless") return renderStoryNodeOperationIfnot(node, el);

@@ -11,8 +11,7 @@
             ],
             [
                 " Continue with purchase "
-            ],
-            0
+            ]
         ]
     },
     " Later that day, ",
@@ -65,6 +64,7 @@
                 " drive ",
                 {
                     "op": "menu",
+                    "name": null,
                     "responses": [
                         [
                             " the car "
@@ -83,8 +83,7 @@
                     "tag": "#at-corey's-leisure"
                 },
                 " "
-            ],
-            0
+            ]
         ]
     },
     ".\n\nRose ",
@@ -97,13 +96,10 @@
                     "op": "did",
                     "match": "arrive",
                     "wrap": [
-                        " ",
                         {
-                            "op": "menu",
-                            "responses": [
-                                [
-                                    " returned to "
-                                ]
+                            "op": "*",
+                            "option": [
+                                " returned to "
                             ]
                         }
                     ]
@@ -117,8 +113,7 @@
                     "match": "Rose wanted to escape"
                 },
                 " "
-            ],
-            0
+            ]
         ]
     },
     " The end."

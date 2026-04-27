@@ -236,6 +236,90 @@ Now that `[goto]` makes multiple branching paths possible, a new wrinkle appears
 
 You would put that declaration in each of those multiple paths, so now you can simply ask `[if Maria found out]` to check if the event occurred regardless of how the reader got there.
 
+## The Author-Character
+
+Most interactive fiction have the notion of a player-character, the character whose actions are under control of the reader. Mirrorway introduces the concept of an author-character as well, which can perform just-in-time edits to the text before being shown to the reader. Every writer knows their writing tool's ability to copy, move, and alter text in basic ways. The author-character's abilities are the same, but they are performed after the story is published and delivered to the reader.
+
+### [cut] [copy] [paste]
+
+You can surround pretty much anything with `[cut]` and `[/cut]`, or `[copy]` and `[/copy]`. Once done, a later `[paste]` places a copy in that location. Think of it as the reverse of a `[goto]`: instead going to where the passage is, instead have the passage come to you.
+
+But improving on the keyboard's limitations, you can name what you `[cut]` or `[copy]`. This allows you several `[paste]` clipboards that can all be used at will.
+
+> [cut the very long inspirational speech]
+> Lorem ipsum...
+> [/cut]
+>
+> ... elsewhere in the text ...
+>
+> "And that is why we must act now! [paste the very long inspirational speech]
+
+The difference between `[cut]` versus `[copy]` is if the content is cut, it's removed from its original location. If it's copied, it stays in its original location. So a `[copy]` is just a `[cut]` immediately followed by `[paste]`.
+
+### Search and [replace]
+
+You can replace words with different words in a passage with [replace].
+
+> [replace his her]
+> His choice in the matter was an illusion. They were never going to honor it.
+> [/replace]
+
+It's intended for single-word substitutions, but you can use the `[` and `]` around words to match multiple words.
+
+> [replace [my car] [your car]]
+> "Well, let's go there and check it out. Should we take my car?"
+> "The bus would raise less suspicion."
+>
+> \* Take my car. \* Take the bus. \*\*
+> [/replace]
+
+This can be combined with cut copy paste to create dynamic text.
+
+### Antecedents with [the ...]
+
+A form letter like "Dear {first name} {last name}" is a template that when combined with data creates a personalized letter. Similarly, antecedents allow you to create templates out of cut/copied passages that can be filled in with something specific when pasted.
+
+> [cut informing [a party] about the inciting incident]
+> In accordance with RT-345.16, the defendant [the party] is hereby ordered to...
+> [/cut]
+>
+> ... elsewhere in the text ...
+>
+> Joe opened the letter, which read: [paste informing [the Joe] about the inciting incident]
+
+### Naming a Chosen Response
+
+One way to create an antecedent is via a menu selection. Despite using `[menu]` this doesn't name the menu. It names whichever response was chosen from the menu.
+
+> [menu fruit choice] \* apple \* banana \* orange \* avacado [/menu]
+>
+> Abby picked up a [the fruit choice]. [paste smelling [the fruit choice]]
+
+This combines with secondary menus like you'd expect.
+
+> [menu the grocery store action]
+>
+> \* Squeeze the [menu fruit choice] \* apple \* cucumber \* orange \* avacado [/menu]
+>
+> \* Smell the [menu fruit choice] \* apple \* banana \* orange [/menu]
+>
+> [/menu]
+
+This has two antecedents. "The fruit choice" would have one of the four fruits in it, while "the grocery store action" would have the whole sentence, like "Squeeze the cucumber" or "Smell the banana".
+
+If a secondary menu didn't use an antecendent that its peers did, then that antecedent would contain a blank space. This is true even if the antecedent had something in it previously.
+
+### Inflection and Agreement
+
+A list of standard replacements comes pre-bundled.
+
+- [past-tense [the action]]
+- [get-plurality [the subject]]
+- [s] or [set-plurality [the verb]]
+- [titlecase [the response]]
+- [untitlecase [the response]]
+- [-ing [the action]]
+
 ## Discarded Features
 
 ### Rewriting the chosen response

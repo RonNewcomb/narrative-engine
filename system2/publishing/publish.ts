@@ -1,13 +1,11 @@
 import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
-import type { iFictionRecord } from "../common/iFictionRecord";
+import { resolve } from "node:path";
 import { exit } from "node:process";
 import { build } from "vite";
-import { resolve } from "node:path";
+import type { iFictionRecord } from "../common/iFictionRecord";
 
 /**
- * To run,                   npm run publish
- *                           or: node --loader ts-node/esm publish.ts
- *                           or: tsx publish.ts
+ * To run,                   npm run publish2
  */
 
 const argTypes: Record<string, string> = {

@@ -1,5 +1,6 @@
 <html>
   <head>
+    <title>Speech to Text</title>
     <style>
       .pulse {
         animation: pulse 1s infinite;
@@ -15,14 +16,27 @@
           transform: scale(1);
         }
       }
+      #qr > div:nth-child(2) {
+        font-size: x-small;
+      }
+      actions-row {
+        display: flex;
+        justify-content: space-around;
+      }
+      button {
+        font-size: x-large;
+        padding: 2em;
+      }
     </style>
   </head>
   <body>
     <div id="qr"></div>
-    <button id="startButton">Listen.</button>
-    <button id="shareButton">Share...</button>
-    <button id="copyButton">Copy to clipboard...</button>
-    <div id="output"></div>
+    <actions-row>
+      <button id="startButton">Listen.</button>
+      <button id="shareButton">Share...</button>
+      <button id="copyButton">Copy to clipboard...</button>
+    </actions-row>
+    <main id="output"></main>
     <script src="./index.ts" type="module"></script>
   </body>
 </html>

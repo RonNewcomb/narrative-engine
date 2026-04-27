@@ -9,3 +9,10 @@ Hello World.
 # prompt menu
 * Option 1 * Option 2 **
 ==> Program(Prompt(Response(Text), Response(Text), Endprompt))
+
+# prompt menu multiline
+* Option 1 
+* Option 2 
+**
+==> Program(Prompt(Response(Text), Response(Text), Endprompt))
+ 

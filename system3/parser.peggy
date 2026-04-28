@@ -3,8 +3,10 @@ anything     = ( escaped / code / hashtag / prompt / loneresponse / text )+
 anythingelse = ( escaped / code / hashtag / text  )+
 
 _ = [ \t]*
+sp = [ \t]+
 
 text    =     letters:[^\*\[\]\#\\]+                                         { return letters.join(""); }
+word    =     letters:[^ \]\t\n\r]+                                            { return letters.join(""); }
 escaped = "\\" letters:[\*\[\]\#\\]                                          { return letters; }
 hashtag = "#" tag:[-A-Za-z0-9']+                                             { return ({op:'hashtag', tag: "#"+tag.join("")})}
 
@@ -14,7 +16,7 @@ prompt = responses:response+  endprompt                                      { r
 response = _ bang option:anythingelse                                        { return option; }
 loneresponse = _ bang option:anythingelse                                    { return ({op:'*', option})}
 
-code = did / didnt / if / unless / menu / plot / goto / cut / copy / paste
+code = did / didnt / if / unless / menu / plot / goto / cut / copy / paste / replace
 did =    "[did "i    _ match:text "]"      wrap:anything     "[/did]"i       { return ({op:'did'   , match, wrap})}
 didnt =  "[didnt "i  _ match:text "]"      wrap:anything     "[/didnt]"i     { return ({op:'didnt' , match, wrap})}
 if =     "[if "i     _ match:text "]"      wrap:anything     "[/if]"i        { return ({op:'if'    , match, wrap})}
@@ -25,3 +27,4 @@ goto =   "[goto "i   _ match:text "]"                                        { r
 cut =    "[cut"i     _ name:text? "]"      wrap:anything     "[/cut]"i       { return ({op:'cut'   , name, wrap})}
 copy  =  "[copy"i    _ name:text? "]"      wrap:anything     "[/copy]"i      { return ({op:'copy'  , name, wrap})}
 paste =  "[paste"i   _ name:text? "]"                                        { return ({op:'paste' , name})}
+replace ="[replace "i _ from:word sp to:word "]" wrap:anything "[/replace]"i   { return ({op:'replace', from, to, wrap})}

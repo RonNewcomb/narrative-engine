@@ -9,7 +9,8 @@ type StoryNode =
   | StoryLoneResponse
   | StoryPlotpoint
   | StoryCutCopy
-  | StoryPaste;
+  | StoryPaste
+  | StoryReplace;
 
 type StoryHashtag = {
   op: "hashtag";
@@ -35,6 +36,13 @@ type StoryCutCopy = {
 type StoryPaste = {
   op: "paste";
   name: string;
+};
+
+type StoryReplace = {
+  op: "replace";
+  from: string;
+  to: string;
+  wrap: StoryNode[];
 };
 
 type StoryOperation = {
@@ -63,6 +71,7 @@ let state = {
   chosen: [] as string[],
   story: [] as Story,
   templates: [] as StoryCutCopy[],
+  replacements: [] as StoryReplace[],
 };
 
 // helpers
@@ -85,7 +94,11 @@ function addResponseToMenu(button: HTMLButtonElement, menu: MenuElement = menus[
 }
 
 function renderStoryNodeString(node: string, el: HTMLElement): false {
-  el.appendChild(document.createTextNode(node));
+  const out = state.replacements.reduce((sum, each) => {
+    sum = sum.replaceAll(each.from, each.to);
+    return sum;
+  }, node);
+  el.appendChild(document.createTextNode(out));
   return false;
 }
 
@@ -167,20 +180,24 @@ function renderStoryNodeOperationDidnot(node: StoryOperation, el: HTMLElement): 
   return !state.chosen.some(oldChoice => oldChoice.includes(node.match)) ? renderStoryNodes(node.wrap, el) : false;
 }
 
-function renderStoryNodeOperationCut(node: StoryCutCopy): false | MenuElement {
+function renderStoryNodeOperationCut(node: StoryCutCopy): false {
   state.templates.push(node);
   return false;
 }
 
 function renderStoryNodeOperationCopy(node: StoryCutCopy, el: HTMLElement): false | MenuElement {
   renderStoryNodeOperationCut(node);
-  renderStoryNodeOperationPaste(node, el);
-  return false;
+  return renderStoryNodeOperationPaste(node, el);
 }
 
 function renderStoryNodeOperationPaste(node: StoryCutCopy | StoryPaste, el: HTMLElement): false | MenuElement {
   const template = state.templates.find(t => t.name === node.name || t.name?.includes(node.name));
   return template ? renderStoryNodes(template.wrap, el) : false;
+}
+
+function renderStoryNodeOperationReplace(node: StoryReplace, el: HTMLElement): false | MenuElement {
+  state.replacements.push(node);
+  return renderStoryNodes(node.wrap, el);
 }
 
 function renderStoryNode(node: StoryNode, el: HTMLElement): false | MenuElement {
@@ -197,6 +214,7 @@ function renderStoryNode(node: StoryNode, el: HTMLElement): false | MenuElement 
   if (node.op == "cut") return renderStoryNodeOperationCut(node);
   if (node.op == "copy") return renderStoryNodeOperationCopy(node, el);
   if (node.op == "paste") return renderStoryNodeOperationPaste(node, el);
+  if (node.op == "replace") return renderStoryNodeOperationReplace(node, el);
   throw new Error("Unknown node type " + JSON.stringify(node));
 }
 
@@ -222,7 +240,7 @@ async function renderCurrentTurn(): Promise<void> {
 export async function interpreter(filename: string, pwa = false): Promise<void> {
   if (pwa && "serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
   const story: Story = await fetch(filename).then(r => r.json());
-  state = { story, current: -1, chosen: [], templates: [] };
+  state = { story, current: -1, chosen: [], templates: [], replacements: [] };
   publishedElement = document.getElementById("published")!;
   menus = [];
   return renderCurrentTurn();

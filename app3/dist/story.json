@@ -22,7 +22,16 @@
             "she left home."
         ]
     },
-    " \n\nZafra ",
+    " \n\n",
+    {
+        "op": "replace",
+        "from": "her",
+        "to": "his",
+        "wrap": [
+            "Rose wanted to escape the confines of her birth. "
+        ]
+    },
+    "\n\nZafra ",
     {
         "op": "did",
         "match": "close",

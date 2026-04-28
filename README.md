@@ -150,6 +150,12 @@ Depending on how choices are written, "did" may not read very smoothly. Instead 
 
 There's no functional difference between the synonyms. Choose whichever reads more smoothly in context.
 
+### Which Choice 
+
+Sometimes you want not whether one choice was made, but which. For this, [the choice] has the text of the most recent menu. 
+
+For older choices, [the choice near ...] lets you mention any of the possible options in a menu. it'll retrieve the menu containing the option you gave, and return to you the text of which choice was made.
+
 ### Hidden Words with #Hashtags
 
 Many times the same choice will appear in different parts of the story but with identical wording. In order to reference the correct one you can place hidden words within the response using hashtags. The reader cannot see these tags but when you reference reponses with `[did]` or the like, the hidden hashtags can make it unambiguous which response you intended.
@@ -319,6 +325,26 @@ A list of standard replacements comes pre-bundled.
 - [titlecase [the response]]
 - [untitlecase [the response]]
 - [-ing [the action]]
+
+## Puzzles
+
+How to construct puzzles in this system? Aimless exploration has its place, but to really engage the reader they need to problem solve with the characters.
+
+Puzzles have pieces that try to fit together. Some examples of framing are:
+- sorting events into a chronological order
+- using process of elimination on a list of possibilities
+- categorizing into buckets
+- futher categorizing into heirarchy
+- brainstorming on cause and effect
+
+Learning facts and trivia and trying to fit them together seem like good intfic.
+
+The Einstein logic puzzle, mastermind, Clue, and topological sort.
+
+There may also be resource management or counterplay. Card games are a good basis for this. War, Spades, Canasta, Peaknuckle. Weapons, building a field, betting, partnership are contained in these card games. Board games just add a visual map, which may not work as well in text.
+
+Holding a puzzle piece means an antecedent, but placing into a frame means prolog tuples brought up in context... which is also an antecedent.
+
 
 ## Discarded Features
 

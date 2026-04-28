@@ -1,6 +1,15 @@
 import { multimenu, type MenuElement } from "./multimenu";
 
-type StoryNode = string | StoryOperation | StoryResponses | StoryHashtag | StoryMatchpoint | StoryLoneResponse;
+type StoryNode =
+  | string
+  | StoryOperation
+  | StoryResponses
+  | StoryHashtag
+  | StoryMatchpoint
+  | StoryLoneResponse
+  | StoryPlotpoint
+  | StoryCutCopy
+  | StoryPaste;
 
 type StoryHashtag = {
   op: "hashtag";
@@ -8,8 +17,24 @@ type StoryHashtag = {
 };
 
 type StoryMatchpoint = {
-  op: "plot" | "goto";
+  op: "goto";
   match: string;
+};
+
+type StoryPlotpoint = {
+  op: "plot";
+  name: string;
+};
+
+type StoryCutCopy = {
+  op: "cut" | "copy";
+  name: string;
+  wrap: StoryNode[];
+};
+
+type StoryPaste = {
+  op: "paste";
+  name: string;
 };
 
 type StoryOperation = {
@@ -37,6 +62,7 @@ let state = {
   current: -1,
   chosen: [] as string[],
   story: [] as Story,
+  templates: [] as StoryCutCopy[],
 };
 
 // helpers
@@ -70,9 +96,9 @@ function renderStoryNodeHashtag(node: StoryHashtag, el: HTMLElement): false {
   return false;
 }
 
-function renderStoryNodePlotpoint(node: StoryMatchpoint): false {
-  state.chosen.push(node.match);
-  console.log("PLOT", node.match);
+function renderStoryNodePlotpoint(node: StoryPlotpoint): false {
+  state.chosen.push(node.name);
+  console.log("PLOT", node.name);
   return false;
 }
 
@@ -114,19 +140,8 @@ function renderStoryNodeResponses(node: StoryResponses, el: HTMLElement): MenuEl
   for (let response of node.responses) {
     if (!response || typeof response === "string") continue;
     renderStoryNodeLoneResponse(response);
-    // const button = document.createElement("button");
-    // addResponseToMenu(button, menu);
-    // response.forEach(segment => renderStoryNode(segment, button));
   }
   el.appendChild(menu);
-  // const buttons = node.responses
-  //   .filter(response => response && typeof response !== "string")
-  //   .map(response => {
-  //     const button = document.createElement("button");
-  //     response.forEach(segment => renderStoryNode(segment, button));
-  //     return button;
-  //   });
-  // el.appendChild(addChildrenToMenu(menu, buttons));
   const outermostMenu = menus.pop();
   return outermostMenu && menus.length == 0 ? outermostMenu : false;
 }
@@ -152,6 +167,22 @@ function renderStoryNodeOperationDidnot(node: StoryOperation, el: HTMLElement): 
   return !state.chosen.some(oldChoice => oldChoice.includes(node.match)) ? renderStoryNodes(node.wrap, el) : false;
 }
 
+function renderStoryNodeOperationCut(node: StoryCutCopy): false | MenuElement {
+  state.templates.push(node);
+  return false;
+}
+
+function renderStoryNodeOperationCopy(node: StoryCutCopy, el: HTMLElement): false | MenuElement {
+  renderStoryNodeOperationCut(node);
+  renderStoryNodeOperationPaste(node, el);
+  return false;
+}
+
+function renderStoryNodeOperationPaste(node: StoryCutCopy | StoryPaste, el: HTMLElement): false | MenuElement {
+  const template = state.templates.find(t => t.name === node.name || t.name?.includes(node.name));
+  return template ? renderStoryNodes(template.wrap, el) : false;
+}
+
 function renderStoryNode(node: StoryNode, el: HTMLElement): false | MenuElement {
   if (typeof node === "string") return renderStoryNodeString(node, el);
   if (node.op == "hashtag") return renderStoryNodeHashtag(node, el);
@@ -163,11 +194,14 @@ function renderStoryNode(node: StoryNode, el: HTMLElement): false | MenuElement 
   if (node.op == "did") return renderStoryNodeOperationDid(node, el);
   if (node.op == "unless") return renderStoryNodeOperationIfnot(node, el);
   if (node.op == "didnt") return renderStoryNodeOperationDidnot(node, el);
+  if (node.op == "cut") return renderStoryNodeOperationCut(node);
+  if (node.op == "copy") return renderStoryNodeOperationCopy(node, el);
+  if (node.op == "paste") return renderStoryNodeOperationPaste(node, el);
   throw new Error("Unknown node type " + JSON.stringify(node));
 }
 
 // render the current turn, but leaves turn pointer to next turn, assuming no gotos
-async function renderCurrentTurn() {
+async function renderCurrentTurn(): Promise<void> {
   let stopForInput: ReturnType<typeof renderStoryNode> = false;
   do {
     state.current++;
@@ -175,21 +209,20 @@ async function renderCurrentTurn() {
     if (!node) break;
     stopForInput = renderStoryNode(node, publishedElement);
   } while (!stopForInput && state.current < state.story.length);
-  if (stopForInput)
-    return multimenu(stopForInput).then(({ chosen, goingTo }) => {
-      if (chosen) state.chosen.push(chosen);
-      if (goingTo) performGoto(goingTo);
-      renderCurrentTurn();
-    });
-  else renderTheEnd();
+  if (!stopForInput) return renderTheEnd();
+  return multimenu(stopForInput).then(({ chosen, goingTo }) => {
+    if (chosen) state.chosen.push(chosen);
+    if (goingTo) performGoto(goingTo);
+    return renderCurrentTurn();
+  });
 }
 
 //////////////////////
 // main entry point
-export async function interpreter(filename: string, pwa = false) {
+export async function interpreter(filename: string, pwa = false): Promise<void> {
   if (pwa && "serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
   const story: Story = await fetch(filename).then(r => r.json());
-  state = { story, current: -1, chosen: [] };
+  state = { story, current: -1, chosen: [], templates: [] };
   publishedElement = document.getElementById("published")!;
   menus = [];
   return renderCurrentTurn();

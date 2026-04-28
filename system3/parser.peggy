@@ -14,11 +14,14 @@ prompt = responses:response+  endprompt                                      { r
 response = _ bang option:anythingelse                                        { return option; }
 loneresponse = _ bang option:anythingelse                                    { return ({op:'*', option})}
 
-code = did / didnt / if / unless / menu / plot / goto
+code = did / didnt / if / unless / menu / plot / goto / cut / copy / paste
 did =    "[did "i    _ match:text "]"      wrap:anything     "[/did]"i       { return ({op:'did'   , match, wrap})}
 didnt =  "[didnt "i  _ match:text "]"      wrap:anything     "[/didnt]"i     { return ({op:'didnt' , match, wrap})}
 if =     "[if "i     _ match:text "]"      wrap:anything     "[/if]"i        { return ({op:'if'    , match, wrap})}
 unless = "[unless "i _ match:text "]"      wrap:anything     "[/unless]"i    { return ({op:'unless', match, wrap})}
 menu =   "[menu"i    _ name:text? "]" responses:response+    "[/menu]"i      { return ({op:'menu'  , name, responses})}
-plot =   "[plot "i   _ match:text "]"                                        { return ({op:'plot'  , match})}
+plot =   "[plot "i   _ name:text  "]"                                        { return ({op:'plot'  , name})}
 goto =   "[goto "i   _ match:text "]"                                        { return ({op:'goto'  , match})}
+cut =    "[cut"i     _ name:text? "]"      wrap:anything     "[/cut]"i       { return ({op:'cut'   , name, wrap})}
+copy  =  "[copy"i    _ name:text? "]"      wrap:anything     "[/copy]"i      { return ({op:'copy'  , name, wrap})}
+paste =  "[paste"i   _ name:text? "]"                                        { return ({op:'paste' , name})}

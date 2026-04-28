@@ -41,19 +41,35 @@
     " and left the room. ",
     {
         "op": "plot",
-        "match": "Zafra knows Rose is in the room"
+        "name": "Zafra knows Rose is in the room"
     },
-    "\n\nYou can use the ",
-    "\\",
-    " backslash to escape characters such as ",
-    "[",
-    " ",
-    "]",
-    " ",
-    "*",
-    " and ",
-    "#",
-    ".\n\nCorey wanted to ",
+    "\n\nAbe's cut speech: \"",
+    {
+        "op": "cut",
+        "name": "speech",
+        "wrap": [
+            "Four score and seven years ago..."
+        ]
+    },
+    "\" \n\"",
+    {
+        "op": "copy",
+        "name": null,
+        "wrap": [
+            "You can use the ",
+            "\\",
+            " backslash to escape characters such as ",
+            "[",
+            " ",
+            "]",
+            " ",
+            "*",
+            " and ",
+            "#",
+            "."
+        ]
+    },
+    "\"\n\nCorey wanted to ",
     {
         "op": "menu",
         "responses": [
@@ -116,5 +132,15 @@
             ]
         ]
     },
-    " The end."
+    " \n\n''",
+    {
+        "op": "paste",
+        "name": null
+    },
+    "'' ''",
+    {
+        "op": "paste",
+        "name": "speech"
+    },
+    "''\n\nThe end."
 ]

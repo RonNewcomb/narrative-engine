@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "dev": "cd language-plugin && npm run prepare && cd .. && vite serve",
+    "dev": "cd language-plugin && npm run prepare && cd .. && vite serve --port 5000",
     "test": "cd language-plugin && npm run test && cd .."
   },
   "dependencies": {

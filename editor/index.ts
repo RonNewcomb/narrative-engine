@@ -3,7 +3,7 @@ import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
 import { bracketMatching, foldGutter, foldKeymap, HighlightStyle, syntaxHighlighting } from "@codemirror/language";
 import { highlightSelectionMatches, searchKeymap } from "@codemirror/search";
 import { EditorState } from "@codemirror/state";
-import { drawSelection, dropCursor, EditorView, highlightSpecialChars, keymap } from "@codemirror/view";
+import { drawSelection, dropCursor, EditorView, highlightSpecialChars, KeyBinding, keymap } from "@codemirror/view";
 import { tags } from "@lezer/highlight";
 import { System3Mirrorways } from "./language-plugin/dist/index";
 
@@ -20,6 +20,16 @@ const mirrorwaysStyle = HighlightStyle.define([
   { tag: tags.invalid, backgroundColor: "lightred" },
   { tag: tags.meta, color: "purple", backgroundColor: "#e3f2ff" },
 ]);
+
+const saveBinding: KeyBinding = {
+  key: "Mod-s", // Captures Ctrl-S on Windows/Linux and Cmd-S on macOS
+  run: view => {
+    const content = view.state.doc.toString();
+    // Your custom save logic here (e.g., API call)
+    console.log("Saving content:", content);
+    return true; // Prevents the browser's default save dialog
+  },
+};
 
 const view = new EditorView({
   doc: `Start documentlkj * Option 1 * Option 2 ** [plot sldkfj] 
@@ -45,6 +55,8 @@ Can you [copy]this?[/copy] Of \\* course!
     EditorState.allowMultipleSelections.of(true),
     // Highlight syntax with a default style
     syntaxHighlighting(mirrorwaysStyle),
+    // wordwrap
+    EditorView.lineWrapping,
     // Highlight matching brackets near cursor
     bracketMatching(),
     // Automatically close brackets
@@ -54,6 +66,8 @@ Can you [copy]this?[/copy] Of \\* course!
     // Highlight text that matches the selected text
     highlightSelectionMatches(),
     keymap.of([
+      // ctrl+s save
+      saveBinding,
       // Closed-brackets aware backspace
       ...closeBracketsKeymap,
       // A large set of basic bindings

@@ -6,9 +6,13 @@
     "arrowParens": "avoid"
   },
   "devDependencies": {
+    "@types/chai": "^5.2.3",
     "@types/dom-speech-recognition": "^0.0.9",
+    "@types/mocha": "^10.0.10",
     "@types/node": "^22.5.0",
     "@vitejs/plugin-basic-ssl": "^2.3.0",
+    "chai": "^6.2.2",
+    "mocha": "^11.7.5",
     "peggy": "^4.0.3",
     "rd-parse": "^3.4.0",
     "rd-parse-jsexpr": "^3.2.0",
@@ -22,6 +26,7 @@
     "serve": "cd app3/dist && vite serve --host && cd ..",
     "app3": "npm run publish && npm run serve",
     "editor-mobile": "cd editor-mobile && vite serve --host && cd ..",
-    "editor": "cd editor && npm run dev && cd .."
+    "editor": "cd editor && npm run dev && cd ..",
+    "prolog-test": "cd system3 && npx tsx ../node_modules/mocha/bin/mocha.js prolog-test.ts"
   }
 }

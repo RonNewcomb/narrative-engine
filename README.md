@@ -248,7 +248,7 @@ Most interactive fiction have the notion of a player-character, the character wh
 
 ### [cut] [copy] [paste]
 
-You can surround pretty much anything with `[cut]` and `[/cut]`, or `[copy]` and `[/copy]`. Once done, a later `[paste]` places a copy in that location. Think of it as the reverse of a `[goto]`: instead going to where the passage is, instead have the passage come to you.
+You can surround pretty much anything with `[cut]` and `[/cut]`, or `[copy]` and `[/copy]`. Once done, a later `[paste]` places a copy in that location. Think of it as the reverse of a `[goto]`: instead of going to where the passage is, have the passage come to you.
 
 But improving on the keyboard's limitations, you can name what you `[cut]` or `[copy]`. This allows you several `[paste]` clipboards that can all be used at will.
 
@@ -260,9 +260,9 @@ But improving on the keyboard's limitations, you can name what you `[cut]` or `[
 >
 > "And that is why we must act now! [paste the very long inspirational speech]
 
-The difference between `[cut]` versus `[copy]` is if the content is cut, it's removed from its original location. If it's copied, it stays in its original location. So a `[copy]` is just a `[cut]` immediately followed by `[paste]`.
+The difference between `[cut]` versus `[copy]` is if the content is cut, it's removed from its original location. If it's copied, it stays in its original location. So a `[copy]` is just a `[cut]` immediately followed by its `[paste]`.
 
-### Search and [replace]
+### Find and [replace]
 
 You can replace words with different words in a passage with [replace].
 
@@ -281,17 +281,7 @@ It's intended for single-word substitutions, but you can use the `[` and `]` aro
 
 This can be combined with cut copy paste to create dynamic text.
 
-### Antecedents with [the ...]
-
-A form letter like "Dear {first name} {last name}" is a template that when combined with data creates a personalized letter. Similarly, antecedents allow you to create templates out of cut/copied passages that can be filled in with something specific when pasted.
-
-> [cut informing [a party] about the inciting incident]
-> In accordance with RT-345.16, the defendant [the party] is hereby ordered to...
-> [/cut]
->
-> ... elsewhere in the text ...
->
-> Joe opened the letter, which read: [paste informing [the Joe] about the inciting incident]
+[find] acts like a go-to. It finds the named passage and jumps to it, continuing the story from there. It's much like the "turn to page 57" you would read in a printed choose-your-own-adventure book.
 
 ### Inflection and Agreement
 
@@ -333,9 +323,9 @@ Now make this second change: the actions aren't performed in real time. The phra
 
 Given four characters and four actions, the reader must mix-and-match them into pairs. This means that each menu has the same secondary menu, each pair is a response, and each subsequent menu display has fewer options. This also means that in order for each character to comment on (potentially) each assigned task, a series of passages for various combinations must be written. This requires features to make this authoring task more manageable.
 
-### Sorting That
+### Sorting That [tip]
 
-Similarly, when trying to put events into chronological order, saying the event and then menu'ing the before/after wouldn't naturally work because you need to see the text that comes after the before/after in order to choose correctly. But, appending the entire rest of the sentence to each operative word would make the menu too long and unwieldy. So, another kind of menu may be in order.
+Similarly, when trying to put events into chronological order, saying the event and then menu'ing the before/after wouldn't naturally work because you need to see the text that comes after the before/after in order to choose correctly. But, appending the entire rest of the sentence to each operative word would make the menu too long and unwieldy. Use [tip]. It acts like the \* bullet point to create the next response, but this response will not be clickable and it will look distinct.
 
 ### Categorizing
 
@@ -352,6 +342,14 @@ Intense logic puzzles always need a visual aid just to remember the details of t
 ### Topological Sort
 
 A character running this algorithm could solve problems for the reader, or even point out issues with a given solution.
+
+### [know] [ofcourse] [suggest] and [search] [ask]
+
+A Prolog engine allows searching through facts and inferences, and answering simple questions about whether a suggested piece of information contradicts the established information.
+
+[know] adds a piece of information to the established.
+[ofcourse] is a common-sense piece of inference to create new knowledge from old. If Ruth is Harry's mom, and Ruth is Sally's daughter, then [ofcourse] Sally is Harry's grandmother.
+[suggest] is a way to propose a piece of information that may or may not be true. It is a working assumption to support a chain of cause.
 
 ## Discarded Features
 

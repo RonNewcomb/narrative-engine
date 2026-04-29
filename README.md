@@ -293,38 +293,12 @@ A form letter like "Dear {first name} {last name}" is a template that when combi
 >
 > Joe opened the letter, which read: [paste informing [the Joe] about the inciting incident]
 
-### Naming a Chosen Response
-
-One way to create an antecedent is via a menu selection. Despite using `[menu]` this doesn't name the menu. It names whichever response was chosen from the menu.
-
-> [menu fruit choice] \* apple \* banana \* orange \* avacado [/menu]
->
-> Abby picked up a [the fruit choice]. [paste smelling [the fruit choice]]
-
-This combines with secondary menus like you'd expect.
-
-> [menu the grocery store action]
->
-> \* Squeeze the [menu fruit choice] \* apple \* cucumber \* orange \* avacado [/menu]
->
-> \* Smell the [menu fruit choice] \* apple \* banana \* orange [/menu]
->
-> [/menu]
-
-This has two antecedents. "The fruit choice" would have one of the four fruits in it, while "the grocery store action" would have the whole sentence, like "Squeeze the cucumber" or "Smell the banana".
-
-If a secondary menu didn't use an antecendent that its peers did, then that antecedent would contain a blank space. This is true even if the antecedent had something in it previously.
-
 ### Inflection and Agreement
 
 A list of standard replacements comes pre-bundled.
 
-- [past-tense [the action]]
-- [get-plurality [the subject]]
-- [s] or [set-plurality [the verb]]
-- [titlecase [the response]]
-- [untitlecase [the response]]
-- [-ing [the action]]
+- [capitalize [the response]]
+- [uncapitalize [the response]]
 
 ## Puzzles
 

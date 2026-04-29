@@ -1,4 +1,4 @@
-@top Program { anything }
+@top Program { Anything }
 
 Prompt {
   Response+ Endprompt
@@ -9,7 +9,7 @@ Endprompt {
 }
 
 Response {
-  "*"   anythingelse
+  "*"   Anythingelse
 }
 
 Code {
@@ -19,23 +19,26 @@ Code {
   Unless |
   Menu |
   Plot |
-  Goto
+  Goto |
+  Cut |
+  Copy |
+  Paste 
 }
 
 Did {
-  "[did" onespace Text "]" anything "[/did]"
+  "[did" space NameText "]" Anything "[/did]"
 }
 
 Didnt {
-  "[didnt" onespace Text "]" anything "[/didnt]"
+  "[didnt" space NameText "]" Anything "[/didnt]"
 }
 
 If {
-  "[if" onespace Text "]" anything "[/if]"
+  "[if" space NameText "]" Anything "[/if]"
 }
 
 Unless {
-  "[unless" onespace Text "]" anything "[/unless]"
+  "[unless" space NameText "]" Anything "[/unless]"
 }
 
 Menu {
@@ -43,33 +46,56 @@ Menu {
 }
 
 Plot {
-  "[plot" onespace Text "]"
+  "[plot" space NameText "]"
 }
 
 Goto {
-  "[goto" onespace Text "]"
+  "[goto" space NameText "]"
+}
+
+Cut {
+  "[cut" (space NameText)? "]" Anything "[/cut]"
+}
+
+Copy {
+  "[copy" (space NameText)? "]" Anything "[/copy]"
+}
+
+Paste {
+  "[paste" (space NameText)? "]"
 }
 
 Hashtag {
   "#" HashtagText
 }
 
+InnerHashtag {
+  "#" InnerHashtagText
+}
+
 escaped {
-  "\\" EscapedChar
+  Escaper EscapedChar
 }
 
-anything {
-  (Text | escaped | Prompt | Code | Hashtag)+
+Anything {
+  ( Hashtag | escaped | Code | Prompt | Text )+
 }
 
-anythingelse {
-  (Text | escaped | Code | Hashtag)+
+Anythingelse {
+  ( Hashtag | escaped | Code | Text )+
+}
+
+NameText {
+  ( InnerHashtag | escaped | Code | InnerText )+
 }
 
 @tokens {
   onespace { $[ \t\n\r] }
   space { $[ \t\n\r]+ }
-  Text { ![\*\[\]\#\\]+ }
+  Text      { ![\*\[\]\#\\]+ }
+  InnerText { ![\*\[\]\#\\]+ }
   HashtagText { $[-A-Za-z0-9']+ }
+  InnerHashtagText { $[-A-Za-z0-9']+ }
   EscapedChar { $[\*\[\]\#\\] }  
+  Escaper { "\\" } 
 }

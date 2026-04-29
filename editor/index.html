@@ -1,9 +1,20 @@
 <html>
   <head>
     <script src="./index.ts" type="module"></script>
+    <script src="./darkmode.ts"></script>
   </head>
-  <body>
-    <h2>Editor</h2>
+  <body style="background-color: #eeeeee">
+    <header style="display: flex; justify-content: space-between">
+      <span style="color: gray; font-family: Arial, Helvetica, sans-serif; font-weight: 300; font-size: 1.5em; padding: 0.3em 0.7em">
+        Mirrorway
+      </span>
+      <button
+        type="button"
+        style="border: 1px solid gray; border-radius: 50%; height: 24px; width: 24px"
+        title="light/dark mode"
+        onclick="toggleDarkMode()"
+      ></button>
+    </header>
     <div id="editor"></div>
   </body>
 </html>

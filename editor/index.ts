@@ -1,13 +1,30 @@
 import { autocompletion, closeBrackets, closeBracketsKeymap, completionKeymap } from "@codemirror/autocomplete";
 import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
-import { bracketMatching, defaultHighlightStyle, foldGutter, foldKeymap, syntaxHighlighting } from "@codemirror/language";
+import { bracketMatching, foldGutter, foldKeymap, HighlightStyle, syntaxHighlighting } from "@codemirror/language";
 import { highlightSelectionMatches, searchKeymap } from "@codemirror/search";
 import { EditorState } from "@codemirror/state";
 import { drawSelection, dropCursor, EditorView, highlightSpecialChars, keymap } from "@codemirror/view";
+import { tags } from "@lezer/highlight";
 import { System3Mirrorways } from "./language-plugin/dist/index";
 
+const mirrorwaysStyle = HighlightStyle.define([
+  { tag: tags.comment, color: "gold" },
+  { tag: tags.name, color: "darkgreen", backgroundColor: "#e3f2ff" },
+  { tag: tags.literal, color: "darkred" },
+  { tag: tags.string, color: "darkred", backgroundColor: "#e3f2ff" },
+  { tag: tags.escape, color: "lightgray" },
+  { tag: tags.keyword, color: "darkblue", backgroundColor: "#e3f2ff" },
+  { tag: tags.operator, color: "gold" },
+  { tag: tags.punctuation, color: "gray" },
+  { tag: tags.content, color: "black" },
+  { tag: tags.invalid, backgroundColor: "lightred" },
+  { tag: tags.meta, color: "purple", backgroundColor: "#e3f2ff" },
+]);
+
 const view = new EditorView({
-  doc: "Start documentlkj * Option 1 * Option 2 ** [plot sldkfj] Of course! #hello-world Continuing...",
+  doc: `Start documentlkj * Option 1 * Option 2 ** [plot sldkfj] 
+Can you [copy]this?[/copy] Of \\* course! 
+[cut for later]And cut this?[/cut]  #hello-world  [paste #something] Continuing...`,
   parent: document.getElementById("editor")!,
   extensions: [
     // System3Mirrorways language support
@@ -25,7 +42,7 @@ const view = new EditorView({
     // Allow multiple cursors/selections
     EditorState.allowMultipleSelections.of(true),
     // Highlight syntax with a default style
-    syntaxHighlighting(defaultHighlightStyle),
+    syntaxHighlighting(mirrorwaysStyle),
     // Highlight matching brackets near cursor
     bracketMatching(),
     // Automatically close brackets

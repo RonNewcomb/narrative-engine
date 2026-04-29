@@ -19,7 +19,9 @@
     "publish2": "cd system2/publishing && node publish.ts && cd ../..",
     "parser": "cd system3 && peggy --format es -o parser.js parser.peggy && node compile.ts ../app3/system3.sample.txt",
     "publish": "cd app3 && node ../system3/publish.ts system3.sample.txt && cd ..",
-    "serve": "cd app3/dist && vite serve --host",
-    "speak": "cd editor-mobile && vite serve --host"
+    "serve": "cd app3/dist && vite serve --host && cd ..",
+    "app3": "npm run publish && npm run serve",
+    "editor-mobile": "cd editor-mobile && vite serve --host && cd ..",
+    "editor": "cd editor && npm run dev && cd .."
   }
 }

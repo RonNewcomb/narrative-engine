@@ -24,7 +24,9 @@ const mirrorwaysStyle = HighlightStyle.define([
 const view = new EditorView({
   doc: `Start documentlkj * Option 1 * Option 2 ** [plot sldkfj] 
 Can you [copy]this?[/copy] Of \\* course! 
-[cut for later]And cut this?[/cut]  #hello-world  [paste #something] Continuing...`,
+[cut for later]And cut this?[/cut]  #hello-world  [paste #something] Continuing...
+[replace this that] in here [/replace]
+`,
   parent: document.getElementById("editor")!,
   extensions: [
     // System3Mirrorways language support

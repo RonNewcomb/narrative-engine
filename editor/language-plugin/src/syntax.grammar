@@ -20,9 +20,11 @@ Code {
   Menu |
   Plot |
   Goto |
+  The |
   Cut |
   Copy |
-  Paste 
+  Paste |
+  Replace
 }
 
 Did {
@@ -53,6 +55,10 @@ Goto {
   "[goto" space NameText "]"
 }
 
+The {
+  "[the" space NameText "]"
+}
+
 Cut {
   "[cut" (space NameText)? "]" Anything "[/cut]"
 }
@@ -63,6 +69,10 @@ Copy {
 
 Paste {
   "[paste" (space NameText)? "]"
+}
+
+Replace {
+  "[replace" space Word space Word "]" Anything "[/replace]"
 }
 
 Hashtag {
@@ -93,6 +103,7 @@ NameText {
   onespace { $[ \t\n\r] }
   space { $[ \t\n\r]+ }
   Text      { ![\*\[\]\#\\]+ }
+  Word      { ![ \t\n\r\]]+ }
   InnerText { ![\*\[\]\#\\]+ }
   HashtagText { $[-A-Za-z0-9']+ }
   InnerHashtagText { $[-A-Za-z0-9']+ }

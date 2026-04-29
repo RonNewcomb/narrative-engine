@@ -31,7 +31,12 @@
             "Rose wanted to escape the confines of her birth. "
         ]
     },
-    "\n\nZafra ",
+    "\n\nRecently chose: ",
+    {
+        "op": "the",
+        "match": "choice"
+    },
+    ".\n\nZafra ",
     {
         "op": "did",
         "match": "close",
@@ -110,6 +115,11 @@
                 " "
             ]
         ]
+    },
+    ".\n\nRecently chose: ",
+    {
+        "op": "the",
+        "match": "choice"
     },
     ".\n\nRose ",
     {

@@ -18,7 +18,7 @@ type StoryHashtag = {
 };
 
 type StoryMatchpoint = {
-  op: "goto";
+  op: "goto" | "the";
   match: string;
 };
 
@@ -72,6 +72,7 @@ let state = {
   story: [] as Story,
   templates: [] as StoryCutCopy[],
   replacements: [] as StoryReplace[],
+  the: {} as Record<string, string>,
 };
 
 // helpers
@@ -200,6 +201,11 @@ function renderStoryNodeOperationReplace(node: StoryReplace, el: HTMLElement): f
   return renderStoryNodes(node.wrap, el);
 }
 
+function renderStoryNodeThe(node: StoryMatchpoint, el: HTMLElement): false | MenuElement {
+  const value = state.the[node.match];
+  return value ? renderStoryNode(value, el) : false;
+}
+
 function renderStoryNode(node: StoryNode, el: HTMLElement): false | MenuElement {
   if (typeof node === "string") return renderStoryNodeString(node, el);
   if (node.op == "hashtag") return renderStoryNodeHashtag(node, el);
@@ -215,6 +221,7 @@ function renderStoryNode(node: StoryNode, el: HTMLElement): false | MenuElement 
   if (node.op == "copy") return renderStoryNodeOperationCopy(node, el);
   if (node.op == "paste") return renderStoryNodeOperationPaste(node, el);
   if (node.op == "replace") return renderStoryNodeOperationReplace(node, el);
+  if (node.op == "the") return renderStoryNodeThe(node, el);
   throw new Error("Unknown node type " + JSON.stringify(node));
 }
 
@@ -230,6 +237,7 @@ async function renderCurrentTurn(): Promise<void> {
   if (!stopForInput) return renderTheEnd();
   return multimenu(stopForInput).then(({ chosen, goingTo }) => {
     if (chosen) state.chosen.push(chosen);
+    if (chosen) state.the["choice"] = chosen;
     if (goingTo) performGoto(goingTo);
     return renderCurrentTurn();
   });
@@ -240,7 +248,7 @@ async function renderCurrentTurn(): Promise<void> {
 export async function interpreter(filename: string, pwa = false): Promise<void> {
   if (pwa && "serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
   const story: Story = await fetch(filename).then(r => r.json());
-  state = { story, current: -1, chosen: [], templates: [], replacements: [] };
+  state = { story, current: -1, chosen: [], templates: [], replacements: [], the: {} };
   publishedElement = document.getElementById("published")!;
   menus = [];
   return renderCurrentTurn();

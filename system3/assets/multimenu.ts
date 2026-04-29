@@ -99,7 +99,7 @@ export async function multimenu(topMenu: MenuElement): Promise<Result> {
       const nextMenu = shouldDisplayMenu(panels[currentSlide]);
       if (nextMenu) return displayMenu(nextMenu);
 
-      const chosen = getCommand(panels, true);
+      const chosen = getCommand(panels, true).trim().replaceAll("  ", " ");
       console.log({ chosen, goingTo });
       resolve({ chosen, goingTo });
 

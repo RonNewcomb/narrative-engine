@@ -2,12 +2,16 @@ It's a sunny day. Rose wanted to escape the confines of her birth. * Follow him 
 
 [replace her his]Rose wanted to escape the confines of her birth. [/replace]
 
+Recently chose: [the choice].
+
 Zafra [did close]opened [if take key]and unlocked[/if] the door[/did] and left the room. [plot Zafra knows Rose is in the room]
 
 Abe's cut speech: "[cut speech]Four score and seven years ago...[/cut]" 
 "[copy]You can use the \\ backslash to escape characters such as \[ \] \* and \#.[/copy]"
 
 Corey wanted to * walk * drive [menu] * the car * the bike [/menu] * run #at-corey's-leisure **.
+
+Recently chose: [the choice].
 
 Rose * left [did arrive] * returned to [/did] the room. * started over. [goto Rose wanted to escape] ** 
 

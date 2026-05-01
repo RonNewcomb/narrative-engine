@@ -186,5 +186,159 @@
         "op": "paste",
         "name": "speech"
     },
-    "''\n\nThe end."
+    "''\n\nThe end.\n\n",
+    {
+        "op": "cut",
+        "name": "people",
+        "wrap": [
+            "\n",
+            {
+                "op": "*",
+                "option": [
+                    " Black\n"
+                ]
+            },
+            {
+                "op": "*",
+                "option": [
+                    " Green\n"
+                ]
+            },
+            {
+                "op": "*",
+                "option": [
+                    " Scarlet\n"
+                ]
+            },
+            {
+                "op": "*",
+                "option": [
+                    " Mustard\n"
+                ]
+            },
+            {
+                "op": "*",
+                "option": [
+                    " Plum\n"
+                ]
+            },
+            {
+                "op": "*",
+                "option": [
+                    " White\n"
+                ]
+            }
+        ]
+    },
+    "\n\n",
+    {
+        "op": "cut",
+        "name": "weapons",
+        "wrap": [
+            "\n",
+            {
+                "op": "*",
+                "option": [
+                    " Candlestick\n"
+                ]
+            },
+            {
+                "op": "*",
+                "option": [
+                    " Knife\n"
+                ]
+            },
+            {
+                "op": "*",
+                "option": [
+                    " Lead Pipe\n"
+                ]
+            },
+            {
+                "op": "*",
+                "option": [
+                    " Revolver\n"
+                ]
+            },
+            {
+                "op": "*",
+                "option": [
+                    " Rope\n"
+                ]
+            },
+            {
+                "op": "*",
+                "option": [
+                    " Wrench\n"
+                ]
+            }
+        ]
+    },
+    "\n\n",
+    {
+        "op": "cut",
+        "name": "rooms",
+        "wrap": [
+            "\n",
+            {
+                "op": "*",
+                "option": [
+                    " Kitchen\n"
+                ]
+            },
+            {
+                "op": "*",
+                "option": [
+                    " Ballroom\n"
+                ]
+            },
+            {
+                "op": "*",
+                "option": [
+                    " Conservatory\n"
+                ]
+            },
+            {
+                "op": "*",
+                "option": [
+                    " Dining Room\n"
+                ]
+            },
+            {
+                "op": "*",
+                "option": [
+                    " Billiard Room\n"
+                ]
+            },
+            {
+                "op": "*",
+                "option": [
+                    " Library\n"
+                ]
+            },
+            {
+                "op": "*",
+                "option": [
+                    " Lounge\n"
+                ]
+            },
+            {
+                "op": "*",
+                "option": [
+                    " Hall\n"
+                ]
+            },
+            {
+                "op": "*",
+                "option": [
+                    " Study\n"
+                ]
+            }
+        ]
+    },
+    "\n\n",
+    {
+        "op": "paste",
+        "name": "people"
+    }
 ]

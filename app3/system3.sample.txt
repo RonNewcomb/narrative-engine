@@ -22,3 +22,35 @@ Rose * left [did arrive] * returned to [/did] the room. * started over. [goto Ro
 ''[paste]'' ''[paste speech]''
 
 The end.
+
+[cut people]
+* Black
+* Green
+* Scarlet
+* Mustard
+* Plum
+* White
+[/cut]
+
+[cut weapons]
+* Candlestick
+* Knife
+* Lead Pipe
+* Revolver
+* Rope
+* Wrench
+[/cut]
+
+[cut rooms]
+* Kitchen
+* Ballroom
+* Conservatory
+* Dining Room
+* Billiard Room
+* Library
+* Lounge
+* Hall
+* Study
+[/cut]
+
+[paste people] 

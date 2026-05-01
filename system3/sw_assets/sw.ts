@@ -1,4 +1,6 @@
-const cacheName = "system-3";
+declare const self: ServiceWorkerGlobalScope;
+
+export const cacheName = "system-3";
 
 const folder = ""; // serve from localhost:5173 or some such
 
@@ -13,7 +15,7 @@ const contentToCache = [
   //folder+"/manifest.json",
 ];
 
-self.addEventListener("install", e => {
+self.addEventListener("install", (e: ExtendableEvent) => {
   console.log("[Service Worker] Install");
   e.waitUntil(
     (async () => {
@@ -24,7 +26,7 @@ self.addEventListener("install", e => {
   );
 });
 
-self.addEventListener("fetch", e => {
+self.addEventListener("fetch", (e: FetchEvent) => {
   e.respondWith(
     (async () => {
       const r = await caches.match(e.request);
@@ -39,7 +41,7 @@ self.addEventListener("fetch", e => {
   );
 });
 
-self.addEventListener("activate", e => {
+self.addEventListener("activate", (e: ExtendableEvent) => {
   e.waitUntil(
     caches.keys().then(keyList => {
       return Promise.all(

@@ -1,6 +1,6 @@
 import { assert } from "chai";
 import { describe, it } from "mocha";
-import { Constant, Fact, Functor, Goal, Rule, Space, Substitution, Term, Variable } from "./assets/prolog.ts";
+import { Constant, Fact, Functor, Goal, Rule, Space, Substitution, Term, Variable } from "./assets/prolog";
 
 describe("terms can be stringified correctly", () => {
   it("case 1", () => {

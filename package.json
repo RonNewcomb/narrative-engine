@@ -27,6 +27,6 @@
     "app3": "npm run publish && npm run serve",
     "editor-mobile": "cd editor-mobile && vite serve --host && cd ..",
     "editor": "cd editor && npm run dev && cd ..",
-    "prolog-test": "cd system3 && npx tsx ../node_modules/mocha/bin/mocha.js prolog-test.ts"
+    "prolog-test": "cd system3 && npx tsx ../node_modules/mocha/bin/mocha.js prolog.spec.ts"
   }
 }

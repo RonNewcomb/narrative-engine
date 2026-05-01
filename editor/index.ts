@@ -21,15 +21,18 @@ const mirrorwaysStyle = HighlightStyle.define([
   { tag: tags.meta, color: "purple", backgroundColor: "#e3f2ff" },
 ]);
 
+function saveFile() {
+  const content = view.state.doc.toString();
+  // Your custom save logic here (e.g., API call)
+  console.log("Saving content:", content);
+  return true; // Prevents the browser's default save dialog
+}
+
 const saveBinding: KeyBinding = {
   key: "Mod-s", // Captures Ctrl-S on Windows/Linux and Cmd-S on macOS
-  run: view => {
-    const content = view.state.doc.toString();
-    // Your custom save logic here (e.g., API call)
-    console.log("Saving content:", content);
-    return true; // Prevents the browser's default save dialog
-  },
+  run: view => saveFile(),
 };
+(window as any).saveFile = saveFile;
 
 const view = new EditorView({
   doc: `Start documentlkj * Option 1 * Option 2 ** [plot sldkfj] 
@@ -68,6 +71,7 @@ Can you [copy]this?[/copy] Of \\* course!
     keymap.of([
       // ctrl+s save
       saveBinding,
+      //openBinding,
       // Closed-brackets aware backspace
       ...closeBracketsKeymap,
       // A large set of basic bindings
@@ -83,3 +87,5 @@ Can you [copy]this?[/copy] Of \\* course!
     ]),
   ],
 });
+
+(window as any).view = view;

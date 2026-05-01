@@ -95,10 +95,7 @@ function addResponseToMenu(button: HTMLButtonElement, menu: MenuElement = menus[
 }
 
 function renderStoryNodeString(node: string, el: HTMLElement): false {
-  const out = state.replacements.reduce((sum, each) => {
-    sum = sum.replaceAll(each.from, each.to);
-    return sum;
-  }, node);
+  const out = state.replacements.reduce((sum, each) => sum.replaceAll(new RegExp(`\\b${each.from}\\b`, "g"), each.to), node);
   el.appendChild(document.createTextNode(out));
   return false;
 }
@@ -198,7 +195,9 @@ function renderStoryNodeOperationPaste(node: StoryCutCopy | StoryPaste, el: HTML
 
 function renderStoryNodeOperationReplace(node: StoryReplace, el: HTMLElement): false | MenuElement {
   state.replacements.push(node);
-  return renderStoryNodes(node.wrap, el);
+  const retval = renderStoryNodes(node.wrap, el);
+  state.replacements = state.replacements.filter(r => r != node);
+  return retval;
 }
 
 function renderStoryNodeThe(node: StoryMatchpoint, el: HTMLElement): false | MenuElement {

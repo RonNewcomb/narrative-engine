@@ -2,6 +2,10 @@ It's a sunny day. Rose wanted to escape the confines of her birth. * Follow him 
 
 [replace her his]Rose wanted to escape the confines of her birth. [/replace]
 
+[cut testreplace]Farawas was here, WAS.[/cut]
+[paste testreplace]
+[replace was is][paste testreplace][/replace]
+
 Recently chose: [the choice].
 
 Zafra [did close]opened [if take key]and unlocked[/if] the door[/did] and left the room. [plot Zafra knows Rose is in the room]

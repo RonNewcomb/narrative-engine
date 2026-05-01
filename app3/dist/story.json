@@ -31,6 +31,31 @@
             "Rose wanted to escape the confines of her birth. "
         ]
     },
+    "\n\n",
+    {
+        "op": "cut",
+        "name": "testreplace",
+        "wrap": [
+            "Farawas was here, WAS."
+        ]
+    },
+    "\n",
+    {
+        "op": "paste",
+        "name": "testreplace"
+    },
+    "\n",
+    {
+        "op": "replace",
+        "from": "was",
+        "to": "is",
+        "wrap": [
+            {
+                "op": "paste",
+                "name": "testreplace"
+            }
+        ]
+    },
     "\n\nRecently chose: ",
     {
         "op": "the",

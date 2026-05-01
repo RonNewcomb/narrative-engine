@@ -4,8 +4,8 @@ import { Application, Constant, Fact, Goal, Rule, Space, Substitution, Term, Var
 
 describe("terms can be stringified correctly", () => {
   it("case 1", () => {
-    const f = "f";
-    const g = "g";
+    const f = new Constant("f");
+    const g = new Constant("g");
     const c = new Constant("c");
     const X = new Variable("X");
     const Y = new Variable("Y");
@@ -20,7 +20,7 @@ describe("substitutions can be applied correctly", () => {
   it("case 1", () => {
     const X = new Variable("X");
     const Y = new Variable("Y");
-    const f = "f";
+    const f = new Constant("f");
     const c = new Constant("c");
     const d = new Constant("d");
 
@@ -35,8 +35,8 @@ describe("substitutions can be applied correctly", () => {
 describe("can process queries correctly", () => {
   describe("case 1", () => {
     const z = new Constant("z");
-    const add = "add"; // relationship name
-    const s = "s";
+    const add = new Constant("add"); // relationship name
+    const s = new Constant("s");
 
     // add(z, Y, Y).
     const facts = [
@@ -137,7 +137,7 @@ owns_revolver(madame_rose).`
         const name = factString.split("(")[0];
         const args = factString.split("(")[1].split(")")[0].split(",");
         return new Fact(
-          name,
+          new Constant(name),
           args.map(arg => new Constant(arg)),
         );
       });
@@ -166,7 +166,7 @@ guilty(X):- suspect(X), went_outside(X), not(has_alibi(X)), revolver_access(X). 
         const name = headP[0];
         const args = headP[1].split(")")[0].split(",");
         const headFact = new Fact(
-          name,
+          new Constant(name),
           args.map(arg => new Variable(arg)),
         );
 
@@ -175,7 +175,7 @@ guilty(X):- suspect(X), went_outside(X), not(has_alibi(X)), revolver_access(X). 
           const termName = termP[0];
           const termArgs = termP[1].split(")")[0].split(",");
           return new Fact(
-            termName,
+            new Constant(termName),
             termArgs.map(arg => new Variable(arg)),
           );
         });
@@ -186,7 +186,7 @@ guilty(X):- suspect(X), went_outside(X), not(has_alibi(X)), revolver_access(X). 
     const space = new Space(facts, rules);
 
     const X = new Variable("X");
-    const guilty = "guilty";
+    const guilty = new Constant("guilty");
     const goal = new Goal(guilty, [X]);
 
     const result = space.query([goal]);

@@ -21,7 +21,7 @@ export class Variable {
 
 export class Application {
   constructor(
-    public readonly relationshipName: string,
+    public readonly relationshipName: Constant,
     public readonly terms: Term[],
   ) {}
 
@@ -50,7 +50,7 @@ export function listVariables(term: Term): Set<Variable> {
 
 export class Fact {
   constructor(
-    public readonly relationshipName: string,
+    public readonly relationshipName: Constant,
     public readonly terms: Term[],
   ) {}
 
@@ -81,8 +81,8 @@ export class Fact {
 
 export class Rule {
   constructor(
-    public readonly left: { relationshipName: string; terms: Term[] },
-    public readonly right: { relationshipName: string; terms: Term[] }[],
+    public readonly left: { relationshipName: Constant; terms: Term[] },
+    public readonly right: { relationshipName: Constant; terms: Term[] }[],
   ) {}
 
   toString(): string {
@@ -131,7 +131,7 @@ export class Rule {
 
 export class Goal {
   constructor(
-    public readonly relationshipName: string,
+    public readonly relationshipName: Constant,
     public readonly terms: Term[],
   ) {}
 

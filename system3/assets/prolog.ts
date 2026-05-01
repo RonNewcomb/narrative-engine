@@ -2,15 +2,8 @@
 
 export type Term = Application | Constant | Variable;
 
-// `{Functor,Constant,Variable,Application}name` is only for readability
+// `{Constant,Variable,Application}name` is only for readability
 // and they not affect behaviours
-
-export class Functor {
-  constructor(public readonly name: string) {}
-  toString(): string {
-    return this.name;
-  }
-}
 
 export class Constant {
   constructor(public readonly name: string) {}
@@ -28,7 +21,7 @@ export class Variable {
 
 export class Application {
   constructor(
-    public readonly functor: Functor,
+    public readonly functor: RelationshipName,
     public readonly terms: Term[],
   ) {}
 
@@ -55,7 +48,7 @@ export function listVariables(term: Term): Set<Variable> {
   return variables;
 }
 
-export class Predicate {
+export class RelationshipName {
   constructor(public readonly name: string) {}
   toString(): string {
     return this.name;
@@ -64,7 +57,7 @@ export class Predicate {
 
 export class Fact {
   constructor(
-    public readonly predicate: Predicate,
+    public readonly predicate: RelationshipName,
     public readonly terms: Term[],
   ) {}
 
@@ -95,8 +88,8 @@ export class Fact {
 
 export class Rule {
   constructor(
-    public readonly left: { predicate: Predicate; terms: Term[] },
-    public readonly right: { predicate: Predicate; terms: Term[] }[],
+    public readonly left: { predicate: RelationshipName; terms: Term[] },
+    public readonly right: { predicate: RelationshipName; terms: Term[] }[],
   ) {}
 
   toString(): string {
@@ -143,7 +136,7 @@ export class Rule {
 
 export class Goal {
   constructor(
-    public readonly predicate: Predicate,
+    public readonly predicate: RelationshipName,
     public readonly terms: Term[],
   ) {}
 

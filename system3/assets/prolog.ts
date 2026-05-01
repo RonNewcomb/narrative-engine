@@ -2,8 +2,7 @@
 
 export type Term = Functor | Constant | Variable;
 
-// `{Constant,Variable,Functor}name` is only for readability
-// and they not affect behaviours
+// `{Constant,Variable,Functor}name` is only for readability and they not affect behaviours
 
 export class Constant {
   constructor(public readonly name: string) {}
@@ -30,6 +29,8 @@ export class Functor {
   }
 }
 
+///////////////////////////////////
+
 export function listVariables(term: Term): Set<Variable> {
   const variables = new Set<Variable>();
 
@@ -47,6 +48,8 @@ export function listVariables(term: Term): Set<Variable> {
 
   return variables;
 }
+
+/////////////////////////////
 
 export class Fact {
   readonly terms: Term[];
@@ -78,8 +81,8 @@ export class Fact {
 
 export class Rule {
   constructor(
-    public readonly left: { terms: Term[] },
-    public readonly right: { terms: Term[] }[],
+    public readonly left: Functor,
+    public readonly right: Functor[],
   ) {}
 
   toString(): string {
@@ -132,6 +135,8 @@ export class Goal {
     return `(${this.terms.map(i => i.toString()).join(", ")})`;
   }
 }
+
+///////////////////////////////////////////
 
 export class Substitution {
   constructor(
@@ -214,7 +219,7 @@ export class Constraint {
   }
 }
 
-// `space` is a set of facts and rules
+// `space` is a set of facts and rules //////////////////////////////////
 export class Space {
   constructor(
     private readonly facts: Fact[],

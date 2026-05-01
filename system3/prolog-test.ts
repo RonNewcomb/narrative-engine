@@ -53,7 +53,7 @@ describe("can process queries correctly", () => {
         const Y = new Variable("Y");
         const Z = new Variable("Z");
 
-        return new Rule({ terms: [add, new Functor(s, X), Y, new Functor(s, Z)] }, [{ terms: [add, X, Y, Z] }]);
+        return new Rule(new Functor(add, new Functor(s, X), Y, new Functor(s, Z)), [new Functor(add, X, Y, Z)]);
       })(),
     ];
 
@@ -156,13 +156,13 @@ guilty(X):- suspect(X), went_outside(X), not(has_alibi(X)), revolver_access(X). 
         const headP = head.split("(");
         const name = headP[0];
         const args = headP[1].split(")")[0].split(",");
-        const headFact = new Fact(...[new Constant(name)].concat(args.map(arg => new Variable(arg))));
+        const headFact = new Functor(...[new Constant(name)].concat(args.map(arg => new Variable(arg))));
 
         const bodyTerms = body.split(",").map(term => {
           const termP = term.trim().split("(");
           const termName = termP[0];
           const termArgs = termP[1].split(")")[0].split(",");
-          return new Fact(...[new Constant(termName)].concat(termArgs.map(arg => new Variable(arg))));
+          return new Functor(...[new Constant(termName)].concat(termArgs.map(arg => new Variable(arg))));
         });
 
         return new Rule(headFact, bodyTerms);

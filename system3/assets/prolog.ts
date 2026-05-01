@@ -20,13 +20,10 @@ export class Variable {
 }
 
 export class Functor {
-  constructor(
-    public readonly relationshipName: Constant,
-    public readonly terms: Term[],
-  ) {}
+  constructor(public readonly terms: Term[]) {}
 
   toString(): string {
-    return `${this.relationshipName}(${this.terms.map(term => term.toString()).join(", ")})`;
+    return `(${this.terms.map(term => term.toString()).join(", ")})`;
   }
 }
 
@@ -49,13 +46,10 @@ export function listVariables(term: Term): Set<Variable> {
 }
 
 export class Fact {
-  constructor(
-    public readonly relationshipName: Constant,
-    public readonly terms: Term[],
-  ) {}
+  constructor(public readonly terms: Term[]) {}
 
   toString(): string {
-    return `${this.relationshipName.toString()}(${this.terms.map(i => i.toString()).join(", ")})`;
+    return `(${this.terms.map(i => i.toString()).join(", ")})`;
   }
 
   // refresh the variables
@@ -72,24 +66,19 @@ export class Fact {
       return new Substitution(variable, new Variable(variable.name));
     });
 
-    return new Fact(
-      this.relationshipName,
-      this.terms.map(term => Substitution.applyAll(term, substitutions)),
-    );
+    return new Fact(this.terms.map(term => Substitution.applyAll(term, substitutions)));
   }
 }
 
 export class Rule {
   constructor(
-    public readonly left: { relationshipName: Constant; terms: Term[] },
-    public readonly right: { relationshipName: Constant; terms: Term[] }[],
+    public readonly left: { terms: Term[] },
+    public readonly right: { terms: Term[] }[],
   ) {}
 
   toString(): string {
-    const left = `${this.left.relationshipName.toString()}(${this.left.terms.map(i => i.toString()).join(", ")})`;
-    const right = this.right.map(
-      ({ relationshipName, terms }) => `${relationshipName.toString()}(${terms.map(i => i.toString()).join(", ")})`,
-    );
+    const left = `(${this.left.terms.map(i => i.toString()).join(", ")})`;
+    const right = this.right.map(({ terms }) => `(${terms.map(i => i.toString()).join(", ")})`);
     return `${left} :- [${right.join(", ")}]`;
   }
 
@@ -116,12 +105,10 @@ export class Rule {
     });
 
     const left = {
-      relationshipName: this.left.relationshipName,
       terms: this.left.terms.map(term => Substitution.applyAll(term, substitutions)),
     };
 
-    const right = this.right.map(({ relationshipName, terms }) => ({
-      relationshipName,
+    const right = this.right.map(({ terms }) => ({
       terms: terms.map(term => Substitution.applyAll(term, substitutions)),
     }));
 
@@ -130,13 +117,10 @@ export class Rule {
 }
 
 export class Goal {
-  constructor(
-    public readonly relationshipName: Constant,
-    public readonly terms: Term[],
-  ) {}
+  constructor(public readonly terms: Term[]) {}
 
   toString(): string {
-    return `${this.relationshipName}(${this.terms.map(i => i.toString()).join(", ")})`;
+    return `(${this.terms.map(i => i.toString()).join(", ")})`;
   }
 }
 
@@ -154,10 +138,7 @@ export class Substitution {
 
     if (term instanceof Constant) return term;
 
-    return new Functor(
-      term.relationshipName,
-      term.terms.map(term => this.apply(term)),
-    );
+    return new Functor(term.terms.map(term => this.apply(term)));
   }
 
   toString(): string {
@@ -213,7 +194,6 @@ export class Constraint {
 
     // from here, `left instanceof Application && right instanceof Application` holds
 
-    if (left.relationshipName !== right.relationshipName) return null;
     if (left.terms.length !== right.terms.length) return null;
 
     const constraintsNew = [];
@@ -284,7 +264,6 @@ export class Space {
             // refresh variables
             const fact = f.clone();
 
-            if (goal.relationshipName !== fact.relationshipName) continue;
             if (goal.terms.length !== fact.terms.length) continue;
 
             const constraints = [];
@@ -307,7 +286,6 @@ export class Space {
             // refresh variables
             const rule = r.clone();
 
-            if (goal.relationshipName !== rule.left.relationshipName) continue;
             if (goal.terms.length !== rule.left.terms.length) continue;
 
             const constraints = [];
@@ -321,7 +299,7 @@ export class Space {
             if (substitutionsNew) {
               queue.push({
                 // replace one goal with new goals
-                goals: [...goals.slice(1), ...rule.right.map(i => new Goal(i.relationshipName, i.terms))],
+                goals: [...goals.slice(1), ...rule.right.map(i => new Goal(i.terms))],
                 substitutions: [...substitutions, ...substitutionsNew],
               });
             }

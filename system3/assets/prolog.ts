@@ -1,8 +1,8 @@
 // https://github.com/kkty/prolog/blob/master/src/main.ts
 
-export type Term = Application | Constant | Variable;
+export type Term = Functor | Constant | Variable;
 
-// `{Constant,Variable,Application}name` is only for readability
+// `{Constant,Variable,Functor}name` is only for readability
 // and they not affect behaviours
 
 export class Constant {
@@ -19,7 +19,7 @@ export class Variable {
   }
 }
 
-export class Application {
+export class Functor {
   constructor(
     public readonly relationshipName: Constant,
     public readonly terms: Term[],
@@ -37,7 +37,7 @@ export function listVariables(term: Term): Set<Variable> {
     variables.add(term);
   }
 
-  if (term instanceof Application) {
+  if (term instanceof Functor) {
     term.terms.forEach(term => {
       listVariables(term).forEach(variable => {
         variables.add(variable);
@@ -154,7 +154,7 @@ export class Substitution {
 
     if (term instanceof Constant) return term;
 
-    return new Application(
+    return new Functor(
       term.relationshipName,
       term.terms.map(term => this.apply(term)),
     );

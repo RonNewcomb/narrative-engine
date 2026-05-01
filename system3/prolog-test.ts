@@ -1,6 +1,6 @@
 import { assert } from "chai";
 import { describe, it } from "mocha";
-import { Application, Constant, Fact, Goal, Rule, Space, Substitution, Term, Variable } from "./assets/prolog.ts";
+import { Constant, Fact, Functor, Goal, Rule, Space, Substitution, Term, Variable } from "./assets/prolog.ts";
 
 describe("terms can be stringified correctly", () => {
   it("case 1", () => {
@@ -10,7 +10,7 @@ describe("terms can be stringified correctly", () => {
     const X = new Variable("X");
     const Y = new Variable("Y");
 
-    const term = new Application(f, [new Application(g, [X, Y]), new Application(f, [X]), c]);
+    const term = new Functor(f, [new Functor(g, [X, Y]), new Functor(f, [X]), c]);
 
     assert.strictEqual(term.toString(), "f(g(X, Y), f(X), c)");
   });
@@ -24,7 +24,7 @@ describe("substitutions can be applied correctly", () => {
     const c = new Constant("c");
     const d = new Constant("d");
 
-    const term = new Application(f, [X, new Application(f, [X, Y])]);
+    const term = new Functor(f, [X, new Functor(f, [X, Y])]);
 
     const substituted = Substitution.applyAll(term, [new Substitution(X, c), new Substitution(Y, d)]);
 
@@ -56,7 +56,7 @@ describe("can process queries correctly", () => {
         return new Rule(
           {
             relationshipName: add,
-            terms: [new Application(s, [X]), Y, new Application(s, [Z])],
+            terms: [new Functor(s, [X]), Y, new Functor(s, [Z])],
           },
           [{ relationshipName: add, terms: [X, Y, Z] }],
         );
@@ -69,7 +69,7 @@ describe("can process queries correctly", () => {
 
     it("case 1-1", () => {
       // add(s(z), s(s(z)), X)
-      const result = space.query([new Goal(add, [new Application(s, [z]), new Application(s, [new Application(s, [z])]), X])]);
+      const result = space.query([new Goal(add, [new Functor(s, [z]), new Functor(s, [new Functor(s, [z])]), X])]);
 
       // there should be one suitable substituion
       const { done, value } = result.next();
@@ -80,7 +80,7 @@ describe("can process queries correctly", () => {
 
     it("case 1-2", () => {
       // add(X, s(z), s(s(z)))
-      const result = space.query([new Goal(add, [X, new Application(s, [z]), new Application(s, [new Application(s, [z])])])]);
+      const result = space.query([new Goal(add, [X, new Functor(s, [z]), new Functor(s, [new Functor(s, [z])])])]);
 
       // there should be one suitable substituion
       const { done, value } = result.next();

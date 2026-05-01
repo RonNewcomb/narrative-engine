@@ -10,7 +10,7 @@ describe("terms can be stringified correctly", () => {
     const X = new Variable("X");
     const Y = new Variable("Y");
 
-    const term = new Functor([f, new Functor([g, X, Y]), new Functor([f, X]), c]);
+    const term = new Functor(f, new Functor(g, X, Y), new Functor(f, X), c);
 
     assert.strictEqual(term.toString(), "(f, (g, X, Y), (f, X), c)");
   });
@@ -24,7 +24,7 @@ describe("substitutions can be applied correctly", () => {
     const c = new Constant("c");
     const d = new Constant("d");
 
-    const term = new Functor([f, X, new Functor([f, X, Y])]);
+    const term = new Functor(f, X, new Functor(f, X, Y));
 
     const substituted = Substitution.applyAll(term, [new Substitution(X, c), new Substitution(Y, d)]);
 
@@ -42,7 +42,7 @@ describe("can process queries correctly", () => {
     const facts = [
       (() => {
         const Y = new Variable("Y");
-        return new Fact([add, z, Y, Y]);
+        return new Fact(add, z, Y, Y);
       })(),
     ];
 
@@ -53,12 +53,7 @@ describe("can process queries correctly", () => {
         const Y = new Variable("Y");
         const Z = new Variable("Z");
 
-        return new Rule(
-          {
-            terms: [add, new Functor([s, X]), Y, new Functor([s, Z])],
-          },
-          [{ terms: [add, X, Y, Z] }],
-        );
+        return new Rule({ terms: [add, new Functor(s, X), Y, new Functor(s, Z)] }, [{ terms: [add, X, Y, Z] }]);
       })(),
     ];
 
@@ -68,7 +63,7 @@ describe("can process queries correctly", () => {
 
     it("case 1-1", () => {
       // add(s(z), s(s(z)), X)
-      const result = space.query([new Goal([add, new Functor([s, z]), new Functor([s, new Functor([s, z])]), X])]);
+      const result = space.query(new Goal(add, new Functor(s, z), new Functor(s, new Functor(s, z)), X));
 
       // there should be one suitable substituion
       const { done, value } = result.next();
@@ -79,7 +74,7 @@ describe("can process queries correctly", () => {
 
     it("case 1-2", () => {
       // add(X, s(z), s(s(z)))
-      const result = space.query([new Goal([add, X, new Functor([s, z]), new Functor([s, new Functor([s, z])])])]);
+      const result = space.query(new Goal(add, X, new Functor(s, z), new Functor(s, new Functor(s, z))));
 
       // there should be one suitable substituion
       const { done, value } = result.next();
@@ -135,7 +130,7 @@ owns_revolver(madame_rose).`
       .map(factString => {
         const name = factString.split("(")[0];
         const args = factString.split("(")[1].split(")")[0].split(",");
-        return new Fact([new Constant(name)].concat(args.map(arg => new Constant(arg))));
+        return new Fact(...[new Constant(name)].concat(args.map(arg => new Constant(arg))));
       });
 
     const howto = `
@@ -161,13 +156,13 @@ guilty(X):- suspect(X), went_outside(X), not(has_alibi(X)), revolver_access(X). 
         const headP = head.split("(");
         const name = headP[0];
         const args = headP[1].split(")")[0].split(",");
-        const headFact = new Fact([new Constant(name)].concat(args.map(arg => new Variable(arg))));
+        const headFact = new Fact(...[new Constant(name)].concat(args.map(arg => new Variable(arg))));
 
         const bodyTerms = body.split(",").map(term => {
           const termP = term.trim().split("(");
           const termName = termP[0];
           const termArgs = termP[1].split(")")[0].split(",");
-          return new Fact([new Constant(termName)].concat(termArgs.map(arg => new Variable(arg))));
+          return new Fact(...[new Constant(termName)].concat(termArgs.map(arg => new Variable(arg))));
         });
 
         return new Rule(headFact, bodyTerms);
@@ -177,9 +172,9 @@ guilty(X):- suspect(X), went_outside(X), not(has_alibi(X)), revolver_access(X). 
 
     const X = new Variable("X");
     const guilty = new Constant("guilty");
-    const goal = new Goal([guilty, X]);
+    const goal = new Goal(guilty, X);
 
-    const result = space.query([goal]);
+    const result = space.query(goal);
 
     const { done, value } = result.next();
     assert.strictEqual(done, false);

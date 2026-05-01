@@ -20,7 +20,10 @@ export class Variable {
 }
 
 export class Functor {
-  constructor(public readonly terms: Term[]) {}
+  readonly terms: Term[];
+  constructor(...terms: Term[]) {
+    this.terms = terms;
+  }
 
   toString(): string {
     return `(${this.terms.map(term => term.toString()).join(", ")})`;
@@ -46,7 +49,10 @@ export function listVariables(term: Term): Set<Variable> {
 }
 
 export class Fact {
-  constructor(public readonly terms: Term[]) {}
+  readonly terms: Term[];
+  constructor(...terms: Term[]) {
+    this.terms = terms;
+  }
 
   toString(): string {
     return `(${this.terms.map(i => i.toString()).join(", ")})`;
@@ -66,7 +72,7 @@ export class Fact {
       return new Substitution(variable, new Variable(variable.name));
     });
 
-    return new Fact(this.terms.map(term => Substitution.applyAll(term, substitutions)));
+    return new Fact(...this.terms.map(term => Substitution.applyAll(term, substitutions)));
   }
 }
 
@@ -117,7 +123,10 @@ export class Rule {
 }
 
 export class Goal {
-  constructor(public readonly terms: Term[]) {}
+  readonly terms: Term[];
+  constructor(...terms: Term[]) {
+    this.terms = terms;
+  }
 
   toString(): string {
     return `(${this.terms.map(i => i.toString()).join(", ")})`;
@@ -138,7 +147,7 @@ export class Substitution {
 
     if (term instanceof Constant) return term;
 
-    return new Functor(term.terms.map(term => this.apply(term)));
+    return new Functor(...term.terms.map(term => this.apply(term)));
   }
 
   toString(): string {
@@ -212,7 +221,7 @@ export class Space {
     private readonly rules: Rule[],
   ) {}
 
-  query(goals: Goal[]): Iterator<Map<Variable, Term>> {
+  query(...goals: Goal[]): Iterator<Map<Variable, Term>> {
     type Item = { goals: Goal[]; substitutions: Substitution[] };
     const queue: Item[] = [{ goals, substitutions: [] }];
 
@@ -299,7 +308,7 @@ export class Space {
             if (substitutionsNew) {
               queue.push({
                 // replace one goal with new goals
-                goals: [...goals.slice(1), ...rule.right.map(i => new Goal(i.terms))],
+                goals: [...goals.slice(1), ...rule.right.map(i => new Goal(...i.terms))],
                 substitutions: [...substitutions, ...substitutionsNew],
               });
             }

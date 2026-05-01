@@ -109,17 +109,11 @@ export class Rule {
       });
     });
 
-    const substitutions = Array.from(variables).map(variable => {
-      return new Substitution(variable, new Variable(variable.name));
-    });
+    const substitutions = Array.from(variables).map(variable => new Substitution(variable, new Variable(variable.name)));
 
-    const left = {
-      terms: this.left.terms.map(term => Substitution.applyAll(term, substitutions)),
-    };
+    const left = new Functor(...this.left.terms.map(term => Substitution.applyAll(term, substitutions)));
 
-    const right = this.right.map(({ terms }) => ({
-      terms: terms.map(term => Substitution.applyAll(term, substitutions)),
-    }));
+    const right = this.right.map(({ terms }) => new Functor(...terms.map(term => Substitution.applyAll(term, substitutions))));
 
     return new Rule(left, right);
   }

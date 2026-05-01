@@ -1,11 +1,11 @@
 import { assert } from "chai";
 import { describe, it } from "mocha";
-import { Application, Constant, Fact, Goal, RelationshipName, Rule, Space, Substitution, Term, Variable } from "./assets/prolog.ts";
+import { Application, Constant, Fact, Goal, Rule, Space, Substitution, Term, Variable } from "./assets/prolog.ts";
 
 describe("terms can be stringified correctly", () => {
   it("case 1", () => {
-    const f = new RelationshipName("f");
-    const g = new RelationshipName("g");
+    const f = "f";
+    const g = "g";
     const c = new Constant("c");
     const X = new Variable("X");
     const Y = new Variable("Y");
@@ -20,7 +20,7 @@ describe("substitutions can be applied correctly", () => {
   it("case 1", () => {
     const X = new Variable("X");
     const Y = new Variable("Y");
-    const f = new RelationshipName("f");
+    const f = "f";
     const c = new Constant("c");
     const d = new Constant("d");
 
@@ -35,8 +35,8 @@ describe("substitutions can be applied correctly", () => {
 describe("can process queries correctly", () => {
   describe("case 1", () => {
     const z = new Constant("z");
-    const add = new RelationshipName("add"); // relationship name
-    const s = new RelationshipName("s");
+    const add = "add"; // relationship name
+    const s = "s";
 
     // add(z, Y, Y).
     const facts = [
@@ -55,10 +55,10 @@ describe("can process queries correctly", () => {
 
         return new Rule(
           {
-            predicate: add,
+            relationshipName: add,
             terms: [new Application(s, [X]), Y, new Application(s, [Z])],
           },
-          [{ predicate: add, terms: [X, Y, Z] }],
+          [{ relationshipName: add, terms: [X, Y, Z] }],
         );
       })(),
     ];
@@ -137,7 +137,7 @@ owns_revolver(madame_rose).`
         const name = factString.split("(")[0];
         const args = factString.split("(")[1].split(")")[0].split(",");
         return new Fact(
-          new RelationshipName(name),
+          name,
           args.map(arg => new Constant(arg)),
         );
       });
@@ -166,7 +166,7 @@ guilty(X):- suspect(X), went_outside(X), not(has_alibi(X)), revolver_access(X). 
         const name = headP[0];
         const args = headP[1].split(")")[0].split(",");
         const headFact = new Fact(
-          new RelationshipName(name),
+          name,
           args.map(arg => new Variable(arg)),
         );
 
@@ -175,7 +175,7 @@ guilty(X):- suspect(X), went_outside(X), not(has_alibi(X)), revolver_access(X). 
           const termName = termP[0];
           const termArgs = termP[1].split(")")[0].split(",");
           return new Fact(
-            new RelationshipName(termName),
+            termName,
             termArgs.map(arg => new Variable(arg)),
           );
         });
@@ -186,7 +186,7 @@ guilty(X):- suspect(X), went_outside(X), not(has_alibi(X)), revolver_access(X). 
     const space = new Space(facts, rules);
 
     const X = new Variable("X");
-    const guilty = new RelationshipName("guilty");
+    const guilty = "guilty";
     const goal = new Goal(guilty, [X]);
 
     const result = space.query([goal]);

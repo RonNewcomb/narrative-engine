@@ -58,3 +58,7 @@ The end.
 
 [paste people] **
 
+[combo]  
+ * boy * girl ** 
+ * tall * short ** 
+[/combo]

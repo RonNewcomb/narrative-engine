@@ -373,5 +373,33 @@
     " ",
     {
         "op": "**"
+    },
+    "\n\n",
+    {
+        "op": "combo",
+        "menus": [
+            {
+                "op": "menu",
+                "responses": [
+                    [
+                        " boy "
+                    ],
+                    [
+                        " girl "
+                    ]
+                ]
+            },
+            {
+                "op": "menu",
+                "responses": [
+                    [
+                        " boy "
+                    ],
+                    [
+                        " girl "
+                    ]
+                ]
+            }
+        ]
     }
 ]

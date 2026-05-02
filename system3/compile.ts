@@ -5,12 +5,13 @@ import { readFile, writeFile } from "fs/promises";
 import { dirname } from "path";
 import { parse, SyntaxError } from "./parser.js";
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (import.meta.url.startsWith(`file://`)) {
   const storyFilename = process.argv[2] || "FILE_NOT_SPECIFIED";
   compileStory(storyFilename);
-}
+} else console.log(import.meta.url);
 
 export async function compileStory(storyFilename: string, outputPath?: string): Promise<string> {
+  console.log("Compiling...");
   let json = "";
   const source = await readFile(storyFilename).then(x => x.toString().trim());
 
@@ -33,5 +34,6 @@ export async function compileStory(storyFilename: string, outputPath?: string): 
   // console.log(json);
   const outputFile = outputPath || dirname(storyFilename) + `/dist/story.json`;
   await writeFile(outputFile, json);
+  console.log("Written to ", outputFile);
   return json;
 }

@@ -9,7 +9,7 @@
     "@types/chai": "^5.2.3",
     "@types/dom-speech-recognition": "^0.0.9",
     "@types/mocha": "^10.0.10",
-    "@types/node": "^22.5.0",
+    "@types/node": "^22.19.17",
     "@vitejs/plugin-basic-ssl": "^2.3.0",
     "chai": "^6.2.2",
     "mocha": "^11.7.5",

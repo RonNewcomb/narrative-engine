@@ -283,13 +283,6 @@ This can be combined with cut copy paste to create dynamic text.
 
 [find] acts like a go-to. It finds the named passage and jumps to it, continuing the story from there. It's much like the "turn to page 57" you would read in a printed choose-your-own-adventure book.
 
-### Inflection and Agreement
-
-A list of standard replacements comes pre-bundled.
-
-- [capitalize [the response]]
-- [uncapitalize [the response]]
-
 ## Puzzles
 
 How to construct puzzles in this system? Aimless exploration has its place, but to really engage the reader they need to problem solve with the characters.

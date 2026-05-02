@@ -45,7 +45,7 @@ export function findLocalIp(container: HTMLElement, logInfo = true) {
   })
     .then(async ips => {
       ips = (ips || []).concat(location.hostname);
-      console.log(ips);
+      // console.log(ips);
       if (!ips) return console.log("No IPs");
       ips = ips.filter(ip => ip && ip.match(/^\d+\.\d+\.\d+\.\d+$/));
       if (!ips.length) return console.log("No IP addresses; mobile can't connect to a localhost address");

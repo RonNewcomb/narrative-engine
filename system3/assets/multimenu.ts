@@ -5,9 +5,7 @@ export interface MenuElement extends HTMLDivElement {
   childNodes: NodeListOf<ResponseButtonElement>;
 }
 
-export interface MenuPanelElement extends MenuElement {
-  combo?: any;
-}
+export interface MenuPanelElement extends MenuElement {}
 
 export interface ResponseButtonElement extends Omit<HTMLButtonElement, "children"> {
   parentElement: MenuElement;

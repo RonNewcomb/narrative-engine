@@ -382,17 +382,6 @@
                 "op": "menu",
                 "responses": [
                     [
-                        " boy "
-                    ],
-                    [
-                        " girl "
-                    ]
-                ]
-            },
-            {
-                "op": "menu",
-                "responses": [
-                    [
                         " tall "
                     ],
                     [
@@ -409,6 +398,17 @@
                     ],
                     [
                         " red "
+                    ]
+                ]
+            },
+            {
+                "op": "menu",
+                "responses": [
+                    [
+                        " boy "
+                    ],
+                    [
+                        " girl "
                     ]
                 ]
             }

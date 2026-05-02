@@ -67,7 +67,6 @@ type StoryResponseEndMenu = {
 type StoryResponses = {
   op: "menu";
   responses: StoryResponse[];
-  combo?: StoryResponses; // interpreter-only
 };
 
 type StoryNodeCombo = {
@@ -176,14 +175,15 @@ function renderStoryResponseEndMenu(el: HTMLElement): MenuElement | false {
   return menu && menus.length == 0 ? menu : false;
 }
 
+// cycle through all responses for a menu and tack on the secondary menu if not already included
 function renderStoryCombo(node: StoryNodeCombo, el: HTMLElement): false | MenuElement {
   for (let i = 0; i < node.menus.length; i++) {
     const menu = node.menus[i];
     const submenu = node.menus[i + 1];
     if (!submenu) break;
-    menu.combo = submenu;
+    for (let response of menu.responses) if (!response.includes(submenu)) response.push(submenu);
   }
-  return renderStoryNodeResponses(node.menus[0], el); // multimenu must interpret "combo"
+  return renderStoryNodeResponses(node.menus[0], el);
 }
 
 function renderStoryNodes(nodes: StoryNode[], el: HTMLElement): false | MenuElement {

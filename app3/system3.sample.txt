@@ -59,7 +59,7 @@ The end.
 [paste people] **
 
 [combo]  
- * boy * girl ** 
  * tall * short ** 
  [menu] * blue * red [/menu]
+ * boy * girl ** 
 [/combo]

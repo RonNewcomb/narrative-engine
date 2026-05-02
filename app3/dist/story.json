@@ -393,10 +393,22 @@
                 "op": "menu",
                 "responses": [
                     [
-                        " boy "
+                        " tall "
                     ],
                     [
-                        " girl "
+                        " short "
+                    ]
+                ]
+            },
+            {
+                "op": "menu",
+                "name": null,
+                "responses": [
+                    [
+                        " blue "
+                    ],
+                    [
+                        " red "
                     ]
                 ]
             }

@@ -61,4 +61,5 @@ The end.
 [combo]  
  * boy * girl ** 
  * tall * short ** 
+ [menu] * blue * red [/menu]
 [/combo]

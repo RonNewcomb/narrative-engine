@@ -11,7 +11,8 @@ type StoryNode =
   | StoryPlotpoint
   | StoryCutCopy
   | StoryPaste
-  | StoryReplace;
+  | StoryReplace
+  | StoryNodeCombo;
 
 type StoryHashtag = {
   op: "hashtag";
@@ -66,6 +67,12 @@ type StoryResponseEndMenu = {
 type StoryResponses = {
   op: "menu";
   responses: StoryResponse[];
+  combo?: StoryResponses; // interpreter-only
+};
+
+type StoryNodeCombo = {
+  op: "combo";
+  menus: StoryResponses[];
 };
 
 type Story = StoryNode[];
@@ -143,16 +150,17 @@ function renderTheEnd(): void {
   publishedElement.appendChild(document.createElement("hr"));
 }
 
-function renderStoryNodeLoneResponse(option: StoryResponse): false {
+function renderStoryNodeLoneResponse(optionText: StoryResponse): false {
   const button = document.createElement("button");
   addResponseToMenu(button);
-  option.forEach(segment => renderStoryNode(segment, button));
+  optionText.forEach(segment => renderStoryNode(segment, button));
   return false;
 }
 
 function renderStoryNodeResponses(node: StoryResponses, el: HTMLElement): MenuElement | false {
   if (!Array.isArray(node.responses)) throw new Error("Expected responses to be an array");
   const menu = createNewMenu(); // do this here so GOTO immediately knows if it's conditional or not
+  // if (node.combo) menu.combo = node.combo;
   for (let response of node.responses) {
     if (!response || typeof response === "string") continue;
     renderStoryNodeLoneResponse(response);
@@ -166,6 +174,16 @@ function renderStoryResponseEndMenu(el: HTMLElement): MenuElement | false {
   if (!menu) return false;
   el.appendChild(menu);
   return menu && menus.length == 0 ? menu : false;
+}
+
+function renderStoryCombo(node: StoryNodeCombo, el: HTMLElement): false | MenuElement {
+  for (let i = 0; i < node.menus.length; i++) {
+    const menu = node.menus[i];
+    const submenu = node.menus[i + 1];
+    if (!submenu) break;
+    menu.combo = submenu;
+  }
+  return renderStoryNodeResponses(node.menus[0], el); // multimenu must interpret "combo"
 }
 
 function renderStoryNodes(nodes: StoryNode[], el: HTMLElement): false | MenuElement {
@@ -224,6 +242,7 @@ function renderStoryNode(node: StoryNode, el: HTMLElement): false | MenuElement 
   if (node.op == "menu") return renderStoryNodeResponses(node, el);
   if (node.op == "*") return renderStoryNodeLoneResponse(node.option);
   if (node.op == "**") return renderStoryResponseEndMenu(el);
+  if (node.op == "combo") return renderStoryCombo(node, el);
   if (node.op == "if") return renderStoryNodeOperationIf(node, el);
   if (node.op == "did") return renderStoryNodeOperationDid(node, el);
   if (node.op == "unless") return renderStoryNodeOperationIfnot(node, el);

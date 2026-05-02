@@ -1,6 +1,7 @@
 function toggleDarkMode() {
   const el = document.getElementById("darkmode")! as HTMLStyleElement;
   el.disabled = !el.disabled;
+  localStorage.setItem("dark-mode", (!el.disabled).toString());
 }
 
 const el = document.createElement("style");
@@ -19,7 +20,10 @@ img, video, iframe, canvas {
   filter: invert(1) hue-rotate(180deg);
 }`;
 document.head.appendChild(el);
-if (!window.matchMedia("(prefers-color-scheme: dark)").matches) toggleDarkMode();
+
+const mode = localStorage.getItem("dark-mode");
+if (mode === null) if (!window.matchMedia("(prefers-color-scheme: dark)").matches) toggleDarkMode();
+if (mode == "false") toggleDarkMode();
 
 const icon = `
 <svg width="24px" height="24px" viewBox="0 0 72 72" title="light/dark mode" onclick="toggleDarkMode()">

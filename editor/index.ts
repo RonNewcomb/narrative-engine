@@ -21,18 +21,10 @@ const mirrorwaysStyle = HighlightStyle.define([
   { tag: tags.meta, color: "purple", backgroundColor: "#e3f2ff" },
 ]);
 
-function saveFile() {
-  const content = view.state.doc.toString();
-  // Your custom save logic here (e.g., API call)
-  console.log("Saving content:", content);
-  return true; // Prevents the browser's default save dialog
-}
-
 const saveBinding: KeyBinding = {
   key: "Mod-s", // Captures Ctrl-S on Windows/Linux and Cmd-S on macOS
-  run: view => saveFile(),
+  run: view => (window as any).saveFile(),
 };
-(window as any).saveFile = saveFile;
 
 const view = new EditorView({
   doc: `Start documentlkj * Option 1 * Option 2 ** [plot sldkfj] 

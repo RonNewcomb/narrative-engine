@@ -22,7 +22,7 @@
             "she left home."
         ]
     },
-    " \n\n",
+    " \r\n\r\n",
     {
         "op": "replace",
         "from": "her",
@@ -31,7 +31,7 @@
             "Rose wanted to escape the confines of her birth. "
         ]
     },
-    "\n\n",
+    "\r\n\r\n",
     {
         "op": "cut",
         "name": "testreplace",
@@ -39,12 +39,12 @@
             "Farawas was here, WAS."
         ]
     },
-    "\n",
+    "\r\n",
     {
         "op": "paste",
         "name": "testreplace"
     },
-    "\n",
+    "\r\n",
     {
         "op": "replace",
         "from": "was",
@@ -56,12 +56,12 @@
             }
         ]
     },
-    "\n\nRecently chose: ",
+    "\r\n\r\nRecently chose: ",
     {
         "op": "the",
         "match": "choice"
     },
-    ".\n\nZafra ",
+    ".\r\n\r\nZafra ",
     {
         "op": "did",
         "match": "close",
@@ -82,7 +82,7 @@
         "op": "plot",
         "name": "Zafra knows Rose is in the room"
     },
-    "\n\nAbe's cut speech: \"",
+    "\r\n\r\nAbe's cut speech: \"",
     {
         "op": "cut",
         "name": "speech",
@@ -90,7 +90,7 @@
             "Four score and seven years ago..."
         ]
     },
-    "\" \n\"",
+    "\" \r\n\"",
     {
         "op": "copy",
         "name": null,
@@ -108,7 +108,7 @@
             "."
         ]
     },
-    "\"\n\nCorey wanted to ",
+    "\"\r\n\r\nCorey wanted to ",
     {
         "op": "menu",
         "responses": [
@@ -141,12 +141,12 @@
             ]
         ]
     },
-    ".\n\nRecently chose: ",
+    ".\r\n\r\nRecently chose: ",
     {
         "op": "the",
         "match": "choice"
     },
-    ".\n\nRose ",
+    ".\r\n\r\nRose ",
     {
         "op": "menu",
         "responses": [
@@ -176,7 +176,7 @@
             ]
         ]
     },
-    " \n\n''",
+    " \r\n\r\n''",
     {
         "op": "paste",
         "name": null
@@ -186,157 +186,145 @@
         "op": "paste",
         "name": "speech"
     },
-    "''\n\nThe end.\n\n",
+    "''\r\n\r\nThe end.\r\n\r\n",
     {
         "op": "cut",
         "name": "people",
         "wrap": [
-            "\n",
+            "\r\n",
             {
-                "op": "*",
-                "option": [
-                    " Black\n"
+                "op": "menu",
+                "responses": [
+                    [
+                        " Black\r\n"
+                    ],
+                    [
+                        " Green\r\n"
+                    ],
+                    [
+                        " Scarlet\r\n"
+                    ],
+                    [
+                        " Mustard\r\n"
+                    ],
+                    [
+                        " Plum\r\n"
+                    ],
+                    [
+                        " White\r\n"
+                    ]
                 ]
             },
-            {
-                "op": "*",
-                "option": [
-                    " Green\n"
-                ]
-            },
-            {
-                "op": "*",
-                "option": [
-                    " Scarlet\n"
-                ]
-            },
-            {
-                "op": "*",
-                "option": [
-                    " Mustard\n"
-                ]
-            },
-            {
-                "op": "*",
-                "option": [
-                    " Plum\n"
-                ]
-            },
-            {
-                "op": "*",
-                "option": [
-                    " White\n"
-                ]
-            }
+            "\r\n"
         ]
     },
-    "\n\n",
+    "\r\n\r\n",
     {
         "op": "cut",
         "name": "weapons",
         "wrap": [
-            "\n",
+            "\r\n",
             {
                 "op": "*",
                 "option": [
-                    " Candlestick\n"
+                    " Candlestick\r\n"
                 ]
             },
             {
                 "op": "*",
                 "option": [
-                    " Knife\n"
+                    " Knife\r\n"
                 ]
             },
             {
                 "op": "*",
                 "option": [
-                    " Lead Pipe\n"
+                    " Lead Pipe\r\n"
                 ]
             },
             {
                 "op": "*",
                 "option": [
-                    " Revolver\n"
+                    " Revolver\r\n"
                 ]
             },
             {
                 "op": "*",
                 "option": [
-                    " Rope\n"
+                    " Rope\r\n"
                 ]
             },
             {
                 "op": "*",
                 "option": [
-                    " Wrench\n"
+                    " Wrench\r\n"
                 ]
             }
         ]
     },
-    "\n\n",
+    "\r\n\r\n",
     {
         "op": "cut",
         "name": "rooms",
         "wrap": [
-            "\n",
+            "\r\n",
             {
                 "op": "*",
                 "option": [
-                    " Kitchen\n"
+                    " Kitchen\r\n"
                 ]
             },
             {
                 "op": "*",
                 "option": [
-                    " Ballroom\n"
+                    " Ballroom\r\n"
                 ]
             },
             {
                 "op": "*",
                 "option": [
-                    " Conservatory\n"
+                    " Conservatory\r\n"
                 ]
             },
             {
                 "op": "*",
                 "option": [
-                    " Dining Room\n"
+                    " Dining Room\r\n"
                 ]
             },
             {
                 "op": "*",
                 "option": [
-                    " Billiard Room\n"
+                    " Billiard Room\r\n"
                 ]
             },
             {
                 "op": "*",
                 "option": [
-                    " Library\n"
+                    " Library\r\n"
                 ]
             },
             {
                 "op": "*",
                 "option": [
-                    " Lounge\n"
+                    " Lounge\r\n"
                 ]
             },
             {
                 "op": "*",
                 "option": [
-                    " Hall\n"
+                    " Hall\r\n"
                 ]
             },
             {
                 "op": "*",
                 "option": [
-                    " Study\n"
+                    " Study\r\n"
                 ]
             }
         ]
     },
-    "\n\n",
+    "\r\n\r\n",
     {
         "op": "paste",
         "name": "people"

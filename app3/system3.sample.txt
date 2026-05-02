@@ -30,6 +30,7 @@ The end.
 * Mustard
 * Plum
 * White
+**
 [/cut]
 
 [cut weapons]

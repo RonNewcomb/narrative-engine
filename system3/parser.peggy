@@ -11,7 +11,7 @@ escaped = "\\" letters:[\*\[\]\#\\]                                             
 hashtag = "#" tag:[-A-Za-z0-9']+                                                { return ({op:'hashtag', tag: "#"+tag.join("")})}
 
 bang = "*"
-endprompt = bang _ bang
+endprompt = bang _ bang                                                         { return ({op:'**'})}
 prompt = responses:response+  endprompt                                         { return ({op:'menu', responses})}
 response = _ bang option:anythingelse                                           { return option; }
 loneresponse = _ bang option:anythingelse                                       { return ({op:'*', option})}

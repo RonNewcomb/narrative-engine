@@ -39,7 +39,6 @@
             "Farawas was here, WAS."
         ]
     },
-    "\n",
     {
         "op": "paste",
         "name": "testreplace"
@@ -49,6 +48,42 @@
         "op": "replace",
         "from": "was",
         "to": "is",
+        "wrap": [
+            {
+                "op": "paste",
+                "name": "testreplace"
+            }
+        ]
+    },
+    "\n",
+    {
+        "op": "replace",
+        "from": "was",
+        "to": "had been",
+        "wrap": [
+            {
+                "op": "paste",
+                "name": "testreplace"
+            }
+        ]
+    },
+    "\n",
+    {
+        "op": "replace",
+        "from": "was here",
+        "to": "left",
+        "wrap": [
+            {
+                "op": "paste",
+                "name": "testreplace"
+            }
+        ]
+    },
+    "\n",
+    {
+        "op": "replace",
+        "from": "was here",
+        "to": "had left",
         "wrap": [
             {
                 "op": "paste",
@@ -191,39 +226,48 @@
         "op": "cut",
         "name": "people",
         "wrap": [
-            "\n",
             {
-                "op": "menu",
-                "responses": [
-                    [
-                        " Black\n"
-                    ],
-                    [
-                        " Green\n"
-                    ],
-                    [
-                        " Scarlet\n"
-                    ],
-                    [
-                        " Mustard\n"
-                    ],
-                    [
-                        " Plum\n"
-                    ],
-                    [
-                        " White\n"
-                    ]
+                "op": "*",
+                "option": [
+                    " Black\n"
                 ]
             },
-            "\n"
+            {
+                "op": "*",
+                "option": [
+                    " Green\n"
+                ]
+            },
+            {
+                "op": "*",
+                "option": [
+                    " Scarlet\n"
+                ]
+            },
+            {
+                "op": "*",
+                "option": [
+                    " Mustard\n"
+                ]
+            },
+            {
+                "op": "*",
+                "option": [
+                    " Plum\n"
+                ]
+            },
+            {
+                "op": "*",
+                "option": [
+                    " White\n"
+                ]
+            }
         ]
     },
-    "\n\n",
     {
         "op": "cut",
         "name": "weapons",
         "wrap": [
-            "\n",
             {
                 "op": "*",
                 "option": [
@@ -262,12 +306,10 @@
             }
         ]
     },
-    "\n\n",
     {
         "op": "cut",
         "name": "rooms",
         "wrap": [
-            "\n",
             {
                 "op": "*",
                 "option": [
@@ -324,9 +366,12 @@
             }
         ]
     },
-    "\n\n",
     {
         "op": "paste",
         "name": "people"
+    },
+    " ",
+    {
+        "op": "**"
     }
 ]

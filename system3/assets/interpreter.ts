@@ -7,6 +7,7 @@ type StoryNode =
   | StoryHashtag
   | StoryMatchpoint
   | StoryLoneResponse
+  | StoryResponseEndMenu
   | StoryPlotpoint
   | StoryCutCopy
   | StoryPaste
@@ -56,6 +57,10 @@ type StoryResponse = StoryNode[];
 type StoryLoneResponse = {
   op: "*";
   option: StoryResponse;
+};
+
+type StoryResponseEndMenu = {
+  op: "**";
 };
 
 type StoryResponses = {
@@ -152,9 +157,15 @@ function renderStoryNodeResponses(node: StoryResponses, el: HTMLElement): MenuEl
     if (!response || typeof response === "string") continue;
     renderStoryNodeLoneResponse(response);
   }
+  return renderStoryResponseEndMenu(el);
+}
+
+function renderStoryResponseEndMenu(el: HTMLElement): MenuElement | false {
+  if (menus.length == 0) return false;
+  const menu = menus.pop();
+  if (!menu) return false;
   el.appendChild(menu);
-  const outermostMenu = menus.pop();
-  return outermostMenu && menus.length == 0 ? outermostMenu : false;
+  return menu && menus.length == 0 ? menu : false;
 }
 
 function renderStoryNodes(nodes: StoryNode[], el: HTMLElement): false | MenuElement {
@@ -212,6 +223,7 @@ function renderStoryNode(node: StoryNode, el: HTMLElement): false | MenuElement 
   if (node.op == "goto") return renderStoryNodeGoto(node, el);
   if (node.op == "menu") return renderStoryNodeResponses(node, el);
   if (node.op == "*") return renderStoryNodeLoneResponse(node.option);
+  if (node.op == "**") return renderStoryResponseEndMenu(el);
   if (node.op == "if") return renderStoryNodeOperationIf(node, el);
   if (node.op == "did") return renderStoryNodeOperationDid(node, el);
   if (node.op == "unless") return renderStoryNodeOperationIfnot(node, el);

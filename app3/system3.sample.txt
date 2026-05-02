@@ -5,6 +5,9 @@ It's a sunny day. Rose wanted to escape the confines of her birth. * Follow him 
 [cut testreplace]Farawas was here, WAS.[/cut]
 [paste testreplace]
 [replace was is][paste testreplace][/replace]
+[replace was [had been]][paste testreplace][/replace]
+[replace [was here] left][paste testreplace][/replace]
+[replace [was here] [had left]][paste testreplace][/replace]
 
 Recently chose: [the choice].
 
@@ -30,7 +33,6 @@ The end.
 * Mustard
 * Plum
 * White
-**
 [/cut]
 
 [cut weapons]
@@ -54,4 +56,5 @@ The end.
 * Study
 [/cut]
 
-[paste people] 
+[paste people] **
+

@@ -1,4 +1,97 @@
 [
+    {
+        "op": "cut",
+        "name": "suspects",
+        "wrap": [
+            {
+                "op": "menu",
+                "responses": [
+                    [
+                        " Mr. Black\n"
+                    ],
+                    [
+                        " Mr. Green\n"
+                    ],
+                    [
+                        " Ms. Scarlet\n"
+                    ],
+                    [
+                        " Mr. Mustard\n"
+                    ]
+                ]
+            },
+            "\n"
+        ]
+    },
+    {
+        "op": "cut",
+        "name": "weapons",
+        "wrap": [
+            {
+                "op": "menu",
+                "responses": [
+                    [
+                        " Candlestick\n"
+                    ],
+                    [
+                        " Knife\n"
+                    ],
+                    [
+                        " Lead Pipe\n"
+                    ],
+                    [
+                        " Revolver\n"
+                    ],
+                    [
+                        " Rope\n"
+                    ],
+                    [
+                        " Wrench\n"
+                    ]
+                ]
+            },
+            "\n"
+        ]
+    },
+    {
+        "op": "cut",
+        "name": "rooms",
+        "wrap": [
+            {
+                "op": "menu",
+                "responses": [
+                    [
+                        " Kitchen\n"
+                    ],
+                    [
+                        " Ballroom\n"
+                    ],
+                    [
+                        " Conservatory\n"
+                    ],
+                    [
+                        " Dining Room\n"
+                    ],
+                    [
+                        " Billiard Room\n"
+                    ],
+                    [
+                        " Library\n"
+                    ],
+                    [
+                        " Lounge\n"
+                    ],
+                    [
+                        " Hall\n"
+                    ],
+                    [
+                        " Study\n"
+                    ]
+                ]
+            },
+            "\n"
+        ]
+    },
     "It's a sunny day. Rose wanted to escape the confines of her birth. ",
     {
         "op": "menu",
@@ -22,7 +115,61 @@
             "she left home."
         ]
     },
-    " \n\n",
+    {
+        "op": "menu",
+        "name": "height",
+        "responses": [
+            [
+                " tall "
+            ],
+            [
+                " short "
+            ]
+        ],
+        "combo": "combo"
+    },
+    {
+        "op": "menu",
+        "name": "color",
+        "responses": [
+            [
+                " blue "
+            ],
+            [
+                " red "
+            ]
+        ],
+        "combo": "combo"
+    },
+    {
+        "op": "menu",
+        "name": "gender",
+        "responses": [
+            [
+                " boy "
+            ],
+            [
+                " girl "
+            ]
+        ],
+        "combo": null
+    },
+    "\n\nYou are a ",
+    {
+        "op": "the",
+        "match": "height"
+    },
+    " ",
+    {
+        "op": "the",
+        "match": "color"
+    },
+    " ",
+    {
+        "op": "the",
+        "match": "gender"
+    },
+    ".\n\n\n\n",
     {
         "op": "replace",
         "from": "her",
@@ -162,7 +309,8 @@
                         [
                             " the bike "
                         ]
-                    ]
+                    ],
+                    "combo": null
                 },
                 " "
             ],
@@ -373,45 +521,5 @@
     " ",
     {
         "op": "**"
-    },
-    "\n\n",
-    {
-        "op": "combo",
-        "menus": [
-            {
-                "op": "menu",
-                "responses": [
-                    [
-                        " tall "
-                    ],
-                    [
-                        " short "
-                    ]
-                ]
-            },
-            {
-                "op": "menu",
-                "name": null,
-                "responses": [
-                    [
-                        " blue "
-                    ],
-                    [
-                        " red "
-                    ]
-                ]
-            },
-            {
-                "op": "menu",
-                "responses": [
-                    [
-                        " boy "
-                    ],
-                    [
-                        " girl "
-                    ]
-                ]
-            }
-        ]
     }
 ]

@@ -1,4 +1,44 @@
+[cut suspects]
+* Mr. Black
+* Mr. Green
+* Ms. Scarlet
+* Mr. Mustard
+**
+[/cut]
+
+[cut weapons]
+* Candlestick
+* Knife
+* Lead Pipe
+* Revolver
+* Rope
+* Wrench
+**
+[/cut]
+
+[cut rooms]
+* Kitchen
+* Ballroom
+* Conservatory
+* Dining Room
+* Billiard Room
+* Library
+* Lounge
+* Hall
+* Study
+**
+[/cut]
+
+
 It's a sunny day. Rose wanted to escape the confines of her birth. * Follow him * Return home * Continue with purchase ** Later that day, [if home]she left home.[/if] 
+
+[menu height] * tall * short [/menu combo]
+[menu color] * blue * red [/menu combo]
+[menu gender] * boy * girl [/menu]
+
+You are a [the height] [the color] [the gender].
+
+
 
 [replace her his]Rose wanted to escape the confines of her birth. [/replace]
 
@@ -57,9 +97,4 @@ The end.
 [/cut]
 
 [paste people] **
-
-[combo]  
- * tall * short ** 
- [menu] * blue * red [/menu]
- * boy * girl ** 
-[/combo]
+ 

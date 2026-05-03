@@ -3,7 +3,7 @@ import { multimenu, type MenuElement } from "./multimenu";
 type StoryNode =
   | string
   | StoryOperation
-  | StoryResponses
+  | StoryMenu
   | StoryHashtag
   | StoryMatchpoint
   | StoryLoneResponse
@@ -11,8 +11,7 @@ type StoryNode =
   | StoryPlotpoint
   | StoryCutCopy
   | StoryPaste
-  | StoryReplace
-  | StoryNodeCombo;
+  | StoryReplace;
 
 type StoryHashtag = {
   op: "hashtag";
@@ -64,14 +63,10 @@ type StoryResponseEndMenu = {
   op: "**";
 };
 
-type StoryResponses = {
+type StoryMenu = {
   op: "menu";
   responses: StoryResponse[];
-};
-
-type StoryNodeCombo = {
-  op: "combo";
-  menus: StoryResponses[];
+  combo?: "combo";
 };
 
 type Story = StoryNode[];
@@ -89,6 +84,8 @@ let state = {
 // helpers
 let publishedElement = document.getElementById("published")!;
 let menus: MenuElement[] = [];
+let outermostMenu: MenuElement | false = false;
+let previousMenuWantsToCombo: MenuElement | false = false;
 
 // rendering
 
@@ -156,34 +153,55 @@ function renderStoryNodeLoneResponse(optionText: StoryResponse): false {
   return false;
 }
 
-function renderStoryNodeResponses(node: StoryResponses, el: HTMLElement): MenuElement | false {
+function renderStoryNodeResponses(node: StoryMenu, el: HTMLElement): MenuElement | false {
   if (!Array.isArray(node.responses)) throw new Error("Expected responses to be an array");
   const menu = createNewMenu(); // do this here so GOTO immediately knows if it's conditional or not
-  // if (node.combo) menu.combo = node.combo;
   for (let response of node.responses) {
     if (!response || typeof response === "string") continue;
     renderStoryNodeLoneResponse(response);
   }
-  return renderStoryResponseEndMenu(el);
+  return renderStoryResponseEndMenu(node, el);
 }
 
-function renderStoryResponseEndMenu(el: HTMLElement): MenuElement | false {
+/**
+ * This function ends a menu, either via [/menu] or **
+ * It returns truthy to stop rendering and await user input. It returns the (top-most / outermost) menu to show the user first.
+ *
+ * Before appending the menu to the Publish element, it asks if the previous menu wanted to combo.
+ * If so, then instead of appending itself to Publish it'll append (clones of) itself to each of previous menu's responses.
+ *
+ * on [/menu combo] sets "previousMenuWantsToCombo" and returns false so rendering won't await user; we need the secondary menu to render first.
+ *
+ * if previous did not want a combo, and this isn't a submenu of a larger menu in-progress, then this is the outermostMenu.
+ *
+ * only stop for input (return truthy) if this is the outermost menu AND it doesn't want to combo with the following menu.
+ *
+ * @param node this will be the [menu] node unless you used the ** menu in which case it'll be blank and can't combo
+ * @param el published element
+ * @returns the outermost menu that needs to stop rendering and await user, or false to keep rendering
+ */
+function renderStoryResponseEndMenu(node: StoryMenu | undefined, el: HTMLElement): MenuElement | false {
   if (menus.length == 0) return false;
   const menu = menus.pop();
   if (!menu) return false;
-  el.appendChild(menu);
-  return menu && menus.length == 0 ? menu : false;
-}
 
-// cycle through all responses for a menu and tack on the secondary menu if not already included
-function renderStoryCombo(node: StoryNodeCombo, el: HTMLElement): false | MenuElement {
-  for (let i = 0; i < node.menus.length; i++) {
-    const menu = node.menus[i];
-    const submenu = node.menus[i + 1];
-    if (!submenu) break;
-    for (let response of menu.responses) if (!response.includes(submenu)) response.push(submenu);
+  if (!previousMenuWantsToCombo) {
+    el.appendChild(menu);
+    if (menu && menus.length == 0) outermostMenu = menu;
+  } else {
+    // cycle through all responses for the previous menu and tack on this new menu
+    for (const button of previousMenuWantsToCombo.childNodes) {
+      if (!Array.from(button.childNodes).includes(menu)) {
+        button.appendChild(menu.cloneNode(true));
+      }
+    }
+    previousMenuWantsToCombo = false;
   }
-  return renderStoryNodeResponses(node.menus[0], el);
+
+  if (node?.combo === "combo") previousMenuWantsToCombo = menu; // if [/menu combo] was used
+
+  const stopForInputForOutermostMenu = outermostMenu && !(node?.combo === "combo") ? outermostMenu : false;
+  return stopForInputForOutermostMenu;
 }
 
 function renderStoryNodes(nodes: StoryNode[], el: HTMLElement): false | MenuElement {
@@ -241,8 +259,7 @@ function renderStoryNode(node: StoryNode, el: HTMLElement): false | MenuElement 
   if (node.op == "goto") return renderStoryNodeGoto(node, el);
   if (node.op == "menu") return renderStoryNodeResponses(node, el);
   if (node.op == "*") return renderStoryNodeLoneResponse(node.option);
-  if (node.op == "**") return renderStoryResponseEndMenu(el);
-  if (node.op == "combo") return renderStoryCombo(node, el);
+  if (node.op == "**") return renderStoryResponseEndMenu(undefined, el);
   if (node.op == "if") return renderStoryNodeOperationIf(node, el);
   if (node.op == "did") return renderStoryNodeOperationDid(node, el);
   if (node.op == "unless") return renderStoryNodeOperationIfnot(node, el);
@@ -264,6 +281,7 @@ async function renderCurrentTurn(): Promise<void> {
     if (!node) break;
     stopForInput = renderStoryNode(node, publishedElement);
   } while (!stopForInput && state.current < state.story.length);
+  outermostMenu = false;
   if (!stopForInput) return renderTheEnd();
   return multimenu(stopForInput).then(({ chosen, goingTo }) => {
     if (chosen) state.chosen.push(chosen);

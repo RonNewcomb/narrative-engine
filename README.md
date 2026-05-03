@@ -120,13 +120,17 @@ This makes it easy to author a work on a PC or laptop, but then play the work on
 
 There is writing, and within are points like:
 
-> He left. \* Follow him \* Return home \* Continue with purchase \*\* Later that day, ...
+```
+He left. * Follow him * Return home * Continue shopping **
+
+Later that day, ...
+```
 
 This paints the prompt's menu and waits on the reader. After they choose a response, the following text is painted no matter the choice. Nothing in the "code" directed control elsewhere. But, the chosen response is remembered.
 
 ### Ending the menu
 
-A group of possible choices is called a menu. Since a lone \* ends the text flow and begins a menu with its first possible choice, we need a way to indicate the end of the menu where the text flow will pick up again after the reader makes a choice. We do that with \*\* two astericks in a row.
+A group of possible choices is called a menu. Since a lone `*` ends the text flow and begins a menu with its first possible choice, we need a way to indicate the end of the menu where the text flow will pick up again after the reader makes a choice. We do that with `**` two astericks in a row.
 
 ## Referencing past choices
 
@@ -134,9 +138,15 @@ A group of possible choices is called a menu. Since a lone \* ends the text flow
 
 Substitutions of the form `[did ...]` can ask which response was made at which prompt.
 
-> He accepted the seat. [did continue purchase] And you bought it anyway, right? [/did]
->
-> He accepted the seat. [didnt continue purchase] If we had gotten it it would've helped. [/didnt]
+```
+He accepted the seat. [did continue shopping] And you bought
+it anyway, right? [/did]
+```
+
+```
+He accepted the seat. [didnt continue shopping] If we had gotten
+it it would've helped. [/didnt]
+```
 
 It searches all possible responses for the match, highlighting it if it's not enough words to distinguish.
 
@@ -144,17 +154,23 @@ It searches all possible responses for the match, highlighting it if it's not en
 
 Depending on how choices are written, "did" may not read very smoothly. Instead we can use `[if]`. Similarly for `[unless]` in place of `[didnt]`.
 
-> He accepted the seat. [if continue purchase] And you bought it anyway, right? [/if]
->
-> He accepted the seat. [unless continue purchase] If we had gotten it it would've helped. [/unless]
+```
+He accepted the seat. [if continue shopping] And you bought it
+anyway, right? [/if]
+```
+
+```
+He accepted the seat. [unless continue shopping] If we had gotten
+it it would've helped. [/unless]
+```
 
 There's no functional difference between the synonyms. Choose whichever reads more smoothly in context.
 
 ### Which Choice
 
-Sometimes you want not whether one choice was made, but which. For this, [the choice] has the text of the most recent menu.
+Sometimes you want not whether one choice was made, but which. For this, `[the choice]` has the text of the most recent menu.
 
-For older choices, [the choice near ...] lets you mention any of the possible options in a menu. it'll retrieve the menu containing the option you gave, and return to you the text of which choice was made.
+For older choices, `[the choice near ...]` lets you mention any of the possible options in a menu. it'll retrieve the menu containing the option you gave, and return to you the text of which choice was made.
 
 ### Hidden Words with #Hashtags
 
@@ -162,7 +178,9 @@ Many times the same choice will appear in different parts of the story but with 
 
 Example:
 
-> He left. \* Follow him. \* Investigate. #museum \*\*
+```
+He left. * Follow him. * Investigate. #museum **
+```
 
 The word "museum" will be hidden from the reader but will still be available for queries like `[did Investigate. #museum]` so that no other response that says "Investigate" would be referenced by mistake.
 
@@ -172,21 +190,17 @@ Hashtags are written without spaces, and without any other punctuation marks bes
 
 You can hide and show different choices in a menu based on previous selections by wrapping the response in a reference. A choice can also reference themselves so it can't be chosen multiple times.
 
-> He left.
->
-> \* Follow him
->
-> \* Return home
->
-> [didnt continue with purchase]
->
-> \* Continue with purchase
->
-> [/didnt]
->
-> \*\*
->
-> Lorem ipsum...
+```
+He left.
+* Follow him
+* Return home
+[didnt Continue shopping]
+* Continue shopping
+[/didnt]
+**
+
+Lorem ipsum...
+```
 
 The above shows a menu with either two or three possible options. The third option appears until the reader chooses it, then it never appears again.
 
@@ -198,13 +212,21 @@ How to write it is a little different. Since the \* asterisk by itself simply ad
 
 Example:
 
-> He left. \* Follow him \* Return [menu] \* home \* to the library [/menu] \* Continue with purchase \*\* Later that day, ...
+```
+He left.
+* Follow him
+* Return [menu] * home * to the library [/menu]
+* Continue shopping
+**
+
+Later that day, ...
+```
 
 This makes an initial menu with three options: follow, return, and continue. If follow or continue is chosen, the story continues normally. If return is chosen, the menu slides aside to reveal a secondary menu with home and library.
 
 While the second menu is shown, the reader can swipe right to return to the first menu. Otherwise, choosing home or library from that menu will complete the response, and the story continues.
 
-When asking what the user chose with `[did]` or `[didnt]`, the system will check as if there was only a single menu with all the options: `[did return to the library]`, for instance. You can query if either of the "return" options was chosen with simply `[did return]` as the text in a `did` or `didnt` doesn't need to be a complete match. As long as an option contains that text it will match. If this references unrelated options that include the word "return" a hashtag can be used between "return" and "[menu]".
+When asking what the user chose with `[did]` or `[didnt]`, the system will check as if there was only a single menu with all the options: `[did return to the library]`, for instance. You can query if either of the "return" options was chosen with simply `[did return]` as the text in a `did` or `didnt` doesn't need to be a complete match. As long as an option contains that passage, it will match. If this references unrelated options that include the word "return" a hashtag can be used between "return" and "[menu]".
 
 Secondary menus can have tertiary menus by also using `[menu]` and `[/menu]` similarly. Multiple responses can have secondary menus, and the secondaries are distinct from one another. You can create a rich heirarchy of multipart responses if you wish. There's no limit to how many menus deep a response can go other than good taste.
 
@@ -216,29 +238,49 @@ A choice can send the reader elsewhere in the work rather than just the next par
 
 Instead of page numbers, we use the first words of the passage to identify where to go.
 
-> Your purchase complete, you head home to prepare for the party.
->
-> [goto Buried in wrapping paper]
->
-> Sitting down for dinner,
+```
+Your purchase complete, you head home to prepare for the party.
 
-Here, "Buried in wrapping paper" is the first words of the passage to jump to. Passages after the [goto] such as "Sitting down for dinner" aren't displayed. Similarly, even if "Buried" is found in the middle of a larger passage, the portions before "Buried" won't display. The text will continue from there as usual.
+[goto Buried in wrapping paper]
+
+Sitting down for dinner,
+```
+
+Here, "Buried in wrapping paper" is the first words of the passage to jump to. Passages after the `[goto]` such as "Sitting down for dinner" aren't displayed.
+
+Similarly, even if "Buried" is found in the middle of a larger passage, the portions before "Buried" won't display.
+
+```
+...and shooed the husbands from the room.  Buried in wrapping paper,
+```
+
+The text the reader sees will begin from "Buried". The reader will not see the dismissal of husbands.
 
 ### Turn to Page 57
 
 Perhaps it's obvious, but when you place the [goto] within a response, the goto doesn't take effect unless the reader chooses that response.
 
-> He left. \* Follow him [goto Pretending to stay put] \* Return home \* Continue with purchase \*\* Later that day, ...
->
-> ...somewhere else in the work...
->
-> Pretending to stay put, you wait until he's out of sight.
+```
+He left.
+* Follow him [goto Pretending to stay put]
+* Return home
+* Continue shopping
+**
+
+Later that day, ...
+
+(...somewhere else in the work...)
+
+Pretending to stay put, you wait until he's out of sight.
+```
 
 ### Marking Events with [plot ...]
 
 Now that `[goto]` makes multiple branching paths possible, a new wrinkle appears. Sometimes an important plot point can be reached through multiple alternative paths. This makes asking `[if]` tricky. In these cases, you can use `[plot]` to mark the event as having occurred, and then query it later.
 
-> [plot Maria found out]
+```
+[plot Maria found out]
+```
 
 You would put that declaration in each of those multiple paths, so now you can simply ask `[if Maria found out]` to check if the event occurred regardless of how the reader got there.
 
@@ -252,13 +294,15 @@ You can surround pretty much anything with `[cut]` and `[/cut]`, or `[copy]` and
 
 But improving on the keyboard's limitations, you can name what you `[cut]` or `[copy]`. This allows you several `[paste]` clipboards that can all be used at will.
 
-> [cut the very long inspirational speech]
-> Lorem ipsum...
-> [/cut]
->
-> ... elsewhere in the text ...
->
-> "And that is why we must act now! [paste the very long inspirational speech]
+```
+[cut the long inspirational speech]
+Lorem ipsum...
+[/cut]
+
+... elsewhere in the text ...
+
+"And that is why we must act now! [paste the long inspirational speech]
+```
 
 The difference between `[cut]` versus `[copy]` is if the content is cut, it's removed from its original location. If it's copied, it stays in its original location. So a `[copy]` is just a `[cut]` immediately followed by its `[paste]`.
 
@@ -266,22 +310,80 @@ The difference between `[cut]` versus `[copy]` is if the content is cut, it's re
 
 You can replace words with different words in a passage with [replace].
 
-> [replace his her]
-> His choice in the matter was an illusion. They were never going to honor it.
-> [/replace]
+```
+[replace His Her]
+His choice in the matter was an illusion.
+[/replace]
+```
 
 It's intended for single-word substitutions, but you can use the `[` and `]` around words to match multiple words.
 
-> [replace [my car] [your car]]
-> "Well, let's go there and check it out. Should we take my car?"
-> "The bus would raise less suspicion."
->
-> \* Take my car. \* Take the bus. \*\*
-> [/replace]
+```
+[replace [my car] [your car]]
+"Well, let's go there and check it out. Should we take my car?"
+"The bus would raise less suspicion."
+\* Take my car. \* Take the bus. \*\*
+[/replace]
+```
 
 This can be combined with cut copy paste to create dynamic text.
 
 [find] acts like a go-to. It finds the named passage and jumps to it, continuing the story from there. It's much like the "turn to page 57" you would read in a printed choose-your-own-adventure book.
+
+## Combination menus with `[/menu combo]`
+
+Normally, a secondary menu is specific to the one response. But what if you wanted to have all responses of a menu have the same secondary menu? You can do this by ending the first menu with `[/menu combo]`. When followed by another menu they will glue together.
+
+Note that you cannot have a `**` menu as part of a combo except perhaps the final menu.
+
+```
+[menu height] * tall * short [/menu combo]
+[menu color] * blue * red [/menu combo]
+* boy * girl **
+```
+
+### The Combo-Paste Combo
+
+The `[cut]` and `[paste]` features mix well with `[combo]`.
+
+```
+[cut suspects]
+* Mr. Black
+* Mr. Green
+* Ms. Scarlet
+* Mr. Mustard
+**
+[/cut]
+
+[cut weapons]
+* Candlestick
+* Knife
+* Lead Pipe
+* Revolver
+* Rope
+* Wrench
+**
+[/cut]
+
+[cut rooms]
+* Kitchen
+* Ballroom
+* Conservatory
+* Dining Room
+* Billiard Room
+* Library
+* Lounge
+* Hall
+* Study
+**
+[/cut]
+
+[combo]
+  [paste suspects]
+  [paste weapons]
+  [paste rooms]
+[/combo]
+```
 
 ## Puzzles
 

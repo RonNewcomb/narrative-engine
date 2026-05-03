@@ -69,7 +69,7 @@ type StoryMenu = {
   combo?: "combo";
 };
 
-type Story = StoryNode[];
+export type Story = StoryNode[];
 
 // state
 let state = {
@@ -295,15 +295,25 @@ async function renderCurrentTurn(): Promise<void> {
 }
 
 //////////////////////
-// main entry point
-export async function interpreter(filename: string, pwa = false): Promise<void> {
-  if (pwa && "serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
-  const story: Story = await fetch(filename).then(r => r.json());
+// near entry point
+export async function interpreter(story: Story): Promise<void> {
   state = { story, current: -1, chosen: [], templates: [], replacements: [], the: {} };
   publishedElement = document.getElementById("published")!;
+  publishedElement.innerHTML = "";
   menus = [];
+  outermostMenu = false;
+  previousMenuWantsToCombo = false;
   return renderCurrentTurn();
 }
 
-(window as any).interpreter = interpreter;
+// far entry point
+export async function loadStory(filename: string, pwa = false) {
+  if (pwa && "serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
+  const story: Story = await fetch(filename).then(r => r.json());
+  return interpreter(story);
+}
+
+import "../../editor/window.d.ts";
+window.interpreter = interpreter;
+window.loadStory = loadStory;
 document.dispatchEvent(new Event("interpreter"));

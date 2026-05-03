@@ -70,3 +70,6 @@ console.log("Compiled successfully.");
 function templating(contents: string): string {
   return substitutions.reduce((text, [key, value]) => (text = text.replaceAll(key, value.toString())), contents);
 }
+
+console.log("Informing editor");
+readdirSync(buildDir).forEach(filename => copyFileSync(buildDir + filename, scriptDir + "/../editor/runtime/" + filename));

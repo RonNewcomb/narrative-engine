@@ -1,12 +1,11 @@
-function toggleDarkMode() {
+export function toggleDarkMode() {
   const el = document.getElementById("darkmode")! as HTMLStyleElement;
   el.disabled = !el.disabled;
   localStorage.setItem("dark-mode", (!el.disabled).toString());
 }
+window.toggleDarkMode = toggleDarkMode;
 
-const el = document.createElement("style");
-el.id = "darkmode";
-el.innerHTML = `
+const darkCSS = `
 html {
   filter: invert(1) hue-rotate(180deg);
 }
@@ -19,11 +18,6 @@ body {
 img, video, iframe, canvas {
   filter: invert(1) hue-rotate(180deg);
 }`;
-document.head.appendChild(el);
-
-const mode = localStorage.getItem("dark-mode");
-if (mode === null) if (!window.matchMedia("(prefers-color-scheme: dark)").matches) toggleDarkMode();
-if (mode == "false") toggleDarkMode();
 
 const icon = `
 <svg width="24px" height="24px" viewBox="0 0 72 72" title="light/dark mode" onclick="toggleDarkMode()">
@@ -34,7 +28,18 @@ const icon = `
   </g>
 </svg>`;
 
-document.addEventListener("DOMContentLoaded", () => {
+function render() {
+  const darkStyle = document.createElement("style");
+  darkStyle.id = "darkmode";
+  darkStyle.innerHTML = darkCSS;
+  document.head.appendChild(darkStyle);
+
+  const mode = localStorage.getItem("dark-mode");
+  if (mode === null) if (!window.matchMedia("(prefers-color-scheme: dark)").matches) toggleDarkMode();
+  if (mode == "false") toggleDarkMode();
+
   const elements = document.getElementsByTagName("dark-mode");
   for (const el of elements) el.innerHTML = icon;
-});
+}
+
+document.addEventListener("DOMContentLoaded", () => render());

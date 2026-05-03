@@ -35,7 +35,10 @@ export async function multimenu(topMenu: MenuElement): Promise<Result> {
     onSwipe = function (n: number) {
       currentSlide = Math.max(0, Math.min(currentSlide + n, slidingWindow.childElementCount - 1));
       slidingWindow.style.left = `calc(-${currentSlide * 100}% - ${currentSlide * 2}em)`; // 2em is the flex-gap
-      const setFocus = () => (slidingWindow.children[currentSlide]?.firstElementChild as HTMLElement)?.focus();
+      const setFocus = () => {
+        // (slidingWindow.children[currentSlide]?.firstElementChild as HTMLElement)?.focus();
+        // publishedElement.querySelector("past-choice:last-of-type")?.scrollIntoView();
+      };
       currentSlide ? setTimeout(setFocus, 750) : setFocus();
     };
     onSwipe(currentSlide); // init

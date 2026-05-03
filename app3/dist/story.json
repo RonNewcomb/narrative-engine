@@ -143,7 +143,6 @@
     },
     {
         "op": "menu",
-        "name": "gender",
         "responses": [
             [
                 " boy "
@@ -151,8 +150,7 @@
             [
                 " girl "
             ]
-        ],
-        "combo": null
+        ]
     },
     "\n\nYou are a ",
     {
@@ -167,7 +165,7 @@
     " ",
     {
         "op": "the",
-        "match": "gender"
+        "match": "choice"
     },
     ".\n\n\n\n",
     {

@@ -34,9 +34,9 @@ It's a sunny day. Rose wanted to escape the confines of her birth. * Follow him 
 
 [menu height] * tall * short [/menu combo]
 [menu color] * blue * red [/menu combo]
-[menu gender] * boy * girl [/menu]
+* boy * girl **
 
-You are a [the height] [the color] [the gender].
+You are a [the height] [the color] [the choice].
 
 
 

@@ -85,7 +85,7 @@ let state = {
 let publishedElement = document.getElementById("published")!;
 let menus: MenuElement[] = [];
 let outermostMenu: MenuElement | false = false;
-let previousMenuWantsToCombo: MenuElement | false = false;
+let previousMenuWantsToCombo: string | false = false;
 
 // rendering
 
@@ -185,20 +185,23 @@ function renderStoryResponseEndMenu(node: StoryMenu | undefined, el: HTMLElement
   const menu = menus.pop();
   if (!menu) return false;
 
+  const dataId = Date.now().toString(36) + Math.random().toString(36).substring(2);
+  menu.className = dataId;
+
   if (!previousMenuWantsToCombo) {
     el.appendChild(menu);
-    if (menu && menus.length == 0) outermostMenu = menu;
+    if (menus.length == 0) outermostMenu = menu;
   } else {
     // cycle through all responses for the previous menu and tack on this new menu
-    for (const button of previousMenuWantsToCombo.childNodes) {
-      if (!Array.from(button.childNodes).includes(menu)) {
+    const previousMenus = Array.from(el.getElementsByClassName(previousMenuWantsToCombo));
+    for (const previousMenu of previousMenus)
+      for (const button of previousMenu.childNodes) {
         button.appendChild(menu.cloneNode(true));
       }
-    }
     previousMenuWantsToCombo = false;
   }
 
-  if (node?.combo === "combo") previousMenuWantsToCombo = menu; // if [/menu combo] was used
+  if (node?.combo === "combo") previousMenuWantsToCombo = dataId; // if [/menu combo] was used
 
   const stopForInputForOutermostMenu = outermostMenu && !(node?.combo === "combo") ? outermostMenu : false;
   return stopForInputForOutermostMenu;

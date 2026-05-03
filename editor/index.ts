@@ -2,6 +2,7 @@ import "./column-editor";
 import { play } from "./column-player";
 import "./dark-mode";
 import { LoadFileEvent, SaveFileEvent } from "./file-opensave";
+import "./underline";
 
 // document.addEventListener("DOMContentLoaded", () => console.log("DOMContentLoaded"));
 

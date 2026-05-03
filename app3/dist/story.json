@@ -1,5 +1,58 @@
 [
-    "Menu delarations:\n\n\n",
+    "Menu  sf:\n\nStart documentlkj ",
+    {
+        "op": "menu",
+        "responses": [
+            [
+                " Option 1 "
+            ],
+            [
+                " Option 2 "
+            ]
+        ]
+    },
+    " ",
+    {
+        "op": "plot",
+        "name": "sldkfj"
+    },
+    " \nCan you ",
+    {
+        "op": "copy",
+        "name": null,
+        "wrap": [
+            "this?"
+        ]
+    },
+    " Of ",
+    "*",
+    " course! \n",
+    {
+        "op": "cut",
+        "name": "for later",
+        "wrap": [
+            "And cut this?"
+        ]
+    },
+    {
+        "op": "hashtag",
+        "tag": "#hello-world"
+    },
+    "  ",
+    {
+        "op": "paste",
+        "name": "#something"
+    },
+    " Continuing...\n",
+    {
+        "op": "replace",
+        "from": "this",
+        "to": "that",
+        "wrap": [
+            " in here "
+        ]
+    },
+    "\n\n\n",
     {
         "op": "cut",
         "name": "suspects",
@@ -314,12 +367,7 @@
                 " "
             ],
             [
-                " run ",
-                {
-                    "op": "hashtag",
-                    "tag": "#at-corey's-leisure"
-                },
-                " "
+                " run #at-corey's-leisure "
             ]
         ]
     },

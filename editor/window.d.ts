@@ -9,5 +9,6 @@ declare global {
     saveFile: () => Promise<void>;
     loadFile: () => Promise<void>;
     toggleDarkMode: () => void;
+    underlineError: (from?: number, to?: number) => void;
   }
 }

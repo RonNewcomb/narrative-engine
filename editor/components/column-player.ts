@@ -1,5 +1,5 @@
-import { parse, SyntaxError } from "../system3/parser.js";
-import { underlineError } from "./underline";
+import { parse, SyntaxError } from "../../system3/parser.js";
+import { underlineError } from "./underline.js";
 
 export function play(source: string) {
   const playerWindow = (document.getElementById("player-frame")! as HTMLIFrameElement).contentWindow as Window;

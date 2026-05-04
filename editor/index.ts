@@ -1,10 +1,10 @@
-import "./column-editor";
-import { play } from "./column-player";
-import "./dark-mode";
-import { LoadFileEvent, SaveFileEvent } from "./file-opensave";
-import "./speech-to-text";
-import { initSpeech2Text } from "./speech-to-text";
-import "./underline";
+import "./components/column-editor";
+import { play } from "./components/column-player";
+import "./components/dark-mode";
+import { LoadFileEvent, SaveFileEvent } from "./components/file-opensave";
+import "./components/speech-to-text";
+import { initSpeech2Text } from "./components/speech-to-text";
+import "./components/underline";
 
 // document.addEventListener("DOMContentLoaded", () => console.log("DOMContentLoaded"));
 

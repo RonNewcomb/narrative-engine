@@ -15,6 +15,7 @@
   },
   "include": [
     "*.ts",
-    "window.d.ts"
+    "components/*.ts",
+    "window.d.ts",
   ]
 }

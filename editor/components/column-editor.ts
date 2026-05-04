@@ -5,7 +5,7 @@ import { highlightSelectionMatches, searchKeymap } from "@codemirror/search";
 import { EditorState } from "@codemirror/state";
 import { drawSelection, dropCursor, EditorView, highlightSpecialChars, KeyBinding, keymap } from "@codemirror/view";
 import { tags } from "@lezer/highlight";
-import { System3Mirrorways } from "./language-plugin/dist/index";
+import { System3Mirrorways } from "../language-plugin/dist/index";
 
 const mirrorwaysStyle = HighlightStyle.define([
   { tag: tags.comment, color: "gold" },

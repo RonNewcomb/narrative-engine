@@ -59,13 +59,15 @@ export function findLocalIp(container: HTMLElement, logInfo = true) {
     .then(ips => {
       if (!ips) return;
       const ip = ips[0];
-      if (!ip || !ip.match(/^\d+\.\d+\.\d+\.\d+$/)) return console.log("local ip " + ip);
+      if (!ip || !ip.match(/^\d+\.\d+\.\d+\.\d+$/)) {
+        if (!ip.includes("192.168")) return console.log("local ip " + ip);
+      }
       const port = location.port ? `:${location.port}` : "";
-      const addy = `${location.protocol}//${ip}${port}`;
+      const subfolder = location.href.includes("/runtime") ? "/runtime/index.html" : "";
+      const addy = `${location.protocol}//${ip}${port}${subfolder}`;
 
       const qrDiv = document.createElement("div");
-      const ipDiv = document.createElement("div");
-      ipDiv.innerText = addy;
+      qrDiv.style = "display: flex; justify-content: flex-end";
       new QRCode(qrDiv, {
         text: addy,
         width: 128,
@@ -74,7 +76,7 @@ export function findLocalIp(container: HTMLElement, logInfo = true) {
         colorLight: "#fff",
         correctLevel: QRCode.CorrectLevel.H,
       });
-      container.replaceChildren(qrDiv, ipDiv);
+      container.replaceChildren(qrDiv);
     });
 }
 

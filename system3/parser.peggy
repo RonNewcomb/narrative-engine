@@ -5,7 +5,7 @@ anythingelse "any non-prompt" = ( escaped / code / hashtag / text  )+
 _ = [ \t\n\r]*
 sp "at least one space" = [ \t\n\r]+
 
-text       "text" = letters:[^\*\[\]\\]+                                              { return letters.join(""); }
+text       "text" = letters:[^\*\[\]\#\\]+                                              { return letters.join(""); }
 word       "word" = letters:[^ \]\t\n\r]+                                             { return letters.join(""); }
 qwords   "qwords" = "[" letters:[^\]]+ "]"                                            { return letters.join(""); }
 words     "words" = qwords / word

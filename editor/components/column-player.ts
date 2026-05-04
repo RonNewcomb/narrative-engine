@@ -3,7 +3,7 @@ import { underlineError } from "./underline.js";
 
 export function play(source: string) {
   const playerWindow = (document.getElementById("player-frame")! as HTMLIFrameElement).contentWindow as Window;
-  if (!playerWindow || !playerWindow.interpreter) return console.log("Awaiting column-3 iframe");
+  if (!playerWindow || !playerWindow.interpreter) return console.log("Interpreter warming up...");
   const footer = document.getElementsByTagName("footer")[0];
   try {
     const ast = parse(source);

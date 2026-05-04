@@ -72,4 +72,6 @@ function templating(contents: string): string {
 }
 
 console.log("Informing editor");
-readdirSync(buildDir).forEach(filename => copyFileSync(buildDir + filename, scriptDir + "/../editor/runtime/" + filename));
+const editorRuntimeDir = scriptDir + "/../editor/runtime/";
+if (!existsSync(editorRuntimeDir)) mkdirSync(editorRuntimeDir);
+readdirSync(buildDir).forEach(filename => copyFileSync(buildDir + filename, editorRuntimeDir + filename));

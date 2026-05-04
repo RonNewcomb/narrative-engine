@@ -204,7 +204,7 @@ function peg$parse(input, options) {
   var peg$c26 = "[/replace]";
 
   var peg$r0 = /^[ \t\n\r]/;
-  var peg$r1 = /^[^*[\]\\]/;
+  var peg$r1 = /^[^*[\]#\\]/;
   var peg$r2 = /^[^ \]\t\n\r]/;
   var peg$r3 = /^[^\]]/;
   var peg$r4 = /^[*[\]#\\]/;
@@ -215,7 +215,7 @@ function peg$parse(input, options) {
   var peg$e2 = peg$classExpectation([" ", "\t", "\n", "\r"], false, false);
   var peg$e3 = peg$otherExpectation("at least one space");
   var peg$e4 = peg$otherExpectation("text");
-  var peg$e5 = peg$classExpectation(["*", "[", "]", "\\"], true, false);
+  var peg$e5 = peg$classExpectation(["*", "[", "]", "#", "\\"], true, false);
   var peg$e6 = peg$otherExpectation("word");
   var peg$e7 = peg$classExpectation([" ", "]", "\t", "\n", "\r"], true, false);
   var peg$e8 = peg$otherExpectation("qwords");

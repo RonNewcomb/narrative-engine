@@ -6,6 +6,7 @@ import { EditorState } from "@codemirror/state";
 import { drawSelection, dropCursor, EditorView, highlightSpecialChars, KeyBinding, keymap } from "@codemirror/view";
 import { tags } from "@lezer/highlight";
 import { System3Mirrorways } from "../language-plugin/dist/index";
+import { mobileSync } from "./remote-sync";
 
 const mirrorwaysStyle = HighlightStyle.define([
   { tag: tags.comment, color: "gold" },
@@ -39,6 +40,8 @@ Can you [copy]this?[/copy] Of \\* course!
   extensions: [
     // System3Mirrorways language support
     System3Mirrorways(),
+    // remote sync with mobile
+    mobileSync(),
     // A gutter with code folding markers
     foldGutter(),
     // Replace non-printable characters with placeholders

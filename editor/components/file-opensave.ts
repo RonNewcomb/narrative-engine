@@ -1,3 +1,5 @@
+import { mobileSync } from "./remote-sync";
+
 export const SaveFileEvent = "interpreter-save";
 export const LoadFileEvent = "interpreter-load";
 
@@ -12,6 +14,7 @@ export async function loadFile() {
   const content = await file.text();
   filename = fileHandle.name;
   render(filename);
+  mobileSync(filename, content);
   if (!content) return alert("No content gotten from file.");
   window.view.dispatch({ changes: { from: 0, to: window.view.state.doc.length, insert: content } });
   dispatchEvent(new CustomEvent("interpreter-load", { detail: content, bubbles: true, cancelable: true }));
@@ -56,10 +59,10 @@ function render(filename?: string) {
         }
       </style>
       <div style="display: ${filename ? "none" : "block"}">
-        <button class="save" onclick="loadFile()">Load</button> 
+        <button class="save" onclick="loadFile()" aria-label="load file">Load</button> 
       </div>
       <div style="display: ${filename ? "block" : "none"}" class="save-header" onclick="saveFile()">
-        ${filename} <button class="save">Save</button> 
+        ${filename} <button class="save" aria-label="save file">Save</button> 
       </div>
     </div>`;
 }

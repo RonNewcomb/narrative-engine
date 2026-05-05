@@ -20,13 +20,15 @@ img, video, iframe, canvas {
 }`;
 
 const icon = `
-<svg width="24px" height="24px" viewBox="0 0 72 72" title="light/dark mode" onclick="toggleDarkMode()">
-  <g><path fill="#FFFFFF" d="M36,45 v-36 a28,28 0 0 1 0 56 z" /></g>
-  <g>
-    <path d="M36,45 v-36 a28,28 0 0 0 0 56 z" />
-    <circle cx="36" cy="36" r="28" fill="none" stroke="#000000" stroke-linejoin="round" stroke-width="2" />
-  </g>
-</svg>`;
+<button type="button" style="border:0" aria-label="toggle dark mode" onclick="toggleDarkMode()">
+  <svg width="24px" height="24px" viewBox="0 0 72 72" title="light/dark mode">
+    <g><path fill="#FFFFFF" d="M36,45 v-36 a28,28 0 0 1 0 56 z" /></g>
+    <g>
+      <path d="M36,45 v-36 a28,28 0 0 0 0 56 z" />
+      <circle cx="36" cy="36" r="28" fill="none" stroke="#000000" stroke-linejoin="round" stroke-width="2" />
+    </g>
+  </svg>
+</button>`;
 
 function render() {
   const darkStyle = document.createElement("style");

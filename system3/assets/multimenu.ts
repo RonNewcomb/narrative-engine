@@ -98,7 +98,7 @@ export async function multimenu(topMenu: MenuElement): Promise<Result> {
       pushedButton.classList.add("selected");
 
       const panels = Array.from(container.childNodes[0]!.childNodes) as MenuPanelElement[];
-      command.innerText = getCommand(panels).trim();
+      command.textContent = getCommand(panels).trim().replaceAll("  ", " ");
 
       const nextMenu = shouldDisplayMenu(panels[currentSlide]);
       if (nextMenu) return displayMenu(nextMenu);

@@ -391,12 +391,11 @@ How to construct puzzles in this system? Aimless exploration has its place, but 
 
 Puzzles have pieces that try to fit together. Some examples of framing are:
 
-- sorting events into a chronological order
+- sorting events into a chronological order (topo-sort)
 - using process of elimination on a list of possibilities
-- categorizing into buckets
-- futher categorizing into heirarchy
+- categorizing into buckets, then heirarchy
 - brainstorming on cause and effect
-- the Einstein logic puzzle, mastermind, Clue, and topological sorting
+- the Einstein logic puzzle, mastermind, Clue
 
 Learning facts and trivia and trying to fit them together seem like good intfic.
 
@@ -445,6 +444,45 @@ A Prolog engine allows searching through facts and inferences, and answering sim
 [know] adds a piece of information to the established.
 [ofcourse] is a common-sense piece of inference to create new knowledge from old. If Ruth is Harry's mom, and Ruth is Sally's daughter, then [ofcourse] Sally is Harry's grandmother.
 [suggest] is a way to propose a piece of information that may or may not be true. It is a working assumption to support a chain of cause.
+
+`[cause ...]` is a way to propose a cause for a given effect. It is a working assumption to support a chain of causes.
+
+`[fact]` creates a prolog fact. `[rule]` creates a prolog rule. These hew close to Prolog.
+
+```
+[fact man dr_black]
+[fact man reverend_green]
+[fact woman mrs_peacock]
+[fact woman madame_rose]
+
+// "category" is the relation "is in"
+[category man dr_black]
+[category man reverend_green]
+[category woman mrs_peacock]
+[category woman madame_rose]
+
+[fact stay_in dr_black room_22]
+[fact stay_in reverend_green room_24]
+[fact stay_in mrs_peacock room_23]
+[fact stay_in madame_rose room_21]
+
+[relation stay_in dr_black room_22]
+[relation stay_in reverend_green room_24]
+[relation stay_in mrs_peacock room_23]
+[relation stay_in madame_rose room_21]
+
+// X in suspect iff X in man and X not-in victim
+[rule [suspect X]  [man X] [not [victim X]] ]
+[rule [suspect X] :- woman(X), not(victim(X))]
+[rule [has_alibi(X)] :- suspect(X), playing_cards(X)]
+[rule [went_outside(X)] :- gardening(X)]
+[rule [went_outside(X)] :- smoker(X)]
+[rule [went_outside(X)] :- played_golf(X)]
+[rule [share_room(X,Y)] :- room(R), stay_in(X,R), stay_in(Y,R), different(X,Y)]
+[rule [revolver_access(X)] :- owns_revolver(X)]
+[rule [revolver_access(X)] :- share_room(X,Y), owns_revolver(Y)]
+[rule [guilty(X)] :- suspect(X), went_outside(X), not(has_alibi(X)), revolver_access(X)]
+```
 
 ## Discarded Features
 

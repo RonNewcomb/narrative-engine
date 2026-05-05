@@ -252,7 +252,7 @@ function renderStoryNodeOperationReplace(node: StoryReplace, el: HTMLElement): f
 
 function renderStoryNodeThe(node: StoryMatchpoint, el: HTMLElement): false | MenuElement {
   const value = state.the[node.match];
-  return value ? renderStoryNode(value, el) : false;
+  return value ? renderStoryNode(value.replaceAll(/#[-a-zA-Z0-9']+/g, "").trim(), el) : false;
 }
 
 function renderStoryNode(node: StoryNode, el: HTMLElement): false | MenuElement {

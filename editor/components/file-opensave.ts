@@ -11,12 +11,11 @@ export async function loadFile() {
   [fileHandle] = await (window as any).showOpenFilePicker();
   // Do something with the file handle.
   const file = await fileHandle.getFile();
-  const content = await file.text();
+  const content = (await file.text()) || "";
   filename = fileHandle.name;
   render(filename);
-  mobileSync(filename, content);
-  if (!content) return alert("No content gotten from file.");
   window.view.dispatch({ changes: { from: 0, to: window.view.state.doc.length, insert: content } });
+  mobileSync(filename, content);
   dispatchEvent(new CustomEvent("interpreter-load", { detail: content, bubbles: true, cancelable: true }));
 }
 

@@ -6,6 +6,7 @@ import { EditorState } from "@codemirror/state";
 import { drawSelection, dropCursor, EditorView, highlightSpecialChars, KeyBinding, keymap } from "@codemirror/view";
 import { tags } from "@lezer/highlight";
 import { System3Mirrorways } from "../language-plugin/dist/index";
+import { saveFile } from "./file-opensave";
 import { mobileSync } from "./remote-sync";
 
 const mirrorwaysStyle = HighlightStyle.define([
@@ -25,7 +26,7 @@ const mirrorwaysStyle = HighlightStyle.define([
 const saveBinding: KeyBinding = {
   key: "Mod-s", // Captures Ctrl-S on Windows/Linux and Cmd-S on macOS
   run: view => {
-    window.saveFile();
+    saveFile();
     return true; // Returning true prevents the browser's default Save dialog
   },
 };

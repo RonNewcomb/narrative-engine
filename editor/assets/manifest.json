@@ -1,0 +1,33 @@
+{
+  "short_name": "${title}",
+  "name": "${title}: ${headline} by ${author}",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any"
+    }
+  ],
+  "id": "/?source=pwa",
+  "start_url": "/?source=pwa",
+  "background_color": "tan",
+  "display": "standalone",
+  "theme_color": "#3e2723",
+  "description": "${description}",
+  "orientation": "portrait",
+  "screenshots": [
+    {
+      "src": "screenshot.png",
+      "sizes": "360x740",
+      "type": "image/png",
+      "label": "Application"
+    },
+    {
+      "src": "screenshot.png",
+      "sizes": "360x740",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Application"
+    }
+  ]
+}

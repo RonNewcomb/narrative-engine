@@ -31,6 +31,10 @@ export async function saveFile() {
   dispatchEvent(new CustomEvent("interpreter-save", { detail: content, bubbles: true, cancelable: true }));
 }
 
+export function getFilename() {
+  return filename;
+}
+
 window.saveFile = saveFile;
 window.loadFile = loadFile;
 

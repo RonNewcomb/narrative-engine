@@ -5,6 +5,8 @@ export default defineConfig({
   plugins: [basicSsl()], // speech-to-text requires https
   server: {
     host: true,
+    port: 24218,
+    strictPort: true,
     // proxy: {
     //   "/api/save": {
     //     target: "http://localhost:3000", // Dummy target

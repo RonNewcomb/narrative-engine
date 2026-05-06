@@ -4,4 +4,3 @@ node_modules
 system3/assets/story.json
 !app3/dist/story.json
 .DS_Store
-editor/runtime

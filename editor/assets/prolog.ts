@@ -1,0 +1,324 @@
+// https://github.com/kkty/prolog/blob/master/src/main.ts
+
+export type Term = Functor | Constant | Variable;
+
+// `{Constant,Variable,Functor}name` is only for readability and they not affect behaviours
+
+export class Constant {
+  constructor(public readonly name: string) {}
+  toString(): string {
+    return this.name;
+  }
+}
+
+export class Variable {
+  constructor(public readonly name: string) {}
+  toString(): string {
+    return this.name;
+  }
+}
+
+export class Functor {
+  readonly terms: Term[];
+  constructor(...terms: Term[]) {
+    this.terms = terms;
+  }
+
+  toString(): string {
+    return `(${this.terms.map(term => term.toString()).join(", ")})`;
+  }
+}
+
+///////////////////////////////////
+
+export function listVariables(term: Term): Set<Variable> {
+  const variables = new Set<Variable>();
+
+  if (term instanceof Variable) {
+    variables.add(term);
+  }
+
+  if (term instanceof Functor) {
+    term.terms.forEach(term => {
+      listVariables(term).forEach(variable => {
+        variables.add(variable);
+      });
+    });
+  }
+
+  return variables;
+}
+
+/////////////////////////////
+
+export class Fact {
+  readonly terms: Term[];
+  constructor(...terms: Term[]) {
+    this.terms = terms;
+  }
+
+  toString(): string {
+    return `(${this.terms.map(i => i.toString()).join(", ")})`;
+  }
+
+  // refresh the variables
+  clone(): Fact {
+    const variables = new Set<Variable>();
+
+    this.terms.forEach(term => {
+      listVariables(term).forEach(variable => {
+        variables.add(variable);
+      });
+    });
+
+    const substitutions = Array.from(variables).map(variable => {
+      return new Substitution(variable, new Variable(variable.name));
+    });
+
+    return new Fact(...this.terms.map(term => Substitution.applyAll(term, substitutions)));
+  }
+}
+
+export class Rule {
+  constructor(
+    public readonly left: Functor,
+    public readonly right: Functor[],
+  ) {}
+
+  toString(): string {
+    const left = `(${this.left.terms.map(i => i.toString()).join(", ")})`;
+    const right = this.right.map(({ terms }) => `(${terms.map(i => i.toString()).join(", ")})`);
+    return `${left} :- [${right.join(", ")}]`;
+  }
+
+  // refresh the variables
+  clone(): Rule {
+    const variables = new Set<Variable>();
+
+    this.left.terms.forEach(term => {
+      listVariables(term).forEach(variable => {
+        variables.add(variable);
+      });
+    });
+
+    this.right.forEach(({ terms }) => {
+      terms.forEach(term => {
+        listVariables(term).forEach(variable => {
+          variables.add(variable);
+        });
+      });
+    });
+
+    const substitutions = Array.from(variables).map(variable => new Substitution(variable, new Variable(variable.name)));
+
+    const left = new Functor(...this.left.terms.map(term => Substitution.applyAll(term, substitutions)));
+
+    const right = this.right.map(({ terms }) => new Functor(...terms.map(term => Substitution.applyAll(term, substitutions))));
+
+    return new Rule(left, right);
+  }
+}
+
+export class Goal {
+  readonly terms: Term[];
+  constructor(...terms: Term[]) {
+    this.terms = terms;
+  }
+
+  toString(): string {
+    return `(${this.terms.map(i => i.toString()).join(", ")})`;
+  }
+}
+
+///////////////////////////////////////////
+
+export class Substitution {
+  constructor(
+    public readonly variable: Variable,
+    public readonly term: Term,
+  ) {}
+
+  apply(term: Term): Term {
+    if (term instanceof Variable) {
+      if (term === this.variable) return this.term;
+      return term;
+    }
+
+    if (term instanceof Constant) return term;
+
+    return new Functor(...term.terms.map(term => this.apply(term)));
+  }
+
+  toString(): string {
+    return `${this.variable.toString()} -> ${this.term.toString()}`;
+  }
+
+  static applyAll(term: Term, substitutions: Substitution[]): Term {
+    return substitutions.reduce((term, substitution) => substitution.apply(term), term);
+  }
+}
+
+export class Constraint {
+  constructor(
+    public readonly left: Term,
+    public readonly right: Term,
+  ) {}
+
+  toString(): string {
+    return `${this.left.toString()} = ${this.right.toString()}`;
+  }
+
+  // return null on failure
+  static unify(constraints: Constraint[]): Substitution[] | null {
+    if (constraints.length === 0) return [];
+
+    // take the first element
+    const [{ left, right }] = constraints;
+
+    if (left === right) {
+      return Constraint.unify(constraints.slice(1));
+    }
+
+    if (left instanceof Variable || right instanceof Variable) {
+      // this conversion is valid as `left instanceof Variable || right instanceof Variable` holds
+      const substitution = (() => {
+        if (left instanceof Variable) return new Substitution(left, right);
+        if (right instanceof Variable) return new Substitution(right, left);
+      })() as Substitution;
+
+      const substitutions = Constraint.unify(
+        constraints.slice(1).map(constraint => new Constraint(substitution.apply(constraint.left), substitution.apply(constraint.right))),
+      );
+
+      if (!substitutions) return null;
+
+      return [substitution, ...substitutions];
+    }
+
+    if (left instanceof Constant || right instanceof Constant) {
+      if (left === right) return [];
+      return null;
+    }
+
+    // from here, `left instanceof Application && right instanceof Application` holds
+
+    if (left.terms.length !== right.terms.length) return null;
+
+    const constraintsNew = [];
+    for (let i = 0; i < left.terms.length; i += 1) {
+      constraintsNew.push(new Constraint(left.terms[i], right.terms[i]));
+    }
+
+    return Constraint.unify([...constraintsNew, ...constraints.slice(1)]);
+  }
+}
+
+// `space` is a set of facts and rules //////////////////////////////////
+export class Space {
+  constructor(
+    private readonly facts: Fact[],
+    private readonly rules: Rule[],
+  ) {}
+
+  query(...goals: Goal[]): Iterator<Map<Variable, Term>> {
+    type Item = { goals: Goal[]; substitutions: Substitution[] };
+    const queue: Item[] = [{ goals, substitutions: [] }];
+
+    const freeVariables = new Set<Variable>();
+    for (const goal of goals) {
+      for (const term of goal.terms) {
+        listVariables(term).forEach(variable => {
+          freeVariables.add(variable);
+        });
+      }
+    }
+
+    return {
+      next: () => {
+        while (queue.length) {
+          // this type conversion is valid as queue.length > 0
+          const { goals, substitutions } = queue.shift() as Item;
+
+          if (goals.length === 0) {
+            const variableTermMapping = new Map<Variable, Term>();
+
+            freeVariables.forEach(variable => {
+              variableTermMapping.set(variable, Substitution.applyAll(variable, substitutions));
+            });
+
+            // `variableTermMapping.get(...)` should not contain variables
+
+            let isValid = true;
+
+            variableTermMapping.forEach((term, _) => {
+              if (listVariables(term).size > 0) {
+                isValid = false;
+              }
+            });
+
+            if (!isValid) {
+              continue;
+            }
+
+            return {
+              done: false,
+              value: variableTermMapping,
+            };
+          }
+
+          const goal = goals[0];
+
+          for (const f of this.facts) {
+            // refresh variables
+            const fact = f.clone();
+
+            if (goal.terms.length !== fact.terms.length) continue;
+
+            const constraints = [];
+            for (let i = 0; i < goal.terms.length; i += 1) {
+              constraints.push(new Constraint(Substitution.applyAll(goal.terms[i], substitutions), fact.terms[i]));
+            }
+
+            const substitutionsNew = Constraint.unify(constraints);
+
+            // if unification succeeded, push an item to the queue
+            if (substitutionsNew) {
+              queue.push({
+                goals: goals.slice(1),
+                substitutions: [...substitutions, ...substitutionsNew],
+              });
+            }
+          }
+
+          for (const r of this.rules) {
+            // refresh variables
+            const rule = r.clone();
+
+            if (goal.terms.length !== rule.left.terms.length) continue;
+
+            const constraints = [];
+            for (let i = 0; i < goal.terms.length; i += 1) {
+              constraints.push(new Constraint(Substitution.applyAll(goal.terms[i], substitutions), rule.left.terms[i]));
+            }
+
+            const substitutionsNew = Constraint.unify(constraints);
+
+            // if unification succeeded, push an item to the queue
+            if (substitutionsNew) {
+              queue.push({
+                // replace one goal with new goals
+                goals: [...goals.slice(1), ...rule.right.map(i => new Goal(...i.terms))],
+                substitutions: [...substitutions, ...substitutionsNew],
+              });
+            }
+          }
+        }
+
+        return {
+          done: true,
+          value: new Map(),
+        };
+      },
+    };
+  }
+}

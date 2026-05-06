@@ -2,25 +2,21 @@ import "./components/column-editor";
 import { play } from "./components/column-player";
 import "./components/dark-mode";
 import { LoadFileEvent, SaveFileEvent } from "./components/file-opensave";
+import "./components/play-button";
+import "./components/publish-button";
 import "./components/speech-to-text";
 import { initSpeech2Text } from "./components/speech-to-text";
 import "./components/underline";
 
-// document.addEventListener("DOMContentLoaded", () => console.log("DOMContentLoaded"));
-
 addEventListener(SaveFileEvent, customEvent => {
-  console.log("heard Saved");
   const e = customEvent as CustomEvent;
   const source = e.detail;
-  console.log("Send to player-column");
   play(source);
 });
 
 addEventListener(LoadFileEvent, customEvent => {
-  console.log("heard Loaded");
   const e = customEvent as CustomEvent;
   const source = e.detail;
-  console.log("Send to player-column");
   play(source);
 });
 

@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>${title}</title>
+    <meta name="description" content="${description}" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta property="ifiction:ifid" content="${ifid}" prefix="ifiction: http://babel.ifarchive.org/protocol/iFiction/" />
+    <link rel="manifest" href="manifest.json" />
+  </head>
+
+  <body>
+    <script src="./interpreter.ts" type="module"></script>
+    <script>
+      document.addEventListener("interpreter", () => loadStory("./story.json"));
+    </script>
+  </body>
+</html>

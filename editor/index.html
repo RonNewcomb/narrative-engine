@@ -8,6 +8,8 @@
       <mirrorway-logo> Mirrorway </mirrorway-logo>
       <file-opensave></file-opensave>
       <div>
+        <play-button></play-button>
+        <publish-button></publish-button>
         <speech-to-text></speech-to-text>
         <dark-mode></dark-mode>
       </div>
@@ -18,5 +20,11 @@
       <div id="player"></div>
     </main>
     <footer></footer>
+    <script>
+      if (window.self !== window.top) {
+        document.documentElement.innerHTML = "";
+        document.body.innerHTML = "Please build the app first.";
+      }
+    </script>
   </body>
 </html>

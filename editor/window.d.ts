@@ -1,5 +1,5 @@
 import type { EditorView } from "@codemirror/view";
-import type { Story } from "./runtime/interpreter";
+import type { Story } from "./assets/interpreter";
 
 declare global {
   interface Window {

@@ -1,0 +1,66 @@
+container-menus {
+  display: block;
+  margin: auto;
+  margin-bottom: 1.5em;
+  margin-top: 1em;
+  width: calc(100% - 4em);
+
+  background-color: wheat;
+  border-radius: 5px;
+  box-shadow: wheat 0 0 8px 11px;
+  overflow: hidden;
+
+  transition: all 0.2s ease-out;
+}
+
+container-menus.exit {
+  position: absolute; /* so the next text doesn't slide as this animates out */
+  max-height: 0;
+  opacity: 0.1;
+  transform: scale(0);
+}
+
+container-menus sliding-window {
+  display: flex;
+  flex-flow: row nowrap;
+  gap: 2em;
+  position: relative;
+  /*left: -0%;*/ /* this is set by javascript on prev/next */
+  transition: left 0.75s;
+}
+
+container-menus sliding-window .menu-panel {
+  display: flex;
+  flex-flow: column nowrap;
+  gap: 0.8em;
+  min-width: 100%;
+  width: 100%;
+  max-width: 100%;
+  text-align: center; /* easiest for fingers to reach */
+}
+
+container-menus sliding-window .menu-panel button {
+  line-height: 2em;
+  border: 0;
+  font-family: sans-serif;
+  background-color: #497d7e;
+  color: white;
+  border-radius: 13px;
+  width: 100%; /* easiest for fingers to reach */
+}
+
+past-choice {
+  font-weight: bold;
+}
+
+hash-tag {
+  display: none;
+}
+
+go-to {
+  display: none;
+}
+
+nav nav {
+  display: none;
+}

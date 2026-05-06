@@ -18,10 +18,6 @@ export async function selectPublishedFolder(appName: string, source: string) {
     await writable.close();
   }
 
-  // console.log("Clear distribution folder", buildDir);
-  // if (existsSync(buildDir)) rmSync(buildDir, { recursive: true, force: true });
-  // if (!existsSync(buildDir)) mkdirSync(buildDir);
-
   console.log("Compiling story");
   const json = await compileStory(source);
   writeFileSync("story.json", json);
@@ -49,37 +45,40 @@ export async function selectPublishedFolder(appName: string, source: string) {
     "</head>": "\n</head>",
   } satisfies Record<string, string | number | boolean>);
 
-  console.log("Copying assets");
-  const assets = [
-    "favicon.ico",
-    "findLocalIP.ts",
-    "icon.svg",
-    // "index.html",
-    "interpreter.ts",
-    "layout.css",
-    "layout.ts",
-    // "manifest.json",
-    "multimenu.css",
-    "multimenu.ts",
-    "prolog.ts",
-  ];
-  assets.forEach(a =>
-    fetch("assets/" + a)
-      .then(x => x.text())
-      .then(text => writeFileSync(a, text)),
-  );
+  // console.log("Copying assets");
+  // readdirSync(commonDir).forEach(filename => copyFileSync(commonDir + filename, buildDir + filename));
+
+  // const assets = [
+  //   "favicon.ico",
+  //   "findLocalIP.ts",
+  //   "icon.svg",
+  //   // "index.html",
+  //   "interpreter.ts",
+  //   "layout.css",
+  //   "layout.ts",
+  //   // "manifest.json",
+  //   "multimenu.css",
+  //   "multimenu.ts",
+  //   "prolog.ts",
+  // ];
+  // assets.forEach(a =>
+  //   fetch("runtime/" + a)
+  //     .then(x => x.text())
+  //     .then(text => writeFileSync(a, text)),
+  // );
 
   console.log("Creating index.html");
-  const indexHtml = await fetch("assets/index.html")
+  await fetch("runtime/index.html")
     .then(x => x.text())
-    .then(templating);
-  writeFileSync("index.html", indexHtml);
+    .then(templating)
+    .then(indexHtml => writeFileSync("index.html", indexHtml));
 
   console.log("Creating manifest.json");
-  const manifestJson = await fetch("assets/manifest.json")
+  await fetch("runtime/manifest.json")
     .then(x => x.text())
-    .then(templating);
-  writeFileSync("manifest.json", manifestJson);
+    .then(templating)
+    .then(manifest => writeFileSync("manifest.json", manifest))
+    .catch(() => console.warn("No manifest found"));
 
   console.log(" ");
   console.log("Compiled successfully.");

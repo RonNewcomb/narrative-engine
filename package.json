@@ -17,7 +17,8 @@
     "rd-parse": "^3.4.0",
     "rd-parse-jsexpr": "^3.2.0",
     "typescript": "^6.0.3",
-    "vite": "^6.4.2"
+    "vite": "^6.4.2",
+    "vite-plugin-singlefile": "^2.3.3"
   },
   "scripts": {
     "publish2": "cd system2/publishing && node publish.ts && cd ../..",
@@ -27,6 +28,7 @@
     "app3": "npm run publish && npm run serve",
     "editor-mobile": "cd editor-mobile && vite serve --host && cd ..",
     "editor": "cd editor && npm run dev && cd ..",
-    "prolog-test": "cd system3 && npx tsx ../node_modules/mocha/bin/mocha.js prolog.spec.ts"
+    "prolog-test": "cd system3 && npx tsx ../node_modules/mocha/bin/mocha.js prolog.spec.ts",
+    "build-runtime": "npm run parser && cd system3/assets && npx vite build && cd ../.."
   }
 }

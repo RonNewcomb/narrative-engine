@@ -1,4 +1,10 @@
-let dialog: HTMLDialogElement;
+const dialog: HTMLDialogElement = document.createElement("dialog");
+const qrDiv: HTMLDivElement = document.createElement("div");
+dialog.setAttribute("closedby", "any");
+dialog.id = "mobile-editor-dialog";
+dialog.innerHTML = `<div>Aim your mobile's camera or QR-code reader at the code below to connect to the mobile editor.</div>`;
+qrDiv.style = "display: flex; justify-content: center";
+dialog.appendChild(qrDiv);
 
 function render() {
   const buttons = document.getElementsByTagName("mobile-editor");
@@ -12,10 +18,6 @@ function render() {
 </button>`;
     button.addEventListener("click", () => serveMobile());
   }
-  dialog = document.createElement("dialog");
-  dialog.setAttribute("closedby", "any");
-  dialog.id = "mobile-editor-dialog";
-  dialog.innerHTML = `<div>Aim your mobile's camera or QR-code reader at the code below to connect to the mobile editor.</div>`;
   document.body.appendChild(dialog);
 }
 
@@ -56,8 +58,7 @@ async function serveMobile(ips?: string[]) {
   const subfolder = location.href.includes("/runtime") ? "/runtime/index.html" : "/editor-mobile/index.html";
   const addy = `${location.protocol}//${ip}${port}${subfolder}`;
 
-  const qrDiv = document.createElement("div");
-  qrDiv.style = "display: flex; justify-content: center";
+  qrDiv.replaceChildren();
   new QRCode(qrDiv, {
     text: addy,
     width: 128,
@@ -66,7 +67,6 @@ async function serveMobile(ips?: string[]) {
     colorLight: "#fff",
     correctLevel: QRCode.CorrectLevel.H,
   });
-  dialog.appendChild(qrDiv);
   dialog.showModal();
 }
 

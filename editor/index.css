@@ -18,6 +18,10 @@ mirrorway-logo {
   padding: 0.3em 0.7em;
 }
 
+.action-row button:active {
+  filter: invert(1);
+}
+
 main {
   display: flex;
   gap: 1.5em;

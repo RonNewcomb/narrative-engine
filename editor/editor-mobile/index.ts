@@ -1,4 +1,4 @@
-import { findLocalIp } from "../system3/assets/findLocalIP";
+import { findLocalIp } from "../../system3/assets/findLocalIP";
 import { speechToText } from "./speech-to-text";
 
 findLocalIp(document.getElementById("qr")!);

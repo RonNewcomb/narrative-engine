@@ -5,7 +5,7 @@ function render() {
   const els = document.getElementsByTagName("publish-button");
   for (const el of els) {
     el.innerHTML = `
-<button type='button' style="border:0">
+<button type='button' style="border:0" aria-label="Compile the work so its ready for distribution" title="Compile the work so its ready for distribution">
   <svg fill="#000000" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
     width="24px" height="24px" viewBox="0 0 335.08 335.079">
       <path d="M311.175,115.775c-1.355-10.186-1.546-27.73,7.915-33.621c0.169-0.108,0.295-0.264,0.443-0.398

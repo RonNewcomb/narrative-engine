@@ -2,6 +2,7 @@ import "./components/column-editor";
 import { play } from "./components/column-player";
 import "./components/dark-mode";
 import { LoadFileEvent, SaveFileEvent } from "./components/file-opensave";
+import "./components/mobile-editor";
 import "./components/play-button";
 import "./components/publish-button";
 import "./components/speech-to-text";

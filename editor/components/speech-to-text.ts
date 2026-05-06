@@ -21,7 +21,7 @@ speech-to-text {
 }`;
 
 const icon = `
-<button type="button" style="border:0" aria-label="toggle speech-to-writing mode">
+<button type="button" style="border:0" aria-label="toggle speech-to-writing mode" title="toggle speech-to-writing mode">
   <svg fill="#000000" width="24px" height="24px" viewBox="-3 0 19 19" xmlns="http://www.w3.org/2000/svg" class="cf-icon-svg">
     <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
     <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>

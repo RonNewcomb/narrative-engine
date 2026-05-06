@@ -20,7 +20,7 @@ img, video, iframe, canvas {
 }`;
 
 const icon = `
-<button type="button" style="border:0" aria-label="toggle dark mode" onclick="toggleDarkMode()">
+<button type="button" style="border:0" aria-label="toggle dark mode" title="toggle dark mode" onclick="toggleDarkMode()">
   <svg width="24px" height="24px" viewBox="0 0 72 72" title="light/dark mode">
     <g><path fill="#FFFFFF" d="M36,45 v-36 a28,28 0 0 1 0 56 z" /></g>
     <g>

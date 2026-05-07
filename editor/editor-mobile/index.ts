@@ -1,7 +1,4 @@
-import { findLocalIp } from "../../system3/assets/findLocalIP";
 import { speechToText } from "./speech-to-text";
-
-findLocalIp(document.getElementById("qr")!);
 
 const startButton = document.getElementById("startButton")!;
 

@@ -1,10 +1,16 @@
 const dialog: HTMLDialogElement = document.createElement("dialog");
-const qrDiv: HTMLDivElement = document.createElement("div");
 dialog.setAttribute("closedby", "any");
 dialog.id = "mobile-editor-dialog";
-dialog.innerHTML = `<div>Aim your mobile's camera or QR-code reader at the code below to connect to the mobile editor.</div>`;
-qrDiv.style = "display: flex; justify-content: center";
-dialog.appendChild(qrDiv);
+dialog.innerHTML = `
+<div class="wrapper">
+  <div>
+    Aim your mobile's camera or QR-code reader at the code below to connect to the mobile editor.
+  </div>
+  <div class="qrcode">
+  </div>
+</div>`;
+document.body.appendChild(dialog);
+const qrDiv: HTMLDivElement = document.querySelector("#mobile-editor-dialog .qrcode")!;
 
 function render() {
   const buttons = document.getElementsByTagName("mobile-editor");
@@ -18,23 +24,15 @@ function render() {
 </button>`;
     button.addEventListener("click", () => serveMobile());
   }
-  document.body.appendChild(dialog);
 }
 
-async function serveMobile(ips?: string[]) {
-  ips = (ips || []).concat(location.hostname);
-  ips = ips.filter(ip => ip && ip.match(/^\d+\.\d+\.\d+\.\d+$/));
-  if (!ips.length) {
-    const msg = "No IP addresses; mobile can't connect to a localhost address";
-    dialog.replaceChildren(msg);
-    dialog.showModal();
-    return console.log(msg);
-  }
+let qrcodeRenderer = false;
 
-  const success = await new Promise<any>(resolve => {
+async function getQrRenderer(): Promise<boolean> {
+  return new Promise<any>(resolve => {
     const script = document.createElement("script");
     script.src = "https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js";
-    script.addEventListener("load", resolve);
+    script.addEventListener("load", () => resolve(true));
     document.body.appendChild(script);
   }).catch(e => {
     const msg = "Cannot load QR library.  " + JSON.stringify(e);
@@ -43,8 +41,21 @@ async function serveMobile(ips?: string[]) {
     console.log(msg);
     return false;
   });
+}
 
-  if (!ips || !success) return;
+async function serveMobile(ips?: string[]) {
+  ips = (ips || []).concat(location.hostname);
+  ips = ips.filter(ip => ip && ip.match(/^\d+\.\d+\.\d+\.\d+$/));
+  if (!ips.length) {
+    const msg = "No IP address for 192.168.x.x so mobile can't connect";
+    dialog.replaceChildren(msg);
+    dialog.showModal();
+    return console.log(msg);
+  }
+
+  if (!qrcodeRenderer) qrcodeRenderer = await getQrRenderer();
+
+  if (!ips || !qrcodeRenderer) return;
   const ip = ips[0];
   if (!ip || !ip.match(/^\d+\.\d+\.\d+\.\d+$/)) {
     if (!ip.includes("192.168")) {

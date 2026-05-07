@@ -39,9 +39,19 @@ export function speechToText({ outputDiv, onStart, onStop }: ISpeechToText): Ret
     onStop?.();
   }
 
+  let nextIndexToEmit = 0;
+
   function onEmit(event: SpeechRecognitionEvent) {
-    const transcript = event.results[0][0].transcript;
-    console.log({ transcript, results: event.results });
+    const lastIndex = event.results.length - 1;
+    if (nextIndexToEmit > lastIndex) nextIndexToEmit = 0;
+    const transcripts = [];
+    for (; nextIndexToEmit <= lastIndex; nextIndexToEmit++) {
+      const t = event.results[nextIndexToEmit];
+      if (t) transcripts.push(t[0].transcript);
+    }
+    const transcript = transcripts.join(" ").trim();
+    // console.log({ transcript, results: event.results });
+    //if (transcript) onChange?.(transcript);
     outputDiv.textContent += transcript + ". ";
   }
 

@@ -15,9 +15,19 @@ export default defineConfig({
         const scriptDir = dirname(fileURLToPath(import.meta.url)); // Script's directory (where the script file is located)
         const buildDir = cwd + "/dist/";
         const editorRuntimeDir = scriptDir + "/../../editor/runtime/";
+        const editorPublishAtRuntimeDir = scriptDir + "/../../editor/publisher/";
+
+        // create or clear out /editor/runtime/
         if (existsSync(editorRuntimeDir)) rmSync(editorRuntimeDir, { recursive: true, force: true });
         if (!existsSync(editorRuntimeDir)) mkdirSync(editorRuntimeDir);
+
+        // copy all from /dist/ to /editor/runtime/
         readdirSync(buildDir).forEach(filename => copyFileSync(buildDir + filename, editorRuntimeDir + filename));
+
+        // copy select files from here to /editor/publisher/ ; THESE FILES work in browser and in nodejs
+        copyFileSync(scriptDir + "/../parser.js", editorPublishAtRuntimeDir + "parser.js");
+        copyFileSync(scriptDir + "/../iFictionRecord.ts", editorPublishAtRuntimeDir + "iFictionRecord.ts");
+        copyFileSync(scriptDir + "/../bibliographic.json", editorPublishAtRuntimeDir + "bibliographic.json");
       },
     },
   ],

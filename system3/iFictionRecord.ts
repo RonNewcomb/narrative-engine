@@ -1,4 +1,4 @@
-export const AuthoringTool = "Fireside";
+export const AuthoringTool = "Mirrorway";
 
 export interface iFictionRecord {
   story: {

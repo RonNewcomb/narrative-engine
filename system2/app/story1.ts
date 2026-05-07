@@ -125,8 +125,8 @@ const Locking: ActionDefinition<Desireable, Desireable> = {
       !attempt.secondNoun
         ? cant
         : (attempt.secondNoun as any)?.owner == attempt.actor
-        ? can
-        : weCouldTry(attempt.actor, Taking, attempt.secondNoun, undefined, attempt),
+          ? can
+          : weCouldTry(attempt.actor, Taking, attempt.secondNoun, undefined, attempt),
   ],
   change: attempt => [["isLocked", attempt.noun!, shouldBe, true]],
 };
@@ -246,5 +246,5 @@ narrativeEngine(
   [inheritance, legitimacy, appointment, doorkey, door],
   narration,
   [zLocking, storyStart, weakDoor, otherRose],
-  getPlayerChoices
+  getPlayerChoices,
 );

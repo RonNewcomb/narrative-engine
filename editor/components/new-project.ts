@@ -1,12 +1,13 @@
-import { iFictionRecord } from "../../system3/iFictionRecord";
+import type { iFictionRecord } from "../publisher/iFictionRecord";
+import { renderErrbar } from "./err-bar";
 import { getFreshIntficRecord, getIntficRecord, render as renderIntficRecord, setIntficRecord } from "./intfic-record";
 
 export async function newProject(): Promise<
   { sourceFile: FileSystemFileHandle; dirHandle: FileSystemDirectoryHandle; initialText: string } | void | undefined
 > {
-  const record = await showNewProjectDialog();
-  if (!record) return;
   const dirHandle = await window.showDirectoryPicker();
+  const shouldntExist = await dirHandle.getFileHandle("about.json", { create: false }).catch(() => undefined);
+  if (shouldntExist) return renderErrbar("Sorry, but this folder already has a project in it. Please choose a different, or new, folder.");
 
   async function writeFileSync(filename: string, contents: string) {
     const fileHandle = await dirHandle.getFileHandle(filename, { create: true });
@@ -16,11 +17,13 @@ export async function newProject(): Promise<
     return fileHandle;
   }
 
+  const record = await showNewProjectDialog();
+  if (!record) return;
   const filename = makeFilesystemSafeName(record.story.bibliographic.title || "intfic");
   record.filename = filename + ".txt";
   record.story.identification.ifid = [crypto.randomUUID().toUpperCase()];
   const initialText = `    "Let me tell you about ${record.story.bibliographic.title}," said ${record.story.bibliographic.author}.`;
-  await writeFileSync("bibliographic.json", JSON.stringify(record, undefined, 4));
+  await writeFileSync("about.json", JSON.stringify(record, undefined, 4));
   const sourceFile = await writeFileSync(record.filename, initialText);
 
   // commit

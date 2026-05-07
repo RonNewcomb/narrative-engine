@@ -24,6 +24,16 @@ Emphasize text-first and de-emphasize code. Avoid a "filling in forms" style of 
 
 Use System 2 as a build-time aid, not a runtime library. Given character beliefs, it creates plot outlines and from that it creates writing prompts for scenes, exchanges, paragraphs.
 
+## Creeping beliefs
+
+I've long thought that there's a spectrum between CYOA and parser intfic.
+
+I suspect that CYOA choices that always jump but never remember the chosen option is swapped, because of how it came from print media.
+
+I believe each character is a map worth exploring.
+
+I believe two characters can collaborate on creating a third map, to figure something out.
+
 ## What ideas will aid the creation of next-gen intfic?
 
 - ease of creation

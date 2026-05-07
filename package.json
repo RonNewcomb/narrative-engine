@@ -27,7 +27,6 @@
     "publish": "npm run parser && cd app3 && node ../system3/publish.ts system3.sample.txt && cd ..",
     "serve": "cd app3/dist && vite serve --host && cd ..",
     "app3": "npm run publish && npm run serve",
-    "editor-mobile": "cd editor/editor-mobile && vite serve --host && cd ../..",
     "editor": "cd editor && npm run dev && cd ..",
     "prolog-test": "cd system3 && npx tsx ../node_modules/mocha/bin/mocha.js prolog.spec.ts",
     "build-runtime": "npm run parser && cd system3/assets && npx vite build && cd ../.."

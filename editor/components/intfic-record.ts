@@ -1,5 +1,5 @@
-import type { iFictionRecord } from "../../system3/iFictionRecord";
-import bjson from "../publisher/intfic.json";
+import bjson from "../publisher/about.json";
+import type { iFictionRecord } from "../publisher/iFictionRecord";
 
 document.addEventListener("DOMContentLoaded", () => render());
 

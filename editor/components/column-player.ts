@@ -1,4 +1,4 @@
-import { parse, SyntaxError } from "../../system3/parser.js";
+import { parse, SyntaxError } from "../publisher/parser.js";
 import { renderErrbar } from "./err-bar.js";
 import { underlineError } from "./underline.js";
 

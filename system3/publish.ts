@@ -28,14 +28,14 @@ console.log("Clear distribution folder", buildDir);
 if (existsSync(buildDir)) rmSync(buildDir, { recursive: true, force: true });
 if (!existsSync(buildDir)) mkdirSync(buildDir);
 
-console.log("Reading", appDir + "bibliographic.json");
-if (!existsSync(appDir + "bibliographic.json")) {
-  console.log("bibliographic.json not found, creating template...");
-  const biblio = readFileSync(scriptDir + "/bibliographic.json", "utf-8");
-  writeFileSync(appDir + "bibliographic.json", biblio);
+console.log("Reading", appDir + "about.json");
+if (!existsSync(appDir + "about.json")) {
+  console.log("about.json not found, creating template...");
+  const biblio = readFileSync(scriptDir + "/about.json", "utf-8");
+  writeFileSync(appDir + "about.json", biblio);
 }
 
-const about: iFictionRecord["story"]["bibliographic"] = JSON.parse(readFileSync(appDir + "bibliographic.json", "utf-8"));
+const about: iFictionRecord["story"]["bibliographic"] = JSON.parse(readFileSync(appDir + "about.json", "utf-8"));
 
 const substitutions = Object.entries({
   "${appName}": appName,

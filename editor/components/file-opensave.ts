@@ -1,4 +1,4 @@
-import type { iFictionRecord } from "../../system3/iFictionRecord";
+import type { iFictionRecord } from "../publisher/iFictionRecord";
 import { newDocument } from "./column-editor";
 import { renderErrbar } from "./err-bar";
 import { setIntficRecord } from "./intfic-record";
@@ -29,19 +29,19 @@ async function newFile() {
   filename = fileHandle.name;
   render(filename);
   newDocument(x.initialText, filename);
-  dispatchEvent(new CustomEvent(LoadFileEvent, { detail: "", bubbles: true, cancelable: true }));
+  dispatchEvent(new CustomEvent(LoadFileEvent, { detail: x.initialText, bubbles: true, cancelable: true }));
 }
 
 export async function loadFile() {
   const fh = await window.showDirectoryPicker().catch(() => undefined);
   if (!fh) return;
-  const biblioHandle = await fh.getFileHandle("bibliographic.json").catch(() => undefined);
-  if (!biblioHandle) return renderErrbar('I could not find a file named "bibliographic.json" in that folder.');
+  const biblioHandle = await fh.getFileHandle("about.json").catch(() => undefined);
+  if (!biblioHandle) return renderErrbar('I could not find a file named "about.json" in that folder.');
   const biblio = await biblioHandle
     .getFile()
     .then(x => x.text())
     .then(x => JSON.parse(x) as iFictionRecord);
-  if (!biblio) return renderErrbar("I could not make sense of the contents of file bibliographic.json");
+  if (!biblio) return renderErrbar("I could not make sense of the contents of file about.json");
   if (!biblio.filename) return renderErrbar("No source filename listed in bibliographic info. Which file has your writing?");
   const sh = await fh.getFileHandle(biblio.filename).catch(() => undefined);
   if (!sh) return renderErrbar("I couldn't find or open file " + biblio.filename + " in that folder.");

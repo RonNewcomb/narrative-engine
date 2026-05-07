@@ -1,5 +1,5 @@
-import type { iFictionRecord } from "../../system3/iFictionRecord";
 import { getIntficRecord } from "../components/intfic-record";
+import type { iFictionRecord } from "./iFictionRecord";
 import { parse } from "./parser";
 
 export async function selectPublishedFolder(appName: string, source: string) {
@@ -19,8 +19,8 @@ export async function selectPublishedFolder(appName: string, source: string) {
   const json = await compileStory(source);
   writeFileSync("story.json", json);
 
-  console.log("Reading", "intfic.json");
-  const intfic: iFictionRecord = getIntficRecord() || (await fetch("publisher/intfic.json").then(x => x.json()));
+  console.log("Reading", "about.json");
+  const intfic: iFictionRecord = getIntficRecord() || (await fetch("publisher/about.json").then(x => x.json()));
   console.log({ intfic });
   const about = intfic.story.bibliographic;
   const substitutions = Object.entries({
@@ -49,7 +49,7 @@ export async function selectPublishedFolder(appName: string, source: string) {
     .catch(() => console.warn("No manifest found"));
 
   console.log("Writing ifiction record");
-  writeFileSync("bibliographic.json", JSON.stringify(intfic, undefined, 4));
+  writeFileSync("about.json", JSON.stringify(intfic, undefined, 4));
 
   console.log(" ");
   console.log("Compiled successfully.");

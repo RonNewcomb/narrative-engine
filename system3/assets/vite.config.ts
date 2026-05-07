@@ -29,7 +29,7 @@ export default defineConfig({
         const packageJson = JSON.parse(readFileSync(scriptDir + "/../../package.json", "utf-8"));
         const version = packageJson.version + "." + new Date().toISOString().replace(/[^0-9]/g, "");
 
-        const biblioJson = JSON.parse(readFileSync(scriptDir + "/../bibliographic.json", "utf-8"));
+        const biblioJson = JSON.parse(readFileSync(scriptDir + "/../about.json", "utf-8"));
         const intficRecord: iFictionRecord = {
           story: {
             identification: { ifid: [], format: "html" },
@@ -40,7 +40,8 @@ export default defineConfig({
 
         // copy select files from here to /editor/publisher/ ; THESE FILES work in browser and in nodejs
         copyFileSync(scriptDir + "/../parser.js", editorPublishAtRuntimeDir + "parser.js");
-        writeFileSync(editorPublishAtRuntimeDir + "intfic.json", JSON.stringify(intficRecord, undefined, 4));
+        copyFileSync(scriptDir + "/../iFictionRecord.ts", editorPublishAtRuntimeDir + "iFictionRecord.ts");
+        writeFileSync(editorPublishAtRuntimeDir + "about.json", JSON.stringify(intficRecord, undefined, 4));
       },
     },
   ],

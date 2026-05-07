@@ -1,47 +1,75 @@
+import type { iFictionRecord } from "../../system3/iFictionRecord";
 import { newDocument } from "./column-editor";
+import { renderErrbar } from "./err-bar";
+import { setIntficRecord } from "./intfic-record";
 import { newProject } from "./new-project";
-import { mobileSync } from "./remote-sync";
 
 export const SaveFileEvent = "interpreter-save";
 export const LoadFileEvent = "interpreter-load";
 
 let filename = "";
-let fileHandle: FileSystemFileHandle;
+let fileHandle: FileSystemFileHandle | undefined;
+let folderHandle: FileSystemDirectoryHandle | undefined;
 
-export async function newFile() {
+function closeProject() {
+  folderHandle = undefined;
+  fileHandle = undefined;
+  filename = "";
+  render();
+  newDocument();
+  location.reload();
+}
+
+async function newFile() {
   const x = await newProject();
-  if (!x) return;
+  if (!x || !x.dirHandle || !x.sourceFile) return;
 
-  fileHandle = x;
+  folderHandle = x.dirHandle;
+  fileHandle = x.sourceFile;
   filename = fileHandle.name;
   render(filename);
-  newDocument();
-  dispatchEvent(new CustomEvent("interpreter-load", { detail: "", bubbles: true, cancelable: true }));
+  newDocument(x.initialText, filename);
+  dispatchEvent(new CustomEvent(LoadFileEvent, { detail: "", bubbles: true, cancelable: true }));
 }
 
 export async function loadFile() {
-  // Destructure the one-element array.
-  [fileHandle] = await window.showOpenFilePicker();
-  // Do something with the file handle.
-  const file = await fileHandle.getFile();
-  const content = (await file.text()) || "";
+  const fh = await window.showDirectoryPicker().catch(() => undefined);
+  if (!fh) return;
+  const biblioHandle = await fh.getFileHandle("bibliographic.json").catch(() => undefined);
+  if (!biblioHandle) return renderErrbar('I could not find a file named "bibliographic.json" in that folder.');
+  const biblio = await biblioHandle
+    .getFile()
+    .then(x => x.text())
+    .then(x => JSON.parse(x) as iFictionRecord);
+  if (!biblio) return renderErrbar("I could not make sense of the contents of file bibliographic.json");
+  if (!biblio.filename) return renderErrbar("No source filename listed in bibliographic info. Which file has your writing?");
+  const sh = await fh.getFileHandle(biblio.filename).catch(() => undefined);
+  if (!sh) return renderErrbar("I couldn't find or open file " + biblio.filename + " in that folder.");
+  const content = await sh
+    .getFile()
+    .then(x => x.text())
+    .then(x => x || "")
+    .catch(() => undefined);
+  if (!content) return renderErrbar("I couldn't load anything from the source file. Is it supposed to be empty?");
+
+  // commit
+  folderHandle = fh;
+  fileHandle = sh;
   filename = fileHandle.name;
+  setIntficRecord(biblio);
   render(filename);
-  window.view.dispatch({ changes: { from: 0, to: window.view.state.doc.length, insert: content } });
-  mobileSync(filename, content);
-  dispatchEvent(new CustomEvent("interpreter-load", { detail: content, bubbles: true, cancelable: true }));
+  newDocument(content, biblio.filename);
+  dispatchEvent(new CustomEvent(LoadFileEvent, { detail: content, bubbles: true, cancelable: true }));
 }
 
 export async function saveFile() {
+  if (!fileHandle) return;
   const content = window.view.state.doc.toString();
-  // Create a FileSystemWritableFileStream to write to.
   const writable = await fileHandle.createWritable();
-  // Write the contents of the file to the stream.
   await writable.write(content);
-  // Close the file and write the contents to disk.
   await writable.close();
   console.log("Saved");
-  dispatchEvent(new CustomEvent("interpreter-save", { detail: content, bubbles: true, cancelable: true }));
+  dispatchEvent(new CustomEvent(SaveFileEvent, { detail: content, bubbles: true, cancelable: true }));
 }
 
 export function getFilename() {
@@ -51,6 +79,7 @@ export function getFilename() {
 window.newFile = newFile;
 window.saveFile = saveFile;
 window.loadFile = loadFile;
+window.closeProject = closeProject;
 
 function render(filename?: string) {
   const el = document.getElementsByTagName("file-opensave")?.[0];
@@ -79,8 +108,11 @@ function render(filename?: string) {
         <button class="save" onclick="newFile()" aria-label="new story">New</button> 
         <button class="save" onclick="loadFile()" aria-label="open story">Open</button> 
       </div>
-      <div style="display: ${filename ? "block" : "none"}" class="save-header" onclick="saveFile()">
-        ${filename} <button class="save" aria-label="save file">Save</button> 
+      <div style="display: ${filename ? "flex" : "none"}; gap: 2em">
+        <div class="save-header" onclick="saveFile()">
+          ${filename} <button class="save" aria-label="save file">Save</button> 
+        </div>
+        <button class="save" onclick="closeProject()" aria-label="close file">Close</button> 
       </div>
     </div>`;
 }

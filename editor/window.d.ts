@@ -11,6 +11,7 @@ declare global {
     newFile: () => Promise<void>;
     saveFile: () => Promise<void>;
     loadFile: () => Promise<void>;
+    closeProject: () => void;
     toggleDarkMode: () => void;
     underlineError: (from?: number, to?: number) => void;
   }

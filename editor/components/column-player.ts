@@ -1,4 +1,5 @@
 import { parse, SyntaxError } from "../../system3/parser.js";
+import { renderErrbar } from "./err-bar.js";
 import { underlineError } from "./underline.js";
 
 export function play(source: string) {
@@ -8,6 +9,7 @@ export function play(source: string) {
     const ast = parse(source);
     playerWindow.interpreter(ast);
     underlineError();
+    renderErrbar();
   } catch (e) {
     if (e instanceof SyntaxError) {
       const err = e as unknown as PeggySyntaxError;
@@ -25,19 +27,6 @@ export function play(source: string) {
 
 export function playPublished(url: string) {
   render(url);
-}
-
-function emptyErrbar() {
-  const footer = document.getElementsByTagName("footer")[0];
-  footer.innerHTML = "";
-  footer.removeEventListener("click", emptyErrbar);
-}
-
-function renderErrbar(e: string) {
-  if (!e) emptyErrbar();
-  const footer = document.getElementsByTagName("footer")[0];
-  footer.innerHTML = "<button type='button' style='border:0'>" + e + "</button>";
-  footer.addEventListener("click", emptyErrbar);
 }
 
 interface PeggySyntaxError {

@@ -1,4 +1,3 @@
-import * as random from "lib0/random";
 import { yCollab } from "y-codemirror.next";
 import { IndexeddbPersistence } from "y-indexeddb";
 import { WebrtcProvider } from "y-webrtc";
@@ -14,7 +13,7 @@ export const usercolors = [
   { color: "#8acb88", light: "#8acb8833" },
   { color: "#1be7ff", light: "#1be7ff33" },
 ];
-const userColor = usercolors[random.uint32() % usercolors.length];
+const userColor = usercolors[Math.floor(Math.random() * usercolors.length * 1000) % usercolors.length];
 
 let ydoc: Y.Doc;
 let provider: WebrtcProvider;

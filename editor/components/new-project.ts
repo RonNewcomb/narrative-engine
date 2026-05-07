@@ -1,8 +1,11 @@
-import { getIntficRecord, render as renderIntficRecord } from "./intfic-record";
+import { iFictionRecord } from "../../system3/iFictionRecord";
+import { getFreshIntficRecord, getIntficRecord, render as renderIntficRecord, setIntficRecord } from "./intfic-record";
 
-export async function newProject(): Promise<FileSystemFileHandle | void | undefined> {
-  const created = await showNewProjectDialog();
-  if (!created) return;
+export async function newProject(): Promise<
+  { sourceFile: FileSystemFileHandle; dirHandle: FileSystemDirectoryHandle; initialText: string } | void | undefined
+> {
+  const record = await showNewProjectDialog();
+  if (!record) return;
   const dirHandle = await window.showDirectoryPicker();
 
   async function writeFileSync(filename: string, contents: string) {
@@ -13,16 +16,19 @@ export async function newProject(): Promise<FileSystemFileHandle | void | undefi
     return fileHandle;
   }
 
-  const record = getIntficRecord();
   const filename = makeFilesystemSafeName(record.story.bibliographic.title || "intfic");
   record.filename = filename + ".txt";
   record.story.identification.ifid = [crypto.randomUUID().toUpperCase()];
-  const sourceFile = await writeFileSync(record.filename, JSON.stringify(getIntficRecord(), undefined, 4));
+  const initialText = `    "Let me tell you about ${record.story.bibliographic.title}," said ${record.story.bibliographic.author}.`;
   await writeFileSync("bibliographic.json", JSON.stringify(record, undefined, 4));
-  return sourceFile;
+  const sourceFile = await writeFileSync(record.filename, initialText);
+
+  // commit
+  setIntficRecord(record);
+  return { sourceFile, dirHandle, initialText };
 }
 
-async function showNewProjectDialog() {
+async function showNewProjectDialog(): Promise<0 | iFictionRecord> {
   const dialog = document.createElement("dialog");
   dialog.className = "new-project";
   dialog.innerHTML = `
@@ -35,21 +41,23 @@ async function showNewProjectDialog() {
     <button id="confirm" class="savebutton" type="button">Create</button>
 </div>`;
   document.body.appendChild(dialog);
-  renderIntficRecord(true);
+  const oldBib = getIntficRecord();
+  const newBib = getFreshIntficRecord();
+  renderIntficRecord(true, newBib.story.bibliographic);
 
-  return new Promise<boolean>(resolve => {
+  return new Promise<iFictionRecord | 0>(resolve => {
     dialog.showModal();
 
-    const cleanup = (value: boolean) => {
+    const done = (value: boolean) => {
       dialog.close();
       dialog.remove(); // Cleanup DOM
-      resolve(value);
-      renderIntficRecord(false);
+      renderIntficRecord(false, oldBib.story.bibliographic);
+      resolve(value ? newBib : 0);
     };
 
-    dialog.onclose = () => cleanup(false);
-    dialog.querySelector<HTMLDialogElement>("#confirm")!.onclick = () => cleanup(true);
-    dialog.querySelector<HTMLDialogElement>("#cancel")!.onclick = () => cleanup(false);
+    dialog.onclose = () => done(false);
+    dialog.querySelector<HTMLDialogElement>("#confirm")!.onclick = () => done(true);
+    dialog.querySelector<HTMLDialogElement>("#cancel")!.onclick = () => done(false);
   });
 }
 

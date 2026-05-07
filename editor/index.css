@@ -62,6 +62,7 @@ footer {
   width: 100%;
   background-color: darkred;
   color: white;
+  text-align: center;
 }
 
 footer > * {

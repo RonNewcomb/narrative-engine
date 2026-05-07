@@ -31,11 +31,11 @@ const saveBinding: KeyBinding = {
   },
 };
 
-const extensions: Extension = [
+const getExtensions = (room?: string, content?: string): Extension => [
   // System3Mirrorways language support
   System3Mirrorways(),
   // remote sync with mobile
-  mobileSync(),
+  mobileSync(room, content),
   // A gutter with code folding markers
   foldGutter(),
   // Replace non-printable characters with placeholders
@@ -79,20 +79,22 @@ const extensions: Extension = [
   ]),
 ];
 
-export function newDocument() {
+export function newDocument(text = "Let it begin.", room?: string) {
   const newState = EditorState.create({
-    doc: "Hello New World",
-    extensions: extensions,
+    doc: text,
+    extensions: getExtensions(room || undefined, text),
   });
   window.view.setState(newState);
 }
 
-window.view = new EditorView({
-  doc: `Start documentlkj * Option 1 * Option 2 ** [plot sldkfj] 
+const initialText = `Start documentlkj * Option 1 * Option 2 ** [plot sldkfj] 
 Can you [copy]this?[/copy] Of \\* course! 
 [cut for later]And cut this?[/cut]  #hello-world  [paste #something] Continuing...
 [replace this that] in here [/replace]
-`,
+`;
+
+window.view = new EditorView({
+  doc: initialText,
   parent: document.getElementById("editor")!,
-  extensions: extensions,
+  extensions: getExtensions(undefined, initialText),
 });

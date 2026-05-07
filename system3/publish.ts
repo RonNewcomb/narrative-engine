@@ -60,9 +60,9 @@ console.log("Creating index.html");
 const indexHtml = readFileSync(buildDir + "index.html", "utf-8");
 writeFileSync(buildDir + "index.html", templating(indexHtml));
 
-console.log("Creating manifest.json");
-const manifestJson = readFileSync(buildDir + "manifest.json", "utf-8");
-writeFileSync(buildDir + "manifest.json", templating(manifestJson));
+console.log("Creating system3.webmanifest");
+const manifestJson = readFileSync(buildDir + "system3.webmanifest", "utf-8");
+writeFileSync(buildDir + "system3.webmanifest", templating(manifestJson));
 
 console.log(" ");
 console.log("Compiled successfully.");

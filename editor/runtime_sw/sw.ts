@@ -12,7 +12,7 @@ const contentToCache = [
   folder + "/screenshot.png",
   folder + "/layout.css",
   folder + "/animate.css",
-  //folder+"/manifest.json",
+  //folder+"/system3.webmanifest",
 ];
 
 self.addEventListener("install", (e: ExtendableEvent) => {

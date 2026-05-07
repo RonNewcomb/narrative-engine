@@ -84,9 +84,9 @@ const substitutions = Object.entries({
 const templating = (contents: string): string =>
   substitutions.reduce((text, [key, value]) => (text = text.replaceAll(key, value.toString())), contents);
 
-console.log("Create", buildDir + "manifest.json", "from", commonDir + "template.manifest.json");
-let manifestJson = readFileSync(commonDir + "template.manifest.json", "utf-8");
-writeFileSync(buildDir + "manifest.json", templating(manifestJson));
+console.log("Create", buildDir + "system3.webmanifest", "from", commonDir + "template.system3.webmanifest");
+let manifestJson = readFileSync(commonDir + "template.system3.webmanifest", "utf-8");
+writeFileSync(buildDir + "system3.webmanifest", templating(manifestJson));
 
 console.log("Create", buildDir + "index.html", "from", commonDir + "template.index.html");
 let indexJs = readFileSync(buildDir + appName + ".js", "utf-8");

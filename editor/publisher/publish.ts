@@ -41,11 +41,11 @@ export async function selectPublishedFolder(appName: string, source: string) {
     .then(templating)
     .then(indexHtml => writeFileSync("index.html", indexHtml));
 
-  console.log("Creating manifest.json");
-  await fetch("runtime/manifest.json")
+  console.log("Creating system3.webmanifest");
+  await fetch("runtime/system3.webmanifest")
     .then(x => x.text())
     .then(templating)
-    .then(manifest => writeFileSync("manifest.json", manifest))
+    .then(manifest => writeFileSync("system3.webmanifest", manifest))
     .catch(() => console.warn("No manifest found"));
 
   console.log("Writing ifiction record");

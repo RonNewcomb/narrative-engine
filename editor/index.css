@@ -42,10 +42,6 @@ main > div#plannr {
   width: 20%;
 }
 
-main > div#plannr .biblio {
-  font-size: smaller;
-}
-
 main > div#editor {
   width: 45%;
   .cm-editor {
@@ -91,4 +87,8 @@ dialog#mobile-editor-dialog > .wrapper {
 dialog#mobile-editor-dialog > .wrapper .qrcode {
   display: flex;
   justify-content: center;
+}
+
+dialog.new-project {
+  max-width: 22em;
 }

@@ -41,4 +41,5 @@ export interface iFictionRecord {
       originated: string; // yyyy-mm-dd
     };
   };
+  filename?: string;
 }

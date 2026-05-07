@@ -2,7 +2,7 @@ import { autocompletion, closeBrackets, closeBracketsKeymap, completionKeymap } 
 import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
 import { bracketMatching, foldGutter, foldKeymap, HighlightStyle, syntaxHighlighting } from "@codemirror/language";
 import { highlightSelectionMatches, searchKeymap } from "@codemirror/search";
-import { EditorState } from "@codemirror/state";
+import { EditorState, Extension } from "@codemirror/state";
 import { drawSelection, dropCursor, EditorView, highlightSpecialChars, KeyBinding, keymap } from "@codemirror/view";
 import { tags } from "@lezer/highlight";
 import { System3Mirrorways } from "../language-plugin/dist/index";
@@ -31,6 +31,62 @@ const saveBinding: KeyBinding = {
   },
 };
 
+const extensions: Extension = [
+  // System3Mirrorways language support
+  System3Mirrorways(),
+  // remote sync with mobile
+  mobileSync(),
+  // A gutter with code folding markers
+  foldGutter(),
+  // Replace non-printable characters with placeholders
+  highlightSpecialChars(),
+  // The undo history
+  history(),
+  // Replace native cursor/selection with our own
+  drawSelection(),
+  // Show a drop cursor when dragging over the editor
+  dropCursor(),
+  // Allow multiple cursors/selections
+  EditorState.allowMultipleSelections.of(true),
+  // Highlight syntax with a default style
+  syntaxHighlighting(mirrorwaysStyle),
+  // wordwrap
+  EditorView.lineWrapping,
+  // Highlight matching brackets near cursor
+  bracketMatching(),
+  // Automatically close brackets
+  closeBrackets(),
+  // Load the autocompletion system
+  autocompletion(),
+  // Highlight text that matches the selected text
+  highlightSelectionMatches(),
+  keymap.of([
+    // ctrl+s save
+    saveBinding,
+    //openBinding,
+    // Closed-brackets aware backspace
+    ...closeBracketsKeymap,
+    // A large set of basic bindings
+    ...defaultKeymap,
+    // Search-related keys
+    ...searchKeymap,
+    // Redo/undo keys
+    ...historyKeymap,
+    // Code folding bindings
+    ...foldKeymap,
+    // Autocompletion keys
+    ...completionKeymap,
+  ]),
+];
+
+export function newDocument() {
+  const newState = EditorState.create({
+    doc: "Hello New World",
+    extensions: extensions,
+  });
+  window.view.setState(newState);
+}
+
 window.view = new EditorView({
   doc: `Start documentlkj * Option 1 * Option 2 ** [plot sldkfj] 
 Can you [copy]this?[/copy] Of \\* course! 
@@ -38,51 +94,5 @@ Can you [copy]this?[/copy] Of \\* course!
 [replace this that] in here [/replace]
 `,
   parent: document.getElementById("editor")!,
-  extensions: [
-    // System3Mirrorways language support
-    System3Mirrorways(),
-    // remote sync with mobile
-    mobileSync(),
-    // A gutter with code folding markers
-    foldGutter(),
-    // Replace non-printable characters with placeholders
-    highlightSpecialChars(),
-    // The undo history
-    history(),
-    // Replace native cursor/selection with our own
-    drawSelection(),
-    // Show a drop cursor when dragging over the editor
-    dropCursor(),
-    // Allow multiple cursors/selections
-    EditorState.allowMultipleSelections.of(true),
-    // Highlight syntax with a default style
-    syntaxHighlighting(mirrorwaysStyle),
-    // wordwrap
-    EditorView.lineWrapping,
-    // Highlight matching brackets near cursor
-    bracketMatching(),
-    // Automatically close brackets
-    closeBrackets(),
-    // Load the autocompletion system
-    autocompletion(),
-    // Highlight text that matches the selected text
-    highlightSelectionMatches(),
-    keymap.of([
-      // ctrl+s save
-      saveBinding,
-      //openBinding,
-      // Closed-brackets aware backspace
-      ...closeBracketsKeymap,
-      // A large set of basic bindings
-      ...defaultKeymap,
-      // Search-related keys
-      ...searchKeymap,
-      // Redo/undo keys
-      ...historyKeymap,
-      // Code folding bindings
-      ...foldKeymap,
-      // Autocompletion keys
-      ...completionKeymap,
-    ]),
-  ],
+  extensions: extensions,
 });

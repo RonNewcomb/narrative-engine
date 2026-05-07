@@ -1,14 +1,27 @@
+import { newDocument } from "./column-editor";
+import { newProject } from "./new-project";
 import { mobileSync } from "./remote-sync";
 
 export const SaveFileEvent = "interpreter-save";
 export const LoadFileEvent = "interpreter-load";
 
 let filename = "";
-let fileHandle: any;
+let fileHandle: FileSystemFileHandle;
+
+export async function newFile() {
+  const x = await newProject();
+  if (!x) return;
+
+  fileHandle = x;
+  filename = fileHandle.name;
+  render(filename);
+  newDocument();
+  dispatchEvent(new CustomEvent("interpreter-load", { detail: "", bubbles: true, cancelable: true }));
+}
 
 export async function loadFile() {
   // Destructure the one-element array.
-  [fileHandle] = await (window as any).showOpenFilePicker();
+  [fileHandle] = await window.showOpenFilePicker();
   // Do something with the file handle.
   const file = await fileHandle.getFile();
   const content = (await file.text()) || "";
@@ -35,6 +48,7 @@ export function getFilename() {
   return filename;
 }
 
+window.newFile = newFile;
 window.saveFile = saveFile;
 window.loadFile = loadFile;
 
@@ -62,7 +76,8 @@ function render(filename?: string) {
         }
       </style>
       <div style="display: ${filename ? "none" : "block"}">
-        <button class="save" onclick="loadFile()" aria-label="load file">Load</button> 
+        <button class="save" onclick="newFile()" aria-label="new story">New</button> 
+        <button class="save" onclick="loadFile()" aria-label="open story">Open</button> 
       </div>
       <div style="display: ${filename ? "block" : "none"}" class="save-header" onclick="saveFile()">
         ${filename} <button class="save" aria-label="save file">Save</button> 

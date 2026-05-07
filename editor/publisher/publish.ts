@@ -2,15 +2,11 @@ import type { iFictionRecord } from "../../system3/iFictionRecord";
 import { getIntficRecord } from "../components/intfic-record";
 import { parse } from "./parser";
 
-interface FileHandle {
-  createWritable(): { write(text: string): void; close(): void };
-}
-
 export async function selectPublishedFolder(appName: string, source: string) {
-  const dirHandle = await (window as any).showDirectoryPicker();
+  const dirHandle = await window.showDirectoryPicker();
 
   async function writeFileSync(filename: string, contents: string) {
-    const fileHandle: FileHandle = await dirHandle.getFileHandle(filename, { create: true });
+    const fileHandle = await dirHandle.getFileHandle(filename, { create: true });
     // Create a FileSystemWritableFileStream to write to.
     const writable = await fileHandle.createWritable();
     // Write the contents of the file to the stream.

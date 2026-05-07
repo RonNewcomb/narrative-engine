@@ -5,9 +5,14 @@ document.addEventListener("DOMContentLoaded", () => render());
 
 type BiblioInfo = iFictionRecord["story"]["bibliographic"];
 
-const biblio = bjson as iFictionRecord; // TODO this is hard-coded default only
+let biblio = bjson as iFictionRecord; // TODO this is hard-coded default only
 
-export function getIntficRecord() {
+export function newIntficRecord(): iFictionRecord {
+  biblio = bjson as iFictionRecord;
+  return biblio;
+}
+
+export function getIntficRecord(): iFictionRecord {
   return biblio;
 }
 
@@ -50,7 +55,7 @@ function bibliographica(open: boolean) {
       </div>`,
   );
   return `
-    <details ${open && "open"} class='biblio'>
+    <details ${open && "open"} style='font-size: smaller'>
       <summary> ${biblio.story.bibliographic.title} by ${biblio.story.bibliographic.author} </summary>
       <div>${fields.join("")}</div>
     </details>

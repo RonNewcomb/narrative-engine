@@ -1,33 +1,34 @@
 {
-    "story": {
-        "identification": {
-            "ifid": [],
-            "format": "html"
-        },
-        "bibliographic": {
-            "title": "Untitled Story",
-            "author": "Some Author",
-            "language": "en",
-            "headline": "An Interactive Fiction",
-            "firstpublished": "2023",
-            "description": "",
-            "series": "",
-            "seriesnumber": "",
-            "contacts": {
-                "url": "",
-                "authoremail": ""
-            },
-            "cover": {
-                "format": "",
-                "height": "",
-                "width": "",
-                "description": ""
-            }
-        },
-        "colophon": {
-            "generator": "Mirrorway",
-            "generatorversion": "1.0.0.20260507020316241",
-            "originated": "2026-05-07"
-        }
+  "story": {
+    "identification": {
+      "ifid": [],
+      "format": "html"
+    },
+    "bibliographic": {
+      "title": "Sample System-3 Story",
+      "author": "First Author",
+      "language": "en",
+      "headline": "An Interactive Fiction",
+      "firstpublished": "2023",
+      "description": "",
+      "series": "",
+      "seriesnumber": "",
+      "contacts": {
+        "url": "",
+        "authoremail": ""
+      },
+      "cover": {
+        "format": "",
+        "height": "",
+        "width": "",
+        "description": ""
+      }
+    },
+    "colophon": {
+      "generator": "Mirrorway",
+      "generatorversion": "1.0.0.2605070",
+      "originated": "2026-05-07"
     }
+  },
+  "filename": "system3.sample.txt"
 }

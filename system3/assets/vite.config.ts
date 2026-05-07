@@ -27,14 +27,20 @@ export default defineConfig({
 
         // create default intfic record
         const packageJson = JSON.parse(readFileSync(scriptDir + "/../../package.json", "utf-8"));
-        const version = packageJson.version + "." + new Date().toISOString().replace(/[^0-9]/g, "");
+        const version =
+          packageJson.version +
+          "." +
+          new Date()
+            .toISOString()
+            .replace(/[^0-9]/g, "")
+            .slice(2, 9);
 
         const biblioJson = JSON.parse(readFileSync(scriptDir + "/../about.json", "utf-8"));
         const intficRecord: iFictionRecord = {
           story: {
             identification: { ifid: [], format: "html" },
             bibliographic: biblioJson,
-            colophon: { generator: "Mirrorway", generatorversion: version, originated: new Date().toISOString().split("T")[0] },
+            colophon: { generator: "Mirrorway", generatorversion: version, originated: "2023-08-18" },
           },
         };
 

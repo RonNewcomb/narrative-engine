@@ -1,4 +1,5 @@
 import "./components/column-editor";
+import "./components/column-planner";
 import { play } from "./components/column-player";
 import "./components/dark-mode";
 import { LoadFileEvent, SaveFileEvent } from "./components/file-opensave";

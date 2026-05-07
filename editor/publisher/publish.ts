@@ -1,4 +1,5 @@
-import type { iFictionRecord } from "./iFictionRecord";
+import type { iFictionRecord } from "../../system3/iFictionRecord";
+import { getIntficRecord } from "../components/intfic-record";
 import { parse } from "./parser";
 
 interface FileHandle {
@@ -22,16 +23,10 @@ export async function selectPublishedFolder(appName: string, source: string) {
   const json = await compileStory(source);
   writeFileSync("story.json", json);
 
-  console.log("Reading", "bibliographic.json");
-  if (true) {
-    // !existsSync("bibliographic.json")) {
-    console.log("bibliographic.json not found, creating template...");
-    const biblio = await fetch("publisher/bibliographic.json").then(x => x.text());
-    writeFileSync("bibliographic.json", biblio);
-  }
-
-  const about: iFictionRecord["story"]["bibliographic"] = await fetch("publisher/bibliographic.json").then(x => x.json());
-
+  console.log("Reading", "intfic.json");
+  const intfic: iFictionRecord = getIntficRecord() || (await fetch("publisher/intfic.json").then(x => x.json()));
+  console.log({ intfic });
+  const about = intfic.story.bibliographic;
   const substitutions = Object.entries({
     "${appName}": appName,
     "${ifid}": new Date().toISOString(),
@@ -40,32 +35,9 @@ export async function selectPublishedFolder(appName: string, source: string) {
     "${headline}": about.headline,
     "${firstpublished}": about.firstpublished,
     "${language}": about.language || "en",
-    "${description}": about.description || `${about.title}: ${about.headline} by ${about.author}`,
-    '<link rel="stylesheet" href="index.css" />': "",
+    "${description}": about.description || `${about.title} by ${about.author}`,
     "</head>": "\n</head>",
   } satisfies Record<string, string | number | boolean>);
-
-  // console.log("Copying assets");
-  // readdirSync(commonDir).forEach(filename => copyFileSync(commonDir + filename, buildDir + filename));
-
-  // const assets = [
-  //   "favicon.ico",
-  //   "findLocalIP.ts",
-  //   "icon.svg",
-  //   // "index.html",
-  //   "interpreter.ts",
-  //   "layout.css",
-  //   "layout.ts",
-  //   // "manifest.json",
-  //   "multimenu.css",
-  //   "multimenu.ts",
-  //   "prolog.ts",
-  // ];
-  // assets.forEach(a =>
-  //   fetch("runtime/" + a)
-  //     .then(x => x.text())
-  //     .then(text => writeFileSync(a, text)),
-  // );
 
   console.log("Creating index.html");
   await fetch("runtime/index.html")
@@ -80,14 +52,15 @@ export async function selectPublishedFolder(appName: string, source: string) {
     .then(manifest => writeFileSync("manifest.json", manifest))
     .catch(() => console.warn("No manifest found"));
 
+  console.log("Writing ifiction record");
+  writeFileSync("bibliographic.json", JSON.stringify(intfic, undefined, 4));
+
   console.log(" ");
   console.log("Compiled successfully.");
 
   function templating(contents: string): string {
     return substitutions.reduce((text, [key, value]) => (text = text.replaceAll(key, value.toString())), contents);
   }
-
-  dirHandle.close();
 
   return true;
 }

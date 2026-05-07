@@ -4,5 +4,17 @@
   "language": "en",
   "headline": "An Interactive Fiction",
   "firstpublished": "2023",
-  "description": ""
+  "description": "",
+  "series": "",
+  "seriesnumber": "",
+  "contacts": {
+    "url": "",
+    "authoremail": ""
+  },
+  "cover": {
+    "format": "",
+    "height": "",
+    "width": "",
+    "description": ""
+  }
 }

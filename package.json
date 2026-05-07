@@ -1,5 +1,6 @@
 {
   "name": "narrative-engine",
+  "version": "1.0.0",
   "type": "module",
   "prettier": {
     "printWidth": 140,

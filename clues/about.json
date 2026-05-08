@@ -1,7 +1,9 @@
 {
   "story": {
     "identification": {
-      "ifid": ["1FABA986-D14B-4448-945E-FED3492082C4"],
+      "ifid": [
+        "1FABA986-D14B-4448-945E-FED3492082C4"
+      ],
       "format": "html"
     },
     "bibliographic": {

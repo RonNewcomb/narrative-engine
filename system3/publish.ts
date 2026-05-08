@@ -15,6 +15,7 @@ const scriptDir = dirname(fileURLToPath(import.meta.url)); // Script's directory
 const appDir = cwd + "/";
 const buildDir = appDir + "dist/";
 const commonDir = scriptDir + "/assets/dist/";
+const editorRuntimeDir = scriptDir + "/../editor/runtime/";
 
 console.log("Current working directory:", cwd);
 console.log("Script directory:", scriptDir);
@@ -41,12 +42,16 @@ const substitutions = Object.entries({
 
 console.log("Open distribution folder", buildDir);
 if (!existsSync(buildDir)) mkdirSync(buildDir);
+if (!existsSync(editorRuntimeDir)) mkdirSync(editorRuntimeDir);
 
 console.log("Compiling story");
 await compileStory(appDir + record.filename, buildDir + "intfic.json");
 
 console.log("Copying templated assets");
-readdirSync(commonDir).forEach(filename => copyFileSync(commonDir + filename, buildDir + filename));
+readdirSync(commonDir).forEach(filename => {
+  copyFileSync(commonDir + filename, buildDir + filename);
+  copyFileSync(commonDir + filename, editorRuntimeDir + filename);
+});
 
 console.log("Creating index.html");
 const indexHtml = readFileSync(buildDir + "index.html", "utf-8");
@@ -64,10 +69,8 @@ function templating(contents: string): string {
   return substitutions.reduce((text, [key, value]) => (text = text.replaceAll(key, (value || "").toString())), contents);
 }
 
-console.log("Informing editor");
-const editorRuntimeDir = scriptDir + "/../editor/runtime/";
-if (!existsSync(editorRuntimeDir)) mkdirSync(editorRuntimeDir);
-readdirSync(buildDir).forEach(filename => copyFileSync(buildDir + filename, editorRuntimeDir + filename));
+// console.log("Informing editor");
+// readdirSync(buildDir).forEach(filename => copyFileSync(buildDir + filename, editorRuntimeDir + filename));
 
 /////////////
 async function compileStory(storyFilename: string, outputFile: string): Promise<string> {

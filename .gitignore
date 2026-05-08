@@ -3,4 +3,8 @@ app3/dist/*
 node_modules
 system3/assets/intfic.json
 !app3/dist/intfic.json
+editor/runtime/intfic.json
+clues/index.html
+clues/intfic.json
+clues/*.webmanifest
 .DS_Store

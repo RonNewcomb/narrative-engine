@@ -104,11 +104,11 @@ function render(filename?: string) {
           border-radius: 1em;
         }
       </style>
-      <div style="display: ${filename ? "none" : "block"}">
+      <div style='display: ${filename ? "none" : "block"}'>
         <button class="save" onclick="newFile()" aria-label="new story">New</button> 
         <button class="save" onclick="loadFile()" aria-label="open story">Open</button> 
       </div>
-      <div style="display: ${filename ? "flex" : "none"}; gap: 2em">
+      <div style='display: ${filename ? "flex" : "none"}; gap: 2em'>
         <div class="save-header" onclick="saveFile()">
           ${filename} <button class="save" aria-label="save file">Save</button> 
         </div>

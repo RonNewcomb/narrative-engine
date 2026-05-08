@@ -4,7 +4,7 @@ export async function showConfirm(message: string) {
     <p>${message}</p>
     <button id="cancel" type="button">Cancel</button>
     <button id="confirm" type="button">Confirm</button>
-  `;
+`;
   document.body.appendChild(dialog);
 
   return new Promise<boolean>(resolve => {

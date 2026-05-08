@@ -42,7 +42,7 @@ export function render(open = true, bib?: BiblioInfo) {
         <input 
           type="text" 
           name="${key}" 
-          value="${getValue(key, bib) || ""}" 
+          value='${getValue(key, bib) || ""}' 
           onchange="biblio.updatefield('${key}', this.value)"
           style="width:17em"
           />
@@ -53,7 +53,7 @@ export function render(open = true, bib?: BiblioInfo) {
       <summary> ${bib.title} by ${bib.author} </summary>
       <div>${fields.join("")}</div>
     </details>
-  `;
+`;
 
   const els = document.getElementsByTagName("intfic-record");
   for (const el of els) {

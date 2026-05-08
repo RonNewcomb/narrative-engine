@@ -49,7 +49,7 @@ export async function selectPublishedFolder(appName: string, source: string) {
     .catch(() => console.warn("No manifest found"));
 
   console.log("Writing ifiction record");
-  writeFileSync("about.json", JSON.stringify(intfic, undefined, 4));
+  writeFileSync("about.json", JSON.stringify(intfic, undefined, 2));
 
   console.log(" ");
   console.log("Compiled successfully.");
@@ -67,7 +67,7 @@ async function compileStory(source: string): Promise<string> {
 
   try {
     const ast = parse(source);
-    json = JSON.stringify(ast, undefined, 4);
+    json = JSON.stringify(ast, undefined, 2);
   } catch (e) {
     if (e instanceof SyntaxError) {
       // @ts-ignore

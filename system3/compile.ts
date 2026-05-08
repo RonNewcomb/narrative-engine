@@ -17,7 +17,7 @@ export async function compileStory(storyFilename: string, outputPath?: string): 
 
   try {
     const ast = parse(source);
-    json = JSON.stringify(ast, undefined, 4);
+    json = JSON.stringify(ast, undefined, 2);
   } catch (e) {
     if (e instanceof SyntaxError) {
       // @ts-ignore

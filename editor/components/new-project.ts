@@ -23,7 +23,7 @@ export async function newProject(): Promise<
   record.filename = filename + ".txt";
   record.story.identification.ifid = [crypto.randomUUID().toUpperCase()];
   const initialText = `    "Let me tell you about ${record.story.bibliographic.title}," said ${record.story.bibliographic.author}.`;
-  await writeFileSync("about.json", JSON.stringify(record, undefined, 4));
+  await writeFileSync("about.json", JSON.stringify(record, undefined, 2));
   const sourceFile = await writeFileSync(record.filename, initialText);
 
   // commit

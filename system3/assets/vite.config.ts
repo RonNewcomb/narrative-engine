@@ -47,7 +47,7 @@ export default defineConfig({
         // copy select files from here to /editor/publisher/ ; THESE FILES work in browser and in nodejs
         copyFileSync(scriptDir + "/../parser.js", editorPublishAtRuntimeDir + "parser.js");
         copyFileSync(scriptDir + "/../iFictionRecord.ts", editorPublishAtRuntimeDir + "iFictionRecord.ts");
-        writeFileSync(editorPublishAtRuntimeDir + "about.json", JSON.stringify(intficRecord, undefined, 4));
+        writeFileSync(editorPublishAtRuntimeDir + "about.json", JSON.stringify(intficRecord, undefined, 2));
       },
     },
   ],

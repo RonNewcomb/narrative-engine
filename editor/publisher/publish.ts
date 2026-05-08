@@ -17,7 +17,7 @@ export async function selectPublishedFolder(appName: string, source: string) {
 
   console.log("Compiling story");
   const json = await compileStory(source);
-  writeFileSync("story.json", json);
+  writeFileSync("intfic.json", json);
 
   console.log("Reading", "about.json");
   const intfic: iFictionRecord = getIntficRecord() || (await fetch("publisher/about.json").then(x => x.json()));

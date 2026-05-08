@@ -105,7 +105,7 @@ The parser-generator is in the `system3` folder and it's currently a multi-step 
 This finishes creating the system-3 compiler. We run the compiler (only) on an author's work to test the parser.
 
 3. We run `compile.ts` (which uses `parser.js`) to distill the sample author work `system3.sample.txt` into an AST file.
-4. The AST is named `story.json` and is placed in a `dist` subfolder.
+4. The AST is named `intfic.json` and is placed in a `dist` subfolder.
 
 To publish the work runs the compiler, asset juggler, ifiction record substitution, and creates a `dist` folder full of stuff ready to go.
 
@@ -114,7 +114,7 @@ To publish the work runs the compiler, asset juggler, ifiction record substituti
 Once built/published, it can be served to browsers.
 
 7. Run `npm run serve` to serve the published work from `dist` and serve it to browsers as `./dist/index.html`.
-8. The `index.html` file must both load the `interpreter.ts` file and the AST file `story.json`.
+8. The `index.html` file must both load the `interpreter.ts` file and the AST file `intfic.json`.
 9. Once both are loaded, it feeds the latter into the former and we're off.
 
 The `index.html` file is preferably served off of a local IP address beginning with `192.168`, which means it should be visible to other devices on the same network (i.e., your home wifi). The top-right corner menu of the running work will, if it detects this, display a QR code that other devices on the same network can scan to also play the work.

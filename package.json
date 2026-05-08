@@ -23,10 +23,10 @@
   },
   "scripts": {
     "publish2": "cd system2/publishing && node publish.ts && cd ../..",
-    "parser": "cd system3 && peggy --format es -o parser.js parser.peggy && node compile.ts ../app3/system3.sample.txt",
-    "publish": "npm run parser && cd app3 && node ../system3/publish.ts system3.sample.txt && cd ..",
-    "serve": "cd app3/dist && vite serve --host && cd ..",
-    "app3": "npm run publish && npm run serve",
+    "parser": "cd system3 && peggy --format es -o parser.js parser.peggy",
+    "publish3": "npm run parser && cd app3 && node ../system3/publish.ts && cd ..",
+    "serve3": "cd app3/dist && vite serve --host && cd ..",
+    "app3": "npm run publish3 && npm run serve3",
     "editor": "cd editor && npm run dev && cd ..",
     "prolog-test": "cd system3 && npx tsx ../node_modules/mocha/bin/mocha.js prolog.spec.ts",
     "build-runtime": "npm run parser && cd system3/assets && npx vite build && cd ../.."

@@ -1,6 +1,6 @@
 build
 app3/dist/*
 node_modules
-system3/assets/story.json
-!app3/dist/story.json
+system3/assets/intfic.json
+!app3/dist/intfic.json
 .DS_Store

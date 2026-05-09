@@ -34,6 +34,14 @@ I believe each character is a map worth exploring.
 
 I believe two characters can collaborate on creating a third map, to figure something out.
 
+## To-do
+
+- planner
+
+- prolog? circles, dots, and arrows?
+
+- mobile + planner
+
 ## What ideas will aid the creation of next-gen intfic?
 
 - ease of creation

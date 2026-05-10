@@ -1,3 +1,6 @@
+import { Character } from "../components/planners/character-list";
+import { Place } from "../components/planners/settings-list";
+
 export const AuthoringTool = "Mirrorway";
 
 export interface iFictionRecord {
@@ -42,4 +45,6 @@ export interface iFictionRecord {
     };
   };
   filename?: string;
+  characters?: Character[];
+  places?: Place[];
 }

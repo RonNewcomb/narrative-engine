@@ -35,6 +35,10 @@ let isRendering = false;
 
 export function render(open = true, bib?: BiblioInfo) {
   if (!bib) bib = biblio.story.bibliographic;
+  if (!bib) {
+    const els = document.getElementsByTagName("intfic-record");
+    for (const el of els) el.innerHTML = "";
+  }
   const fields = keys.map(
     key => `
       <div style="text-align:right;text-transform:capitalize">

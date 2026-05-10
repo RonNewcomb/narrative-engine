@@ -48,10 +48,12 @@ const fields = [
   "internal conflicts",
 ];
 
-const characters: Character[] = [
-  { name: "Rose", beliefs: [], goals: [] },
-  { name: "Zafra", beliefs: [], goals: [] },
-];
+let characters: Character[] = [];
+
+export function setCharacters(ch?: Character[]) {
+  characters = ch ?? [];
+  render();
+}
 
 function goalsOf(goals: Character["goals"]) {
   return (

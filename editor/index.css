@@ -44,6 +44,17 @@ main > div#plannr {
   width: 20%;
 }
 
+main > div#plannr summary:hover {
+  background-color: lightgray;
+}
+
+main > div#plannr details div:hover {
+  background-color: transparent;
+}
+main > div#plannr details div:hover div:hover {
+  background-color: lightgray;
+}
+
 main > div#editor {
   width: 45%;
   .cm-editor {

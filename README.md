@@ -37,16 +37,16 @@ I believe two characters can collaborate on creating a third map, to figure some
 ## To-do
 
 - planner
-
 - prolog? circles, dots, and arrows?
-
 - mobile + planner
-
 - qr code with logo
-
 - in-editor instructions, with playable examples? Accordian sections? iframe with srcdoc for examples?
-
 - tabs for the side columns
+- `[dice]` to prove there's a model?
+- `[first]`, `[second]`, `[hundredth]` useful in copy/paste?
+- a character = a group of beliefs
+- a provocation against a belief = character action
+- a character attempt = a scene
 
 ## What ideas will aid the creation of next-gen intfic?
 

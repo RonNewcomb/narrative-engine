@@ -20,7 +20,12 @@ function piecesOf(pl: Place) {
   return retval.join("");
 }
 
-const places: Place[] = [{ name: "savannah" }];
+let places: Place[] = [];
+
+export function setPlaces(pl?: Place[]) {
+  places = pl ?? [];
+  render();
+}
 
 export function render() {
   const elements = document.getElementsByTagName("settings-list");

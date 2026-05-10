@@ -30,5 +30,10 @@
       "originated": "2026-05-07"
     }
   },
-  "filename": "system3.sample.txt"
+  "filename": "system3.sample.txt",
+  "characters": [
+    { "name": "Rose", "beliefs": [], "goals": [] },
+    { "name": "Zafra", "beliefs": [], "goals": [] }
+  ],
+  "places": [{ "name": "savannah" }]
 }

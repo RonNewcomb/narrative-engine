@@ -1,8 +1,11 @@
 import type { iFictionRecord } from "../publisher/iFictionRecord";
 import { newDocument } from "./column-editor";
+import { render as renderPlanner } from "./column-planner";
 import { renderErrbar } from "./err-bar";
 import { setIntficRecord } from "./intfic-record";
 import { newProject } from "./new-project";
+import { setCharacters } from "./planners/character-list";
+import { setPlaces } from "./planners/settings-list";
 
 export const SaveFileEvent = "interpreter-save";
 export const LoadFileEvent = "interpreter-load";
@@ -56,8 +59,12 @@ export async function loadFile() {
   folderHandle = fh;
   fileHandle = sh;
   filename = fileHandle.name;
+  console.log({ biblio });
+  setCharacters(biblio.characters);
+  setPlaces(biblio.places);
   setIntficRecord(biblio);
   render(filename);
+  renderPlanner();
   newDocument(content, biblio.filename);
   dispatchEvent(new CustomEvent(LoadFileEvent, { detail: content, bubbles: true, cancelable: true }));
 }

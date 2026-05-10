@@ -44,7 +44,7 @@ export function render(open = true, bib?: BiblioInfo) {
           name="${key}" 
           value='${getValue(key, bib) || ""}' 
           onchange="biblio.updatefield('${key}', this.value)"
-          style="width:17em"
+          style="width:16em"
           />
       </div>`,
   );

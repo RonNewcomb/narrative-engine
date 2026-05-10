@@ -42,6 +42,12 @@ I believe two characters can collaborate on creating a third map, to figure some
 
 - mobile + planner
 
+- qr code with logo
+
+- in-editor instructions, with playable examples? Accordian sections? iframe with srcdoc for examples?
+
+- tabs for the side columns
+
 ## What ideas will aid the creation of next-gen intfic?
 
 - ease of creation

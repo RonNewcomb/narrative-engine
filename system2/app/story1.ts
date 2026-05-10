@@ -40,47 +40,47 @@ import bibliographic from "./bibliographic.json";
 //////////
 
 type positioning = "rock" | "paper" | "scissors" | "";
-const positions = ["rock", "paper", "scissors"];
+export const positions = ["rock", "paper", "scissors"];
 
 ///////////////
 
-const doorkey: Desireable = { name: "door key", isKey: true };
-const door: Desireable = { name: "door", isLocked: true };
-const inheritance: Desireable = { name: "Rose's inheritance" };
-const legitimacy: Desireable = { name: "legitimacy in the eyes of the court" };
-const appointment: Desireable = { name: "to be at Harrenfall before the 12th" };
-const rook: Desireable = { name: "rook", pins: "" as positioning };
-const pawn: Desireable = { name: "pawn", at: "rock" as positioning };
+export const doorkey: Desireable = { name: "door key", isKey: true };
+export const door: Desireable = { name: "door", isLocked: true };
+export const inheritance: Desireable = { name: "Rose's inheritance" };
+export const legitimacy: Desireable = { name: "legitimacy in the eyes of the court" };
+export const appointment: Desireable = { name: "to be at Harrenfall before the 12th" };
+export const rook: Desireable = { name: "rook", pins: "" as positioning };
+export const pawn: Desireable = { name: "pawn", at: "rock" as positioning };
 
 ////////////////
 
-const Aim: ActionDefinition<positioning> = {
+export const Aim: ActionDefinition<positioning> = {
   verb: "aim at _",
   options1: positions,
   change: attempt => [["pins", rook, shouldBe, attempt.noun]],
 };
 
-const Zig: ActionDefinition = {
+export const Zig: ActionDefinition = {
   verb: "zig",
   change: attempt => [["at", pawn, shouldBe, pawn.at == "rock" ? "paper" : "scissors"]],
 };
 
-const Zag: ActionDefinition = {
+export const Zag: ActionDefinition = {
   verb: "zag",
   change: attempt => [["at", pawn, shouldBe, pawn.at == "rock" ? "scissors" : "paper"]],
 };
 
-const Exiting: ActionDefinition = {
+export const Exiting: ActionDefinition = {
   verb: "exit",
   can: [attempt => (!door.isLocked ? can : weCouldTry(attempt.actor, Unlocking, door, undefined, attempt))],
   change: attempt => [["location", attempt.actor, shouldBe, "out"]],
 };
 
-const Waiting: ActionDefinition = {
+export const Waiting: ActionDefinition = {
   verb: "wait",
 };
 
-const Taking: ActionDefinition<Desireable> = {
+export const Taking: ActionDefinition<Desireable> = {
   verb: "take _",
   change: attempt => [
     ["owned", attempt.noun!, shouldBe, true],
@@ -88,7 +88,7 @@ const Taking: ActionDefinition<Desireable> = {
   ],
 };
 
-const Dropping: ActionDefinition = {
+export const Dropping: ActionDefinition = {
   verb: "drop _",
   change: attempt => [
     ["owned", attempt.noun!, shouldBe, false],
@@ -96,18 +96,18 @@ const Dropping: ActionDefinition = {
   ],
 };
 
-const Opening: ActionDefinition = {
+export const Opening: ActionDefinition = {
   verb: "open _",
   can: [attempt => ((attempt.noun as any)?.isLocked ? weCouldTry(attempt.actor, Unlocking, attempt.noun, undefined, attempt) : can)],
   change: attempt => [["isOpen", attempt.noun!, shouldBe, true]],
 };
 
-const Closing: ActionDefinition = {
+export const Closing: ActionDefinition = {
   verb: "close _",
   change: attempt => [["isOpen", attempt.noun!, shouldBe, false]],
 };
 
-const Unlocking: ActionDefinition = {
+export const Unlocking: ActionDefinition = {
   verb: "unlock _ with _",
   can: [
     // attempt => (attempt.secondNoun?.isKey ? can : weCouldTry(attempt.actor, Taking, attempt.secondNoun, undefined, attempt)),
@@ -115,7 +115,7 @@ const Unlocking: ActionDefinition = {
   change: attempt => [["isLocked", attempt.noun!, shouldBe, false]],
 };
 
-const Locking: ActionDefinition<Desireable, Desireable> = {
+export const Locking: ActionDefinition<Desireable, Desireable> = {
   verb: "lock _ with _",
   can: [
     // // second noun must be key
@@ -131,31 +131,31 @@ const Locking: ActionDefinition<Desireable, Desireable> = {
   change: attempt => [["isLocked", attempt.noun!, shouldBe, true]],
 };
 
-const AskingFor: ActionDefinition = {
+export const AskingFor: ActionDefinition = {
   verb: "ask _ for _",
 };
 
 /////////////////
 
-const Rose: Character = {
+export const Rose: Character = {
   name: "Rose",
   beliefs: [],
   goals: [createGoal(Exiting)],
 };
 
-const Zafra: Character = {
+export const Zafra: Character = {
   name: "Zafra",
   beliefs: [createBelief("isLocked", door, shouldBe, true)],
 };
 
 ////////////
 
-const storyStart: SceneType = {
+export const storyStart: SceneType = {
   match: ({ actor, definition }, story) => definition == Exiting && actor == Rose,
   beginning: () => "Rose wanted to escape the confines of her birth.",
 };
 
-const otherRose: SceneType = {
+export const otherRose: SceneType = {
   match: ({ actor, definition }, story) => actor == Rose,
   middle: async (texts, attempt, story, scene) => {
     let result: CanOrCantOrTryThese = cant;
@@ -170,7 +170,7 @@ const otherRose: SceneType = {
   },
 };
 
-const zLocking: SceneType = {
+export const zLocking: SceneType = {
   match: ({ actor, definition }, story) => {
     return definition == Locking && actor == Zafra;
   },
@@ -188,7 +188,7 @@ const zLocking: SceneType = {
   },
 };
 
-const weakDoor: SceneType = {
+export const weakDoor: SceneType = {
   match: ({ actor, definition, noun: news, secondNoun: belief }, story) =>
     definition == ReceivingImportantNews && actor == Zafra && (belief as ShouldBe).ofDesireable == door,
   beginning: () => "Zafra wonders how to reverse the change.",
@@ -211,7 +211,7 @@ spelling({ the: ["teh", "hte"], receiving: "receiveing", taking: "takeing" });
 
 ///////
 
-const narration = [
+export const narration = [
   [Rose, did, Exiting, speak, `"Finally, teh way is open. I'm free," said Rose.`],
   [Rose, trying, Exiting, speak, `"I'll have to find another way."`],
   [storyStart, begin, Rose, Exiting, `Scenic opening.`],

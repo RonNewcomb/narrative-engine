@@ -1,5 +1,5 @@
-import { selectPublishedFolder } from "./services/publish";
-import { useProject } from "./services/useProject";
+import { selectPublishedFolder } from "../services/publish";
+import { useProject } from "../services/useProject";
 
 export function PublishButton({ onError }: { onError: (msg?: string) => void }) {
   const project = useProject();

@@ -1,17 +1,17 @@
 import { useState } from "react";
 import { createRoot } from "react-dom/client";
+import { DarkMode } from "./components/buttons/dark-mode";
+import { SpeechToText } from "./components/buttons/microphone-button";
+import { MobileEditor } from "./components/buttons/mobile-editor-button";
+import { PlayButton } from "./components/buttons/play-button";
+import { PublishButton } from "./components/buttons/publish-button";
 import { CodeEditor } from "./components/column-editor";
 import { Planner } from "./components/column-planner";
 import { Player } from "./components/column-player";
-import { DarkMode } from "./components/dark-mode";
 import { ErrBar } from "./components/err-bar";
 import { FileOpenSave } from "./components/file-opensave";
 import { MirrorwayLogo } from "./components/MirrorwayLogo";
-import { MobileEditor } from "./components/mobile-editor";
-import { PlayButton } from "./components/play-button";
-import { PublishButton } from "./components/publish-button";
 import { Project, ProjectProvider, useProject } from "./components/services/useProject";
-import { SpeechToText } from "./components/speech-to-text";
 
 export function App() {
   return (

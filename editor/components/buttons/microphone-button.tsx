@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { speechToText } from "./speech-to-text";
+import { speechToText } from "../services/speech-to-text";
 
 function onEmit(speech: string) {
   if (!speech || !speech.trim()) return;

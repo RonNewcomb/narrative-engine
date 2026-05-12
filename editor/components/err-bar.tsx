@@ -1,12 +1,11 @@
-export function emptyErrbar() {
-  const footer = document.getElementsByTagName("footer")[0];
-  footer.innerHTML = ``;
-  footer.removeEventListener("click", emptyErrbar);
-}
+import { useState } from "react";
 
-export function renderErrbar(e?: string) {
-  if (!e) return emptyErrbar();
-  const footer = document.getElementsByTagName("footer")[0];
-  footer.innerHTML = `<button type='button' style='border:0'>${e}</button>`;
-  footer.addEventListener("click", emptyErrbar);
+export function ErrBar({ e }: { e?: string }) {
+  const [error, setError] = useState(e);
+  if (!e) return null;
+  return (
+    <button type="button" style={{ border: 0 }} onClick={() => setError(undefined)}>
+      ${error}
+    </button>
+  );
 }

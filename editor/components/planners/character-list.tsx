@@ -1,18 +1,10 @@
-export interface Resource {}
+import { useProject } from "../services/useProject";
 
-export interface Desireable extends Resource, Record<string | symbol, any> {
-  name: string;
-  number?: number;
-  owner?: Character;
-}
+export type Resource = string;
 
-export interface Topic extends Resource {
-  topic: string;
-}
-
-export interface ShouldBe extends Resource {
+export interface ShouldBe {
   property: string;
-  ofDesireable: Desireable;
+  ofDesireable: Resource;
   shouldBe: "should be" | "should NOT be";
   toValue: any | any[];
 }
@@ -20,7 +12,7 @@ export interface ShouldBe extends Resource {
 /** An action which has failed.  Attempts record which Check rule prevented the action and whether the action could or should be re-attempted later.
  *  For a re-attempt to be successful, certain pre-requisites need to be 'fulfilled' (a relation) by other actions, so the same Check rule doesn't
  *  simply stop the action again. */
-export interface Attempt extends Resource {
+export interface Attempt {
   verb: string;
   noun?: Resource;
   secondNoun?: Resource;
@@ -31,7 +23,7 @@ export interface Attempt extends Resource {
   //   consequences?: ConsequenceWithForeshadowedNewsProvingAgency[];
 }
 
-export interface Character extends Resource {
+export interface Character {
   name: string;
   beliefs: ShouldBe[];
   goals?: Attempt[];
@@ -48,54 +40,65 @@ const fields = [
   "internal conflicts",
 ];
 
-let characters: Character[] = [];
-
-export function setCharacters(ch?: Character[]) {
-  characters = ch ?? [];
-  render();
-}
-
 function goalsOf(goals: Character["goals"]) {
   return (
-    goals
-      ?.map(
-        attempt =>
-          `<div>${attempt.actor} ${attempt.verb} ${attempt.noun} ${attempt.secondNoun} ${attempt.status ? `(${attempt.status})` : ""}</div>`,
-      )
-      .join("") || ""
+    goals?.map(attempt => (
+      <div>
+        {attempt.actor.name} {attempt.verb} {attempt.noun} {attempt.secondNoun} {attempt.status ? `(${attempt.status})` : ""}
+      </div>
+    )) || []
   );
 }
 
 function beliefsOf(b: Character["beliefs"]) {
-  const retval = b.map(belief => `<div>${belief.property} of ${belief.ofDesireable} should ${belief.shouldBe} ${belief.toValue} </div>`);
+  const retval = b.map(belief => (
+    <div>
+      {belief.property} of {belief.ofDesireable} should {belief.shouldBe} {belief.toValue}
+    </div>
+  ));
   retval.unshift(
-    `<div><input name='property' value=""/> of <input name='ofDesireable' value=""/> should <select name='shouldBe' value=""><option>be</option><option>not be</option></select> <input name='toValue' value=""/></div>`,
+    <div>
+      <input name="property" value="" /> of <input name="ofDesireable" value="" /> should{" "}
+      <select name="shouldBe" value="">
+        <option>be</option>
+        <option>not be</option>
+      </select>{" "}
+      <input name="toValue" value="" />
+    </div>,
   );
-  return retval.join("");
+  return retval;
 }
 
 function piecesOf(ch: Character) {
-  const retval = fields.map(f => `<div>${f}: ${(ch as any)[f] ?? ""}</div>`);
-  retval.unshift(beliefsOf(ch.beliefs));
-  retval.unshift(goalsOf(ch.goals));
-  return retval.join("");
+  const retval = fields.map(f => (
+    <div>
+      {f}: {(ch as any)[f] ?? ""}
+    </div>
+  ));
+  retval.unshift(...beliefsOf(ch.beliefs));
+  retval.unshift(...goalsOf(ch.goals));
+  return retval;
 }
 
-export function render() {
-  const elements = document.getElementsByTagName("character-list");
+export function CharacterList() {
+  const project = useProject();
+  const characters = project?.project?.record.characters || [];
 
-  for (const el of elements) {
-    el.innerHTML =
-      `
-<style>
+  return (
+    <character-list>
+      <style>{`
     character-list { display: block }
     character-list .indent { margin-left: 1em }
-</style>
-<details>
-<summary>🎭 Characters</summary>
-` +
-      characters.map(c => `<details class="indent"><summary>${c.name}</summary><div>${piecesOf(c)}</div></details>`).join("") +
-      `</details>
-        `;
-  }
+    `}</style>
+      <details>
+        <summary>🎭 Characters</summary>
+        {characters.map(c => (
+          <details className="indent">
+            <summary>{c.name}</summary>
+            <div>{piecesOf(c)}</div>
+          </details>
+        ))}
+      </details>
+    </character-list>
+  );
 }

@@ -1,13 +1,15 @@
 import type { iFictionRecord } from "../publisher/iFictionRecord";
-import { renderErrbar } from "./err-bar";
-import { getFreshIntficRecord, getIntficRecord, render as renderIntficRecord, setIntficRecord } from "./planners/intfic-record";
+//import { getFreshIntficRecord, getIntficRecord, render as renderIntficRecord, setIntficRecord } from "./planners/intfic-record";
 
 export async function newProject(): Promise<
-  { sourceFile: FileSystemFileHandle; dirHandle: FileSystemDirectoryHandle; initialText: string } | void | undefined
+  | { record: iFictionRecord; sourceFile: FileSystemFileHandle; dirHandle: FileSystemDirectoryHandle; initialText: string }
+  | void
+  | undefined
+  | string
 > {
   const dirHandle = await window.showDirectoryPicker();
   const shouldntExist = await dirHandle.getFileHandle("about.json", { create: false }).catch(() => undefined);
-  if (shouldntExist) return renderErrbar("Sorry, but this folder already has a project in it. Please choose a different, or new, folder.");
+  if (shouldntExist) return "Sorry, but this folder already has a project in it. Please choose a different, or new, folder.";
 
   async function writeFileSync(filename: string, contents: string) {
     const fileHandle = await dirHandle.getFileHandle(filename, { create: true });
@@ -26,9 +28,7 @@ export async function newProject(): Promise<
   await writeFileSync("about.json", JSON.stringify(record, undefined, 2));
   const sourceFile = await writeFileSync(record.filename, initialText);
 
-  // commit
-  setIntficRecord(record);
-  return { sourceFile, dirHandle, initialText };
+  return { record, sourceFile, dirHandle, initialText };
 }
 
 async function showNewProjectDialog(): Promise<0 | iFictionRecord> {

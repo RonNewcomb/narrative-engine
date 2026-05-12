@@ -1,25 +1,29 @@
-const chapters = [{ scenes: ["scene 1"] }];
+import { useProject } from "../services/useProject";
 
-function scenesOf(ch: { scenes: string[] }) {
-  return ch.scenes.map(c => `<details class="indent"><summary>📈 ${c}</summary>${c}: </details>`).join("");
-}
+export function ChaptersScenes() {
+  const project = useProject();
+  const chapters = project?.project?.record.chapters || [];
 
-export function render() {
-  const elements = document.getElementsByTagName("chapters-scenes");
-
-  const cs = chapters.map(c => `<details class="indent"><summary>📒 Chapter:</summary>${scenesOf(c)}</details>`).join("");
-
-  for (const el of elements) {
-    el.innerHTML =
-      `
-<style>
+  return (
+    <chapters-scenes>
+      <style>{`
     chapters-scenes { display: block }
     chapters-scenes .indent { margin-left: 1em; }
     chapters-scenes .indent .indent { margin-left: 1em; }
-</style>
-<details>
-  <summary>📕 Manuscript</summary>` +
-      cs +
-      `</details>`;
-  }
+`}</style>
+      <details>
+        <summary>📕 Manuscript</summary>
+        {chapters.map(chapter => (
+          <details className="indent">
+            <summary>📒 Chapter:</summary>
+            {chapter.scenes.map(scene => (
+              <details className="indent">
+                <summary>📈 ${scene}</summary>${scene}:
+              </details>
+            ))}
+          </details>
+        ))}
+      </details>
+    </chapters-scenes>
+  );
 }

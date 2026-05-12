@@ -1,74 +1,49 @@
 import bjson from "../../publisher/about.json";
 import type { iFictionRecord } from "../../publisher/iFictionRecord";
-
-document.addEventListener("DOMContentLoaded", () => render());
-
-let biblio = bjson as iFictionRecord;
+import { useProject } from "../services/useProject";
 
 export function getFreshIntficRecord(): iFictionRecord {
   return { ...bjson } as iFictionRecord;
 }
 
-export function newIntficRecord(): iFictionRecord {
-  biblio = getFreshIntficRecord();
-  render(true, biblio.story.bibliographic);
-  return biblio;
-}
-
-export function getIntficRecord(): iFictionRecord {
-  return biblio;
-}
-
-export function setIntficRecord(r: iFictionRecord) {
-  biblio = r;
-  render(false, biblio.story.bibliographic);
-}
-
-(window as any).biblio = {
-  updatefield(key: string, value: string) {
-    setValue(key, biblio.story.bibliographic, value);
-    // console.log({ key, value });
-    // render();
-  },
-};
-let isRendering = false;
-
-export function render(open = true, bib?: BiblioInfo) {
-  if (!bib) bib = biblio.story.bibliographic;
-  if (!bib) {
-    const els = document.getElementsByTagName("intfic-record");
-    for (const el of els) el.innerHTML = "";
-  }
-  const fields = keys.map(
-    key => `
-      <div style="text-align:right;text-transform:capitalize">
-        ${key}: 
-        <input 
-          type="text" 
-          name="${key}" 
-          value='${getValue(key, bib) || ""}' 
-          onchange="biblio.updatefield('${key}', this.value)"
-          style="width:16em"
-          />
-      </div>`,
+export function IntficRecord({ open = true }: { open?: boolean }) {
+  const project = useProject();
+  const biblio = project?.project?.record;
+  if (!biblio) return <intfic-record></intfic-record>;
+  const bib = biblio.story.bibliographic;
+  const fields = keys.map(key => (
+    <div style={{ textAlign: "right", textTransform: "capitalize" }}>
+      {key}:
+      <input
+        type="text"
+        name={key}
+        value={getValue(key, bib)}
+        onChange={e => setValue(key, bib, e.target.value)}
+        style={{ width: "16em" }}
+      />
+    </div>
+  ));
+  return (
+    <intfic-record>
+      <details style={{ fontSize: "smaller" }} open={open}>
+        <summary>
+          {bib.title} by {bib.author}{" "}
+        </summary>
+        <div>{fields.join("")}</div>
+      </details>
+    </intfic-record>
   );
-  const txt = `
-    <details ${open && "open"} style='font-size: smaller'>
-      <summary> ${bib.title} by ${bib.author} </summary>
-      <div>${fields.join("")}</div>
-    </details>
-`;
 
-  const els = document.getElementsByTagName("intfic-record");
-  for (const el of els) {
-    el.innerHTML = txt;
-    el.children[0].addEventListener("toggle", e => {
-      if ((e.target as HTMLDetailsElement)?.open || isRendering) return;
-      isRendering = true;
-      render(false);
-      isRendering = false;
-    });
-  }
+  // const els = document.getElementsByTagName("intfic-record");
+  // for (const el of els) {
+  //   el.innerHTML = txt;
+  //   el.children[0].addEventListener("toggle", e => {
+  //     if ((e.target as HTMLDetailsElement)?.open || isRendering) return;
+  //     isRendering = true;
+  //     render(false);
+  //     isRendering = false;
+  //   });
+  // }
 }
 
 const keys = [
@@ -88,10 +63,10 @@ const keys = [
 
 type BiblioInfo = iFictionRecord["story"]["bibliographic"];
 
-function getValue(key: string, obj: BiblioInfo) {
-  if (key == "url") return obj.contacts?.url;
-  if (key == "authoremail") return obj.contacts?.authoremail;
-  return obj[key as keyof BiblioInfo];
+function getValue(key: string, obj: BiblioInfo): string {
+  if (key == "url") return obj.contacts?.url || "";
+  if (key == "authoremail") return obj.contacts?.authoremail || "";
+  return (obj as any)[key] || "";
 }
 
 function setValue(key: string, obj: BiblioInfo, val: string) {

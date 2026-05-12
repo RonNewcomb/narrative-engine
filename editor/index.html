@@ -5,28 +5,12 @@
     <script src="./index.ts" type="module"></script>
   </head>
   <body>
-    <header>
-      <mirrorway-logo> Mirrorway </mirrorway-logo>
-      <file-opensave></file-opensave>
-      <div class="action-row">
-        <mobile-editor></mobile-editor>
-        <play-button></play-button>
-        <publish-button></publish-button>
-        <speech-to-text></speech-to-text>
-        <dark-mode></dark-mode>
-      </div>
-    </header>
-    <main>
-      <div id="plannr"></div>
-      <div id="editor"></div>
-      <div id="player"></div>
-    </main>
+    <mirrorway-app></mirrorway-app>
     <script>
       if (window.self !== window.top) {
         document.documentElement.innerHTML = "";
         document.body.innerHTML = "Please build the app first.";
       }
     </script>
-    <footer></footer>
   </body>
 </html>

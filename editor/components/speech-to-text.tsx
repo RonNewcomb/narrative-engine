@@ -1,3 +1,5 @@
+import { useEffect, useRef, useState } from "react";
+
 const pulseCSS = `
 .pulse {
   animation: pulse 1s infinite;
@@ -20,34 +22,71 @@ speech-to-text {
   display: inline-block;
 }`;
 
-const icon = `
-<button type="button" style="border:0" aria-label="toggle speech-to-writing mode" title="toggle speech-to-writing mode">
-  <svg fill="#000000" width="24px" height="24px" viewBox="-3 0 19 19" xmlns="http://www.w3.org/2000/svg" class="cf-icon-svg">
-    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-    <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-    <g id="SVGRepo_iconCarrier">
-      <path d="M11.665 7.915v1.31a5.257 5.257 0 0 1-1.514 3.694 5.174 5.174 0 0 1-1.641 1.126 5.04 5.04 0 0 1-1.456.384v1.899h2.312a.554.554 0 0 1 0 1.108H3.634a.554.554 0 0 1 0-1.108h2.312v-1.899a5.045 5.045 0 0 1-1.456-.384 5.174 5.174 0 0 1-1.641-1.126 5.257 5.257 0 0 1-1.514-3.695v-1.31a.554.554 0 1 1 1.109 0v1.31a4.131 4.131 0 0 0 1.195 2.917 3.989 3.989 0 0 0 5.722 0 4.133 4.133 0 0 0 1.195-2.917v-1.31a.554.554 0 1 1 1.109 0zM3.77 10.37a2.875 2.875 0 0 1-.233-1.146V4.738A2.905 2.905 0 0 1 3.77 3.58a3 3 0 0 1 1.59-1.59 2.902 2.902 0 0 1 1.158-.233 2.865 2.865 0 0 1 1.152.233 2.977 2.977 0 0 1 1.793 2.748l-.012 4.487a2.958 2.958 0 0 1-.856 2.09 3.025 3.025 0 0 1-.937.634 2.865 2.865 0 0 1-1.152.233 2.905 2.905 0 0 1-1.158-.233A2.957 2.957 0 0 1 3.77 10.37z">
-      </path>
-    </g>
-  </svg>
-</button>`;
+const style = document.createElement("style");
+style.id = "speech-to-text";
+style.innerHTML = pulseCSS;
+document.head.appendChild(style);
 
-export function initSpeech2Text(onEmit: (text: string) => void) {
-  const style = document.createElement("style");
-  style.id = "speech-to-text";
-  style.innerHTML = pulseCSS;
-  document.head.appendChild(style);
-
-  const el = document.getElementsByTagName("speech-to-text")[0];
-  el.innerHTML = icon;
-
-  const handlers = speechToText({
-    onStart: () => el.classList.add("pulse"),
-    onStop: () => el.classList.remove("pulse"),
-    onChange: onEmit,
+function onEmit(speech: string) {
+  if (!speech || !speech.trim()) return;
+  const text = " " + speech;
+  const cursor = window.view.state.selection.main.head; // Get current cursor position
+  window.view.dispatch({
+    changes: {
+      from: cursor,
+      to: cursor, // 'from' and 'to' being the same means it's an insertion
+      insert: text,
+    },
+    // Optional: move cursor to the end of the inserted text
+    selection: { anchor: cursor + text.length },
+    scrollIntoView: true,
   });
-  if (handlers) el.addEventListener("click", handlers.onToggle);
 }
+
+export function SpeechToText() {
+  const ref = useRef<HTMLButtonElement>(null);
+  const [live, setLive] = useState(false);
+  const [toggler, setToggler] = useState<Function>(() => () => 0);
+
+  useEffect(() => {
+    const handlers = speechToText({
+      onStart: () => setLive(true),
+      onStop: () => setLive(false),
+      onChange: onEmit,
+    });
+    if (handlers?.onToggle) setToggler(handlers.onToggle);
+  }, [ref.current, onEmit]);
+
+  return (
+    <speech-to-text>
+      <button
+        onClick={() => toggler()}
+        type="button"
+        className={live ? "pulse" : ""}
+        style={{ border: 0 }}
+        aria-label="toggle speech-to-writing mode"
+        title="toggle speech-to-writing mode"
+      >
+        <svg fill="#000000" width="24px" height="24px" viewBox="-3 0 19 19" xmlns="http://www.w3.org/2000/svg" className="cf-icon-svg">
+          <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+          <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+          <g id="SVGRepo_iconCarrier">
+            <path d="M11.665 7.915v1.31a5.257 5.257 0 0 1-1.514 3.694 5.174 5.174 0 0 1-1.641 1.126 5.04 5.04 0 0 1-1.456.384v1.899h2.312a.554.554 0 0 1 0 1.108H3.634a.554.554 0 0 1 0-1.108h2.312v-1.899a5.045 5.045 0 0 1-1.456-.384 5.174 5.174 0 0 1-1.641-1.126 5.257 5.257 0 0 1-1.514-3.695v-1.31a.554.554 0 1 1 1.109 0v1.31a4.131 4.131 0 0 0 1.195 2.917 3.989 3.989 0 0 0 5.722 0 4.133 4.133 0 0 0 1.195-2.917v-1.31a.554.554 0 1 1 1.109 0zM3.77 10.37a2.875 2.875 0 0 1-.233-1.146V4.738A2.905 2.905 0 0 1 3.77 3.58a3 3 0 0 1 1.59-1.59 2.902 2.902 0 0 1 1.158-.233 2.865 2.865 0 0 1 1.152.233 2.977 2.977 0 0 1 1.793 2.748l-.012 4.487a2.958 2.958 0 0 1-.856 2.09 3.025 3.025 0 0 1-.937.634 2.865 2.865 0 0 1-1.152.233 2.905 2.905 0 0 1-1.158-.233A2.957 2.957 0 0 1 3.77 10.37z"></path>
+          </g>
+        </svg>
+      </button>
+    </speech-to-text>
+  );
+}
+
+// export function initSpeech2Text(onEmit: (text: string) => void) {
+//   const handlers = speechToText({
+//     onStart: () => el.classList.add("pulse"),
+//     onStop: () => el.classList.remove("pulse"),
+//     onChange: onEmit,
+//   });
+//   if (handlers) el.addEventListener("click", handlers.onToggle);
+// }
 
 interface ISpeechToText {
   onStart?: () => void;

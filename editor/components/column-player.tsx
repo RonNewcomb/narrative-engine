@@ -1,6 +1,15 @@
+import { useRef } from "react";
 import { parse, SyntaxError } from "../publisher/parser.js";
-import { renderErrbar } from "./err-bar.js";
-import { underlineError } from "./underline.js";
+import { underlineError } from "./services/underline";
+
+export function Player({ src = "/runtime/index.html" }: { src?: string }) {
+  const ref = useRef<HTMLIFrameElement>(null);
+  return (
+    <player-frame>
+      <iframe id="player-frame" ref={ref} src={src} width="100%" height="100%"></iframe>
+    </player-frame>
+  );
+}
 
 export function play(source: string) {
   const playerWindow = (document.getElementById("player-frame")! as HTMLIFrameElement).contentWindow as Window;
@@ -25,10 +34,6 @@ export function play(source: string) {
   }
 }
 
-export function playPublished(url: string) {
-  render(url);
-}
-
 interface PeggySyntaxError {
   name: "SyntaxError";
   expected: { type: string }[];
@@ -39,9 +44,3 @@ interface PeggySyntaxError {
     end: { offset: number; line: number; column: number };
   };
 }
-
-function render(src: string = "/runtime/index.html") {
-  document.getElementById("player")!.innerHTML = `<iframe id="player-frame" src="${src}" width="100%" height="100%"></iframe>`;
-}
-
-document.addEventListener("DOMContentLoaded", () => render());

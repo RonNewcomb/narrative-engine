@@ -50,4 +50,3 @@ export function underlineError(from?: number, to?: number) {
   window.view.dispatch({ effects });
   return true;
 }
-window.underlineError = underlineError;

@@ -1,14 +1,35 @@
 import { selectPublishedFolder } from "../publisher/publish";
-import { getFilename } from "./file-opensave";
+import { getFilename } from "./services/project";
 
-function render() {
-  const els = document.getElementsByTagName("publish-button");
-  for (const el of els) {
-    el.innerHTML = `
-<button type='button' style="border:0" aria-label="Compile the work so its ready for distribution" title="Compile the work so its ready for distribution">
-  <svg fill="#000000" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
-    width="24px" height="24px" viewBox="0 0 335.08 335.079">
-      <path d="M311.175,115.775c-1.355-10.186-1.546-27.73,7.915-33.621c0.169-0.108,0.295-0.264,0.443-0.398
+export function PublishButton() {
+  async function publish() {
+    console.log("Publish button clicked");
+    const filename = getFilename();
+    const content = window.view.state.doc.toString();
+    const url = await selectPublishedFolder(filename, content);
+    //playPublished(url);
+  }
+
+  return (
+    <publish-button>
+      <button
+        type="button"
+        onClick={publish}
+        style={{ border: 0 }}
+        aria-label="Compile the work so its ready for distribution"
+        title="Compile the work so its ready for distribution"
+      >
+        <svg
+          fill="#000000"
+          version="1.1"
+          id="Capa_1"
+          xmlns="http://www.w3.org/2000/svg"
+          width="24px"
+          height="24px"
+          viewBox="0 0 335.08 335.079"
+        >
+          <path
+            d="M311.175,115.775c-1.355-10.186-1.546-27.73,7.915-33.621c0.169-0.108,0.295-0.264,0.443-0.398
         c7.735-2.474,13.088-5.946,8.886-10.618l-114.102-34.38L29.56,62.445c0,0-21.157,3.024-19.267,35.894
         c1.026,17.89,6.637,26.676,11.544,31l-15.161,4.569c-4.208,4.672,1.144,8.145,8.88,10.615c0.147,0.138,0.271,0.293,0.443,0.401
         c9.455,5.896,9.273,23.438,7.913,33.626c-33.967,9.645-21.774,12.788-21.774,12.788l7.451,1.803
@@ -27,19 +48,10 @@ function render() {
         c0.185,1.804,0.391,3.443,0.591,4.693l-147.812,36.771l1.292-40.01l31.601-6.497l4.667,1.129l17.492-5.685l80.631-16.569
         l15.457-3.18C293.261,219.146,293.466,231.517,294.284,239.459z M302.426,185.084c-0.269,0.006-0.538,0.042-0.791,0.122
         l-11.148,3.121l-106.148,29.764l-1.298-40.289l34.826-11.359l84.327-27.501c0.011-0.005,4.436-0.988,7.684,2.315
-        c3.144,3.214,4.704,9.537,4.52,18.28C313.848,184.035,302.827,185.053,302.426,185.084z"/>
-  </svg>
-  </button>`;
-    el.addEventListener("click", publish);
-  }
+        c3.144,3.214,4.704,9.537,4.52,18.28C313.848,184.035,302.827,185.053,302.426,185.084z"
+          />
+        </svg>
+      </button>
+    </publish-button>
+  );
 }
-
-async function publish() {
-  console.log("Publish button clicked");
-  const filename = getFilename();
-  const content = window.view.state.doc.toString();
-  const url = await selectPublishedFolder(filename, content);
-  //playPublished(url);
-}
-
-document.addEventListener("DOMContentLoaded", () => render());

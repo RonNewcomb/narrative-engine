@@ -1,10 +1,3 @@
-export function toggleDarkMode() {
-  const el = document.getElementById("darkmode")! as HTMLStyleElement;
-  el.disabled = !el.disabled;
-  localStorage.setItem("dark-mode", (!el.disabled).toString());
-}
-window.toggleDarkMode = toggleDarkMode;
-
 const darkCSS = `
 html {
   filter: invert(1) hue-rotate(180deg);
@@ -30,18 +23,20 @@ const icon = `
   </svg>
 </button>`;
 
-function render() {
-  const darkStyle = document.createElement("style");
-  darkStyle.id = "darkmode";
-  darkStyle.innerHTML = darkCSS;
-  document.head.appendChild(darkStyle);
+const darkStyle = document.createElement("style");
+darkStyle.id = "darkmode";
+darkStyle.innerHTML = darkCSS;
+document.head.appendChild(darkStyle);
 
-  const mode = localStorage.getItem("dark-mode");
-  if (mode === null) if (!window.matchMedia("(prefers-color-scheme: dark)").matches) toggleDarkMode();
-  if (mode == "false") toggleDarkMode();
-
-  const elements = document.getElementsByTagName("dark-mode");
-  for (const el of elements) el.innerHTML = icon;
+function toggleDarkMode() {
+  darkStyle.disabled = !darkStyle.disabled;
+  localStorage.setItem("dark-mode", (!darkStyle.disabled).toString());
 }
 
-document.addEventListener("DOMContentLoaded", () => render());
+const mode = localStorage.getItem("dark-mode");
+if (mode === null) if (!window.matchMedia("(prefers-color-scheme: dark)").matches) toggleDarkMode();
+if (mode == "false") toggleDarkMode();
+
+export function DarkMode() {
+  return <dark-mode onClick={toggleDarkMode}>{icon}</dark-mode>;
+}

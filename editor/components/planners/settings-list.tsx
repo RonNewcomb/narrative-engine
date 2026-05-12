@@ -1,3 +1,5 @@
+import { useProject } from "../services/useProject";
+
 export interface Place {
   name: string;
 }
@@ -15,29 +17,34 @@ const fields = [
 ];
 
 function piecesOf(pl: Place) {
-  const retval = fields.map(f => `<div>${f}: ${(pl as any)[f] ?? ""}</div>`);
+  const retval = fields.map(f => (
+    <div>
+      ${f}: ${(pl as any)[f] ?? ""}
+    </div>
+  ));
   // retval.unshift(pl.name);
-  return retval.join("");
+  return retval;
 }
 
-let places: Place[] = [];
+export function SettingsList() {
+  const project = useProject();
+  const places = project?.project?.record.places || [];
 
-export function setPlaces(pl?: Place[]) {
-  places = pl ?? [];
-  render();
-}
-
-export function render() {
-  const elements = document.getElementsByTagName("settings-list");
-  for (const el of elements) {
-    el.innerHTML =
-      `
-<style>
+  return (
+    <settings-list>
+      <style>{`
     settings-list { display: block }
     settings-list .indent { margin-left: 1em }
-</style><details>
-<summary>🗺️ Settings</summary>` +
-      places.map(c => `<details class="indent"><summary>${c.name}</summary><div>${piecesOf(c)}</div></details>`).join("") +
-      `</details>`;
-  }
+`}</style>
+      <details>
+        <summary>🗺️ Settings</summary>
+        {places.map(c => (
+          <details className="indent">
+            <summary>${c.name}</summary>
+            <div>${piecesOf(c)}</div>
+          </details>
+        ))}
+      </details>
+    </settings-list>
+  );
 }

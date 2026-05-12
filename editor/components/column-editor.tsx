@@ -6,8 +6,7 @@ import { EditorState, Extension } from "@codemirror/state";
 import { drawSelection, dropCursor, EditorView, highlightSpecialChars, KeyBinding, keymap } from "@codemirror/view";
 import { tags } from "@lezer/highlight";
 import { System3Mirrorways } from "../language-plugin/dist/index";
-import { saveFile } from "./file-opensave";
-import { mobileSync } from "./remote-sync";
+import { saveFile } from "./services/project";
 
 const mirrorwaysStyle = HighlightStyle.define([
   { tag: tags.comment, color: "gold" },
@@ -35,7 +34,7 @@ const getExtensions = (room?: string, content?: string): Extension => [
   // System3Mirrorways language support
   System3Mirrorways(),
   // remote sync with mobile
-  mobileSync(room, content),
+  //mobileSync(room, content),
   // A gutter with code folding markers
   foldGutter(),
   // Replace non-printable characters with placeholders
@@ -98,3 +97,7 @@ window.view = new EditorView({
   parent: document.getElementById("editor")!,
   extensions: getExtensions(undefined, initialText),
 });
+
+export function CodeEditor() {
+  return <code-editor></code-editor>;
+}

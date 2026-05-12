@@ -1,8 +1,7 @@
-import { iFictionRecord } from "../publisher/iFictionRecord";
-import { closeProject, loadFile, newFile, saveFile } from "./services/project";
-import { useProject } from "./services/useProject";
+import { closeProject, loadProject, newProject, saveFile } from "./services/project";
+import { Project, useProject } from "./services/useProject";
 
-export async function FileOpenSave({
+export function FileOpenSave({
   onSave,
   onNew,
   onLoad,
@@ -10,25 +9,20 @@ export async function FileOpenSave({
   onError,
 }: {
   onSave?: (e?: { detail: string }) => void;
-  onNew?: (about: {
-    record: iFictionRecord;
-    sourceFile: FileSystemFileHandle;
-    dirHandle: FileSystemDirectoryHandle;
-    initialText: string;
-    detail: string;
-  }) => void;
+  onNew?: (project: Project) => void;
   onError?: (msg: string) => void;
-  onLoad?: (e?: { detail: string }) => void;
+  onLoad?: (project: Project) => void;
   onClose?: (e?: { detail: string }) => void;
 }) {
-  const project = useProject();
-  const filename = project?.project?.record.filename;
+  const { project, setProject } = useProject();
+  const filename = project?.record.filename;
 
   const handleNew = async () => {
-    const x = await newFile();
-    if (!x) return;
-    if (typeof x === "string") onError?.(x);
-    else onNew?.(x);
+    const project = await newProject();
+    if (!project) return;
+    if (typeof project === "string") return onError?.(project);
+    setProject(project);
+    onNew?.(project);
   };
 
   const handleSave = async () => {
@@ -38,10 +32,11 @@ export async function FileOpenSave({
   };
 
   const handleLoad = async () => {
-    const x = await loadFile();
-    if (!x) return;
-    if (typeof x === "string") onError?.(x);
-    else onLoad?.(x);
+    const project = await loadProject();
+    if (!project) return;
+    if (typeof project === "string") return onError?.(project);
+    setProject(project);
+    onLoad?.(project);
   };
 
   const handleClose = async () => {

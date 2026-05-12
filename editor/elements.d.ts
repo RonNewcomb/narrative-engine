@@ -7,9 +7,8 @@ declare module "react" {
       "dark-mode": DetailedHTMLProps<HTMLAttributes<HTMLElement>, HTMLElement>;
       "publish-button": DetailedHTMLProps<HTMLAttributes<HTMLElement>, HTMLElement>;
       "play-button": DetailedHTMLProps<HTMLAttributes<HTMLElement>, HTMLElement>;
-      player: DetailedHTMLProps<HTMLAttributes<HTMLElement>, HTMLElement>;
       "code-editor": DetailedHTMLProps<HTMLAttributes<HTMLElement>, HTMLElement>;
-      planner: DetailedHTMLProps<HTMLAttributes<HTMLElement>, HTMLElement>;
+      "scene-planner": DetailedHTMLProps<HTMLAttributes<HTMLElement>, HTMLElement>;
       "intfic-record": DetailedHTMLProps<HTMLAttributes<HTMLElement>, HTMLElement>;
       "mobile-editor": DetailedHTMLProps<HTMLAttributes<HTMLElement>, HTMLElement>;
       "speech-to-text": DetailedHTMLProps<HTMLAttributes<HTMLElement>, HTMLElement>;

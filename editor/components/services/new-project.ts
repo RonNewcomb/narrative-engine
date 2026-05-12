@@ -1,17 +1,13 @@
-import type { iFictionRecord } from "../../publisher/iFictionRecord";
 import { showNewProjectDialog } from "../modals/NewProjectModal";
+import { Project } from "./useProject";
 
-export async function newProject(): Promise<
-  | { record: iFictionRecord; sourceFile: FileSystemFileHandle; dirHandle: FileSystemDirectoryHandle; initialText: string }
-  | undefined
-  | string
-> {
-  const dirHandle = await (window as any).showDirectoryPicker();
-  const shouldntExist = await dirHandle.getFileHandle("about.json", { create: false }).catch(() => undefined);
+export async function createProject(): Promise<Project | string> {
+  const topFolder = await (window as any).showDirectoryPicker();
+  const shouldntExist = await topFolder.getFileHandle("about.json", { create: false }).catch(() => undefined);
   if (shouldntExist) return "Sorry, but this folder already has a project in it. Please choose a different, or new, folder.";
 
   async function writeFileSync(filename: string, contents: string) {
-    const fileHandle = await dirHandle.getFileHandle(filename, { create: true });
+    const fileHandle = await topFolder.getFileHandle(filename, { create: true });
     const writable = await fileHandle.createWritable();
     await writable.write(contents);
     await writable.close();
@@ -19,7 +15,7 @@ export async function newProject(): Promise<
   }
 
   const record = await showNewProjectDialog();
-  if (!record) return;
+  if (!record) return "Cancelled.";
   const filename = makeFilesystemSafeName(record.story.bibliographic.title || "intfic");
   record.filename = filename + ".txt";
   record.story.identification.ifid = [crypto.randomUUID().toUpperCase()];
@@ -27,7 +23,7 @@ export async function newProject(): Promise<
   await writeFileSync("about.json", JSON.stringify(record, undefined, 2));
   const sourceFile = await writeFileSync(record.filename, initialText);
 
-  return { record, sourceFile, dirHandle, initialText };
+  return { record, sourceFile, topFolder, initialText };
 }
 
 export function makeFilesystemSafeName(

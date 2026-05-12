@@ -1,4 +1,4 @@
-import { JSX } from "react";
+import { useMemo, useState } from "react";
 
 let folder: FileSystemDirectoryHandle | undefined;
 
@@ -6,41 +6,64 @@ export function clear() {
   folder = undefined;
 }
 
-export async function OtherFiles({ folder: folderHandle }: { folder?: FileSystemDirectoryHandle }) {
+export function OtherFiles({ folder: folderHandle }: { folder?: FileSystemDirectoryHandle }) {
   folder = folderHandle || folder;
-  return <other-files>{folderHandle && <OtherFilesRecurse folder={folderHandle} />}</other-files>;
+  const [nodes, setNodes] = useState<FileTree[]>([]);
+  useMemo(() => folder && walkFolders(folder).then(setNodes), [folder]);
+
+  if (!folder || !nodes || nodes.length == 0) return <other-files></other-files>;
+  return (
+    <other-files>
+      <OtherFilesRecurse nodes={nodes} />
+    </other-files>
+  );
 }
 
-export async function OtherFilesRecurse({ folder }: { folder: FileSystemDirectoryHandle }) {
-  if (!folder) return "";
+export function OtherFilesRecurse({ nodes }: { nodes: FileTree[] }) {
+  return nodes.map(node => <OneOtherFile key={node.key} node={node} />);
+}
 
-  const nodes: JSX.Element[] = [];
+export function OneOtherFile({ node }: { node: FileTree }) {
+  switch (node.type) {
+    case "file":
+      return (
+        <div>
+          <a onClick={() => openInTab(node.key)}>{node.key}</a>
+        </div>
+      );
+    case "folder":
+      return (
+        <details>
+          <summary> {node.key} </summary>
+          <OtherFilesRecurse nodes={node.nodes || []} />
+        </details>
+      );
+  }
+}
 
+interface FileTree {
+  type: "folder" | "file";
+  key: string;
+  value: FileSystemDirectoryHandle | FileSystemFileHandle;
+  nodes?: FileTree[];
+}
+
+async function walkFolders(folder: FileSystemDirectoryHandle): Promise<FileTree[]> {
+  let nodes: FileTree[] = [];
   for await (const [key, value] of (folder as any).entries()) {
-    if (key !== "about.json") {
-      console.log({ key, value });
+    if (key === "about.json") continue;
+    console.log({ key, value });
 
-      switch (value.kind) {
-        case "directory":
-          nodes.push(
-            <details>
-              <summary>${key}</summary>
-              <OtherFilesRecurse folder={value as FileSystemDirectoryHandle} />
-            </details>,
-          );
-          break;
-        case "file":
-          nodes.push(
-            <div>
-              <a onClick={() => openInTab(key)}>${key}</a>
-            </div>,
-          );
-          break;
-      }
+    switch (value.kind) {
+      case "directory":
+        nodes.push({ type: "folder", key, value, nodes: await walkFolders(value) });
+        break;
+      case "file":
+        nodes.push({ type: "file", key, value });
+        break;
     }
   }
-
-  return <>{nodes}</>;
+  return nodes;
 }
 
 function openInTab(key: string) {

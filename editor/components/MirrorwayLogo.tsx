@@ -1,3 +1,3 @@
 export function MirrorwayLogo() {
-  return <mirrorway-logo></mirrorway-logo>;
+  return <mirrorway-logo> Mirrorway </mirrorway-logo>;
 }

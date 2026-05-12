@@ -1,6 +1,7 @@
 import type { iFictionRecord } from "../../publisher/iFictionRecord";
 import { newDocument } from "../column-editor";
-import { newProject } from "./new-project";
+import { createProject } from "./new-project";
+import { Project } from "./useProject";
 
 let filename = "";
 let fileHandle: FileSystemFileHandle | undefined;
@@ -14,45 +15,45 @@ export function closeProject() {
   location.reload();
 }
 
-export async function newFile() {
-  const about = await newProject();
+export async function newProject(): Promise<Project | string> {
+  const about = await createProject();
   if (typeof about === "string") return about;
-  if (!about || !about.dirHandle || !about.sourceFile) return;
+  if (!about || !about.topFolder || !about.sourceFile) return "Failed to create new project";
 
-  folderHandle = about.dirHandle;
+  folderHandle = about.topFolder;
   fileHandle = about.sourceFile;
   filename = fileHandle.name;
   newDocument(about.initialText, filename);
-  return { detail: about.initialText, ...about };
+  return about;
 }
 
-export async function loadFile() {
-  const fh = await window.showDirectoryPicker().catch(() => undefined);
-  if (!fh) return;
-  const biblioHandle = await fh.getFileHandle("about.json").catch(() => undefined);
+export async function loadProject(): Promise<Project | string> {
+  const topFolder = await window.showDirectoryPicker().catch(() => undefined);
+  if (!topFolder) return "Cancelled.";
+  const biblioHandle = await topFolder.getFileHandle("about.json").catch(() => undefined);
   if (!biblioHandle) return 'I could not find a file named "about.json" in that folder.';
-  const biblio = await biblioHandle
+  const record = await biblioHandle
     .getFile()
     .then(x => x.text())
     .then(x => JSON.parse(x) as iFictionRecord);
-  if (!biblio) return "I could not make sense of the contents of file about.json";
-  if (!biblio.filename) return "No source filename listed in bibliographic info. Which file has your writing?";
-  const sh = await fh.getFileHandle(biblio.filename).catch(() => undefined);
-  if (!sh) return "I couldn't find or open file " + biblio.filename + " in that folder.";
-  const content = await sh
+  if (!record) return "I could not make sense of the contents of file about.json";
+  if (!record.filename) return "No source filename listed in bibliographic info. Which file has your writing?";
+  const sourceFile = await topFolder.getFileHandle(record.filename).catch(() => undefined);
+  if (!sourceFile) return "I couldn't find or open file " + record.filename + " in that folder.";
+  const initialText = await sourceFile
     .getFile()
     .then(x => x.text())
     .then(x => x || "")
     .catch(() => undefined);
-  if (!content) return "I couldn't load anything from the source file. Is it supposed to be empty?";
+  if (!initialText) return "I couldn't load anything from the source file. Is it supposed to be empty?";
 
   // commit
-  folderHandle = fh;
-  fileHandle = sh;
+  folderHandle = topFolder;
+  fileHandle = sourceFile;
   filename = fileHandle.name;
-  console.log({ biblio });
-  newDocument(content, biblio.filename);
-  return { detail: content };
+  console.log({ biblio: record });
+  newDocument(initialText, record.filename);
+  return { record, sourceFile, topFolder, initialText };
 }
 
 export async function saveFile() {
@@ -63,8 +64,4 @@ export async function saveFile() {
   await writable.close();
   console.log("Saved");
   return { detail: content };
-}
-
-export function getFilename() {
-  return filename;
 }

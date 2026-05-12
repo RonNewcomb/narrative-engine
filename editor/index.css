@@ -40,29 +40,29 @@ main > div {
   overflow-y: auto;
 }
 
-main > div#plannr {
+main > scene-planner {
   width: 20%;
 }
 
-main > div#plannr summary:hover {
+main > scene-planner summary:hover {
   background-color: lightgray;
 }
 
-main > div#plannr details div:hover {
+main > scene-planner details div:hover {
   background-color: transparent;
 }
-main > div#plannr details div:hover div:hover {
+main > scene-planner details div:hover div:hover {
   background-color: lightgray;
 }
 
-main > div#editor {
+main > code-editor {
   width: 45%;
   .cm-editor {
     height: 100%;
   }
 }
 
-main > div#player {
+main > player-frame {
   width: 32%;
   iframe {
     border: none;

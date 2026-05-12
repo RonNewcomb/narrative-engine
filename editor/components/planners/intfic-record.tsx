@@ -19,7 +19,7 @@ export function IntficRecord({
   if (!bib) return <intfic-record></intfic-record>;
 
   const fields = keys.map(key => (
-    <div style={{ textAlign: "right", textTransform: "capitalize" }}>
+    <div key={key} style={{ textAlign: "right", textTransform: "capitalize" }}>
       {key}:
       <input
         type="text"
@@ -39,7 +39,7 @@ export function IntficRecord({
         <summary>
           {bib.title} by {bib.author}{" "}
         </summary>
-        <div>{fields.join("")}</div>
+        <div>{fields}</div>
       </details>
     </intfic-record>
   );

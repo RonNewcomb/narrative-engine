@@ -4,9 +4,8 @@ import type { iFictionRecord } from "../../publisher/iFictionRecord";
 export interface Project {
   record: iFictionRecord;
   sourceFile: FileSystemFileHandle;
-  dirHandle: FileSystemDirectoryHandle;
+  topFolder: FileSystemDirectoryHandle;
   initialText: string;
-  detail: string;
 }
 
 interface ProjectContextType {

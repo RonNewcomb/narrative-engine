@@ -5,6 +5,7 @@ import { highlightSelectionMatches, searchKeymap } from "@codemirror/search";
 import { EditorState, Extension } from "@codemirror/state";
 import { drawSelection, dropCursor, EditorView, highlightSpecialChars, KeyBinding, keymap } from "@codemirror/view";
 import { tags } from "@lezer/highlight";
+import { useEffect, useMemo } from "react";
 import { System3Mirrorways } from "../language-plugin/dist/index";
 import { saveFile } from "./services/project";
 
@@ -78,11 +79,8 @@ const getExtensions = (room?: string, content?: string): Extension => [
   ]),
 ];
 
-export function newDocument(text = "Let it begin.", room?: string) {
-  const newState = EditorState.create({
-    doc: text,
-    extensions: getExtensions(room || undefined, text),
-  });
+export function newDocument(doc = "Let it begin.", room?: string) {
+  const newState = EditorState.create({ doc, extensions: getExtensions(room || undefined, doc) });
   window.view.setState(newState);
 }
 
@@ -92,12 +90,15 @@ Can you [copy]this?[/copy] Of \\* course!
 [replace this that] in here [/replace]
 `;
 
-window.view = new EditorView({
-  doc: initialText,
-  parent: document.getElementById("editor")!,
-  extensions: getExtensions(undefined, initialText),
-});
-
 export function CodeEditor() {
-  return <code-editor></code-editor>;
+  useEffect(() => {
+    window.view = new EditorView({
+      doc: initialText,
+      parent: document.getElementById("editor")!,
+      extensions: getExtensions(undefined, initialText),
+    });
+  }, []);
+
+  const ed = useMemo(() => <div id="editor"></div>, []);
+  return <code-editor>{ed}</code-editor>;
 }

@@ -7,17 +7,17 @@ import { TrashBin } from "./planners/trash-bin";
 import { useProject } from "./services/useProject";
 
 export function Planner() {
-  const project = useProject();
-  const biblio: Bibliographic | undefined = project?.project?.record.story.bibliographic;
+  const { project } = useProject();
+  const biblio: Bibliographic | undefined = project?.record.story.bibliographic;
 
   return (
-    <planner>
+    <scene-planner>
       <IntficRecord bib={biblio} />
       <ChaptersScenes />
       <CharacterList />
       <SettingsList />
       <TrashBin />
-      <OtherFiles folder={project.project?.dirHandle} />
-    </planner>
+      <OtherFiles folder={project?.topFolder} />
+    </scene-planner>
   );
 }

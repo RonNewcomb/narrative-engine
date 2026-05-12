@@ -1,10 +1,11 @@
 import type { iFictionRecord } from "../publisher/iFictionRecord";
 import { newDocument } from "./column-editor";
-import { render as renderPlanner } from "./column-planner";
+import { renderPlanner } from "./column-planner";
 import { renderErrbar } from "./err-bar";
-import { setIntficRecord } from "./intfic-record";
 import { newProject } from "./new-project";
 import { setCharacters } from "./planners/character-list";
+import { setIntficRecord } from "./planners/intfic-record";
+import { render as renderOtherFiles } from "./planners/other-files";
 import { setPlaces } from "./planners/settings-list";
 
 export const SaveFileEvent = "interpreter-save";
@@ -19,6 +20,7 @@ function closeProject() {
   fileHandle = undefined;
   filename = "";
   render();
+  renderOtherFiles();
   newDocument();
   location.reload();
 }
@@ -31,6 +33,7 @@ async function newFile() {
   fileHandle = x.sourceFile;
   filename = fileHandle.name;
   render(filename);
+  renderOtherFiles(folderHandle);
   newDocument(x.initialText, filename);
   dispatchEvent(new CustomEvent(LoadFileEvent, { detail: x.initialText, bubbles: true, cancelable: true }));
 }
@@ -65,6 +68,7 @@ export async function loadFile() {
   setIntficRecord(biblio);
   render(filename);
   renderPlanner();
+  renderOtherFiles(folderHandle);
   newDocument(content, biblio.filename);
   dispatchEvent(new CustomEvent(LoadFileEvent, { detail: content, bubbles: true, cancelable: true }));
 }

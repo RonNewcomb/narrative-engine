@@ -10,5 +10,5 @@
     "esModuleInterop": true,
     "resolveJsonModule": true
   },
-  "include": ["*.ts", "components/*.ts", "window.d.ts"]
+  "include": ["*.ts", "components/*.ts", "window.d.ts", "components/planners/intfic-record.ts"]
 }

@@ -1,6 +1,6 @@
 import type { iFictionRecord } from "../publisher/iFictionRecord";
 import { renderErrbar } from "./err-bar";
-import { getFreshIntficRecord, getIntficRecord, render as renderIntficRecord, setIntficRecord } from "./intfic-record";
+import { getFreshIntficRecord, getIntficRecord, render as renderIntficRecord, setIntficRecord } from "./planners/intfic-record";
 
 export async function newProject(): Promise<
   { sourceFile: FileSystemFileHandle; dirHandle: FileSystemDirectoryHandle; initialText: string } | void | undefined

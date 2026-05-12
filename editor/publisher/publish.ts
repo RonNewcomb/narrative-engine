@@ -1,5 +1,5 @@
 import { renderErrbar } from "../components/err-bar";
-import { getIntficRecord } from "../components/intfic-record";
+import { getIntficRecord } from "../components/planners/intfic-record";
 import type { iFictionRecord } from "./iFictionRecord";
 import { parse } from "./parser";
 

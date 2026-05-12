@@ -1,12 +1,13 @@
-import { selectPublishedFolder } from "../publisher/publish";
-import { getFilename } from "./services/project";
+import { selectPublishedFolder } from "./services/publish";
+import { useProject } from "./services/useProject";
 
-export function PublishButton() {
+export function PublishButton({ onError }: { onError: (msg?: string) => void }) {
+  const project = useProject();
+
   async function publish() {
-    console.log("Publish button clicked");
-    const filename = getFilename();
+    if (!project.project) return onError("No project selected");
     const content = window.view.state.doc.toString();
-    const url = await selectPublishedFolder(filename, content);
+    const url = await selectPublishedFolder(project.project, content, onError);
     //playPublished(url);
   }
 

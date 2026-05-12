@@ -1,16 +1,23 @@
 import bjson from "../../publisher/about.json";
 import type { iFictionRecord } from "../../publisher/iFictionRecord";
-import { useProject } from "../services/useProject";
+
+export type Bibliographic = iFictionRecord["story"]["bibliographic"];
 
 export function getFreshIntficRecord(): iFictionRecord {
   return { ...bjson } as iFictionRecord;
 }
 
-export function IntficRecord({ open = true }: { open?: boolean }) {
-  const project = useProject();
-  const biblio = project?.project?.record;
-  if (!biblio) return <intfic-record></intfic-record>;
-  const bib = biblio.story.bibliographic;
+export function IntficRecord({
+  open = true,
+  bib,
+  onChange,
+}: {
+  open?: boolean;
+  bib?: Bibliographic;
+  onChange?: (bib: Bibliographic) => void;
+}) {
+  if (!bib) return <intfic-record></intfic-record>;
+
   const fields = keys.map(key => (
     <div style={{ textAlign: "right", textTransform: "capitalize" }}>
       {key}:
@@ -18,7 +25,10 @@ export function IntficRecord({ open = true }: { open?: boolean }) {
         type="text"
         name={key}
         value={getValue(key, bib)}
-        onChange={e => setValue(key, bib, e.target.value)}
+        onChange={e => {
+          setValue(key, bib, e.target.value);
+          onChange?.(bib);
+        }}
         style={{ width: "16em" }}
       />
     </div>

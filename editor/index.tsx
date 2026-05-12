@@ -2,7 +2,7 @@ import { useState } from "react";
 import { createRoot } from "react-dom/client";
 import { CodeEditor } from "./components/column-editor";
 import { Planner } from "./components/column-planner";
-import { play, Player } from "./components/column-player";
+import { Player } from "./components/column-player";
 import { DarkMode } from "./components/dark-mode";
 import { ErrBar } from "./components/err-bar";
 import { FileOpenSave } from "./components/file-opensave";
@@ -24,6 +24,7 @@ export function App() {
 function Editor() {
   const project = useProject();
   const [error, setError] = useState<string | undefined>(undefined);
+  const [source, setSource] = useState("");
 
   const handleNewProject = (about: Project) => {
     project.setProject(about);
@@ -32,13 +33,13 @@ function Editor() {
   const handleSaveFileEvent = (e?: { detail: string }) => {
     const source = e?.detail;
     if (!source) return;
-    play(source);
+    setSource(source);
   };
 
   const handleLoadFileEvent = (e?: { detail: string }) => {
     const source = e?.detail;
     if (!source) return;
-    play(source);
+    setSource(source);
   };
 
   return (
@@ -48,8 +49,8 @@ function Editor() {
         <FileOpenSave onSave={handleSaveFileEvent} onLoad={handleLoadFileEvent} onError={setError} onNew={handleNewProject} />
         <div className="action-row">
           <MobileEditor />
-          <PlayButton />
-          <PublishButton />
+          <PlayButton onClick={setSource} />
+          <PublishButton onError={setError} />
           <SpeechToText />
           <DarkMode />
         </div>
@@ -57,7 +58,7 @@ function Editor() {
       <main>
         <Planner />
         <CodeEditor />
-        <Player />
+        <Player source={source} onError={setError} />
       </main>
       <footer>
         <ErrBar e={error} />

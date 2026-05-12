@@ -1,9 +1,8 @@
 import type { iFictionRecord } from "../publisher/iFictionRecord";
-//import { getFreshIntficRecord, getIntficRecord, render as renderIntficRecord, setIntficRecord } from "./planners/intfic-record";
+import { showNewProjectDialog } from "./modals/NewProjectModal";
 
 export async function newProject(): Promise<
   | { record: iFictionRecord; sourceFile: FileSystemFileHandle; dirHandle: FileSystemDirectoryHandle; initialText: string }
-  | void
   | undefined
   | string
 > {
@@ -29,39 +28,6 @@ export async function newProject(): Promise<
   const sourceFile = await writeFileSync(record.filename, initialText);
 
   return { record, sourceFile, dirHandle, initialText };
-}
-
-async function showNewProjectDialog(): Promise<0 | iFictionRecord> {
-  const dialog = document.createElement("dialog");
-  dialog.className = "new-project";
-  dialog.innerHTML = `
-<p>Only the title is really necessary. A working title is fine too, you can change these values later.</p>
-<div>
-    <intfic-record></intfic-record>
-</div>
-<div style="display:flex;justify-content:space-around;padding:1em">
-    <button id="cancel"  class="savebutton" type="button">Nevermind</button>
-    <button id="confirm" class="savebutton" type="button">Create</button>
-</div>`;
-  document.body.appendChild(dialog);
-  const oldBib = getIntficRecord();
-  const newBib = getFreshIntficRecord();
-  renderIntficRecord(true, newBib.story.bibliographic);
-
-  return new Promise<iFictionRecord | 0>(resolve => {
-    dialog.showModal();
-
-    const done = (value: boolean) => {
-      dialog.close();
-      dialog.remove(); // Cleanup DOM
-      renderIntficRecord(false, oldBib.story.bibliographic);
-      resolve(value ? newBib : 0);
-    };
-
-    dialog.onclose = () => done(false);
-    dialog.querySelector<HTMLDialogElement>("#confirm")!.onclick = () => done(true);
-    dialog.querySelector<HTMLDialogElement>("#cancel")!.onclick = () => done(false);
-  });
 }
 
 export function makeFilesystemSafeName(

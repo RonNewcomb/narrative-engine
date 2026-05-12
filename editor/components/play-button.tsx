@@ -1,9 +1,7 @@
-import { play } from "./column-player";
-
-export function PlayButton() {
+export function PlayButton({ onClick }: { onClick: (source: string) => void }) {
   async function playBtn() {
     const content = window.view.state.doc.toString();
-    play(content);
+    onClick(content);
   }
 
   return (

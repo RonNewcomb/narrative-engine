@@ -1,12 +1,12 @@
-import type { iFictionRecord } from "../publisher/iFictionRecord";
-import { showNewProjectDialog } from "./modals/NewProjectModal";
+import type { iFictionRecord } from "../../publisher/iFictionRecord";
+import { showNewProjectDialog } from "../modals/NewProjectModal";
 
 export async function newProject(): Promise<
   | { record: iFictionRecord; sourceFile: FileSystemFileHandle; dirHandle: FileSystemDirectoryHandle; initialText: string }
   | undefined
   | string
 > {
-  const dirHandle = await window.showDirectoryPicker();
+  const dirHandle = await (window as any).showDirectoryPicker();
   const shouldntExist = await dirHandle.getFileHandle("about.json", { create: false }).catch(() => undefined);
   if (shouldntExist) return "Sorry, but this folder already has a project in it. Please choose a different, or new, folder.";
 

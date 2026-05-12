@@ -1,6 +1,6 @@
 import type { iFictionRecord } from "../../publisher/iFictionRecord";
 import { newDocument } from "../column-editor";
-import { newProject } from "../new-project";
+import { newProject } from "./new-project";
 
 let filename = "";
 let fileHandle: FileSystemFileHandle | undefined;

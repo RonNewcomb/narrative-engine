@@ -7,7 +7,8 @@ import { drawSelection, dropCursor, EditorView, highlightSpecialChars, KeyBindin
 import { tags } from "@lezer/highlight";
 import { useEffect, useMemo } from "react";
 import { System3Mirrorways } from "../language-plugin/dist/index";
-import { saveFile } from "./services/project";
+import { saveProject } from "./services/project";
+import { useProject } from "./services/useProject";
 
 const mirrorwaysStyle = HighlightStyle.define([
   { tag: tags.comment, color: "gold" },
@@ -26,7 +27,7 @@ const mirrorwaysStyle = HighlightStyle.define([
 const saveBinding: KeyBinding = {
   key: "Mod-s", // Captures Ctrl-S on Windows/Linux and Cmd-S on macOS
   run: view => {
-    saveFile();
+    saveFn();
     return true; // Returning true prevents the browser's default Save dialog
   },
 };
@@ -90,7 +91,15 @@ Can you [copy]this?[/copy] Of \\* course!
 [replace this that] in here [/replace]
 `;
 
+let saveFn = () => {};
+
 export function CodeEditor() {
+  const { project } = useProject();
+
+  useEffect(() => {
+    saveFn = () => project && saveProject(project);
+  }, [project, saveProject]);
+
   useEffect(() => {
     window.view = new EditorView({
       doc: initialText,

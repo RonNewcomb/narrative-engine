@@ -7,7 +7,7 @@ let filename = "";
 let fileHandle: FileSystemFileHandle | undefined;
 let folderHandle: FileSystemDirectoryHandle | undefined;
 
-export function closeProject() {
+export function closeProject(project: Project) {
   folderHandle = undefined;
   fileHandle = undefined;
   filename = "";
@@ -56,12 +56,18 @@ export async function loadProject(): Promise<Project | string> {
   return { record, sourceFile, topFolder, initialText };
 }
 
-export async function saveFile() {
-  if (!fileHandle) return;
+export async function saveProject(project: Project) {
+  if (!project) return;
   const content = window.view.state.doc.toString();
-  const writable = await fileHandle.createWritable();
+  const writable = await project.sourceFile.createWritable();
   await writable.write(content);
   await writable.close();
   console.log("Saved");
+
+  const biblioHandle = await project.topFolder.getFileHandle("about.json", { create: true });
+  const biblioWritable = await biblioHandle.createWritable();
+  await biblioWritable.write(JSON.stringify(project.record, null, 2));
+  await biblioWritable.close();
+
   return { detail: content };
 }

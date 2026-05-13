@@ -116,3 +116,8 @@ dialog#mobile-editor-dialog > .wrapper .qrcode {
 dialog.new-project {
   max-width: 22em;
 }
+
+the-modal {
+  width: 80%;
+  padding: 2em;
+}

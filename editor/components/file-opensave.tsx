@@ -1,4 +1,4 @@
-import { closeProject, loadProject, newProject, saveFile } from "./services/project";
+import { closeProject, loadProject, newProject, saveProject } from "./services/project";
 import { Project, useProject } from "./services/useProject";
 
 export function FileOpenSave({
@@ -26,7 +26,7 @@ export function FileOpenSave({
   };
 
   const handleSave = async () => {
-    const x = await saveFile();
+    const x = await saveProject(project!);
     if (!x) return;
     onSave?.(x);
   };
@@ -40,7 +40,7 @@ export function FileOpenSave({
   };
 
   const handleClose = async () => {
-    const x = await closeProject();
+    const x = await closeProject(project!);
     onClose?.();
   };
 

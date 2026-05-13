@@ -48,5 +48,5 @@ export interface iFictionRecord {
   filename?: string;
   characters?: Character[];
   places?: Place[];
-  chapters?: { scenes: Scene[] }[];
+  scenes?: Scene[];
 }

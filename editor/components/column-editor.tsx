@@ -1,6 +1,6 @@
 import { autocompletion, closeBrackets, closeBracketsKeymap, completionKeymap } from "@codemirror/autocomplete";
 import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
-import { bracketMatching, foldGutter, foldKeymap, HighlightStyle, syntaxHighlighting } from "@codemirror/language";
+import { bracketMatching, foldKeymap, HighlightStyle, syntaxHighlighting } from "@codemirror/language";
 import { highlightSelectionMatches, searchKeymap } from "@codemirror/search";
 import { EditorState, Extension } from "@codemirror/state";
 import { drawSelection, dropCursor, EditorView, highlightSpecialChars, KeyBinding, keymap } from "@codemirror/view";
@@ -37,7 +37,7 @@ const getExtensions = (room?: string, content?: string): Extension => [
   // remote sync with mobile
   //mobileSync(room, content),
   // A gutter with code folding markers
-  foldGutter(),
+  //foldGutter(),
   // Replace non-printable characters with placeholders
   highlightSpecialChars(),
   // The undo history

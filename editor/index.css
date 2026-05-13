@@ -61,9 +61,15 @@ main > scene-planner details div:hover div:hover {
 
 main > code-editor {
   width: 45%;
-  .cm-editor {
-    height: 100%;
-  }
+}
+
+.cm-editor {
+  height: 100%;
+}
+
+.cm-content {
+  font-family: Arial;
+  font-size: 16px;
 }
 
 main > player-frame {

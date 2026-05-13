@@ -52,7 +52,7 @@ async function walkFolders(folder: FileSystemDirectoryHandle): Promise<FileTree[
   let nodes: FileTree[] = [];
   for await (const [key, value] of (folder as any).entries()) {
     if (key === "about.json") continue;
-    console.log({ key, value });
+    // console.log({ key, value });
 
     switch (value.kind) {
       case "directory":

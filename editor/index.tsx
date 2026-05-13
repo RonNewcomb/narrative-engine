@@ -11,13 +11,16 @@ import { Player } from "./components/column-player";
 import { ErrBar } from "./components/err-bar";
 import { FileOpenSave } from "./components/file-opensave";
 import { MirrorwayLogo } from "./components/MirrorwayLogo";
+import { ModalProvider } from "./components/services/modal";
 import { Project, ProjectProvider } from "./components/services/useProject";
 
 export function App() {
   return (
-    <ProjectProvider>
-      <Editor />
-    </ProjectProvider>
+    <ModalProvider backgroundColor="white">
+      <ProjectProvider>
+        <Editor />
+      </ProjectProvider>
+    </ModalProvider>
   );
 }
 

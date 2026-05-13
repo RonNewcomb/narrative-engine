@@ -32,7 +32,7 @@ const defaultModalStyle: CSSProperties = {
   position: "fixed",
   top: "50%",
   left: "50%",
-  translate: "-50%",
+  translate: "-50% -50%",
 };
 
 const focusable = "input,select,textarea,button,a[href],[tabindex]:not([tabindex='-1'])";
@@ -61,7 +61,7 @@ export interface ModalProviderProps {
  * Uses a separate component to avoid re-rendering App.
  */
 export function ModalProvider({ children, ...props }: PropsWithChildren<ModalProviderProps>) {
-  console.log("ModalProvider");
+  // console.log("ModalProvider");
   return (
     <modal-provider>
       {children}
@@ -82,7 +82,7 @@ function ModalsList({
   backgroundColor,
   exitClassName,
 }: ModalProviderProps) {
-  console.log("ModalsList");
+  // console.log("ModalsList");
   const [modals, setModals] = useState<ReactNode[]>([]);
 
   setOpenModals = setModals;

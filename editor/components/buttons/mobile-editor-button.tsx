@@ -1,27 +1,9 @@
-const dialog: HTMLDialogElement = document.createElement("dialog");
-dialog.setAttribute("closedby", "any");
-dialog.id = "mobile-editor-dialog";
-dialog.innerHTML = `
-<div class="wrapper">
-  <div>
-    Aim your mobile's camera or QR-code reader at the code below to connect to the mobile editor.
-  </div>
-  <div class="qrcode">
-  </div>
-</div>`;
-document.body.appendChild(dialog);
-const qrDiv: HTMLDivElement = document.querySelector("#mobile-editor-dialog .qrcode")!;
+import { serveMobile } from "../modals/MobileEditorQR";
 
 export function MobileEditor() {
   return (
     <mobile-editor>
-      <button
-        type="button"
-        onClick={() => serveMobile()}
-        style={{ border: 0 }}
-        aria-label="Edit on your mobile"
-        title="Edit on your mobile"
-      >
+      <button type="button" onClick={() => serveMobile()} aria-label="Edit on your mobile" title="Edit on your mobile">
         <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path
             d="M13 19C13 19.5523 12.5523 20 12 20C11.4477 20 11 19.5523 11 19C11 18.4477 11.4477 18 12 18C12.5523 18 13 18.4477 13 19Z"
@@ -38,63 +20,3 @@ export function MobileEditor() {
     </mobile-editor>
   );
 }
-
-let qrcodeRenderer = false;
-
-async function getQrRenderer(): Promise<boolean> {
-  return new Promise<any>(resolve => {
-    const script = document.createElement("script");
-    script.src = "https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js";
-    script.addEventListener("load", () => resolve(true));
-    document.body.appendChild(script);
-  }).catch(e => {
-    const msg = "Cannot load QR library.  " + JSON.stringify(e);
-    dialog.replaceChildren(msg);
-    dialog.showModal();
-    console.log(msg);
-    return false;
-  });
-}
-
-async function serveMobile(ips?: string[]) {
-  ips = (ips || []).concat(location.hostname);
-  ips = ips.filter(ip => ip && ip.match(/^\d+\.\d+\.\d+\.\d+$/));
-  if (!ips.length) {
-    const msg = "No IP address for 192.168.x.x so mobile can't connect";
-    dialog.replaceChildren(msg);
-    dialog.showModal();
-    return console.log(msg);
-  }
-
-  if (!qrcodeRenderer) qrcodeRenderer = await getQrRenderer();
-
-  if (!ips || !qrcodeRenderer) return;
-  const ip = ips[0];
-  if (!ip || !ip.match(/^\d+\.\d+\.\d+\.\d+$/)) {
-    if (!ip.includes("192.168")) {
-      const msg = "Address is not 192.168 local.";
-      dialog.replaceChildren(msg);
-      dialog.showModal();
-      return console.log(msg);
-    }
-  }
-  const port = location.port ? `:${location.port}` : "";
-  const subfolder = location.href.includes("/runtime") ? "/runtime/index.html" : "/editor-mobile/index.html";
-  const addy = `${location.protocol}//${ip}${port}${subfolder}`;
-
-  qrDiv.replaceChildren();
-  new QRCode(qrDiv, {
-    text: addy,
-    width: 128,
-    height: 128,
-    colorDark: "#000",
-    colorLight: "#fff",
-    correctLevel: QRCode.CorrectLevel.H,
-  });
-  dialog.showModal();
-}
-
-declare const QRCode: {
-  new (element: HTMLElement, options: any): void;
-  CorrectLevel: Record<string, string>;
-};

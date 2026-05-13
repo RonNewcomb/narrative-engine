@@ -22,14 +22,13 @@ function toggleDarkMode() {
   localStorage.setItem("dark-mode", (!darkStyle.disabled).toString());
 }
 
-const mode = localStorage.getItem("dark-mode");
-if (mode === null) if (!window.matchMedia("(prefers-color-scheme: dark)").matches) toggleDarkMode();
-if (mode == "false") toggleDarkMode();
+if ("false" == (localStorage.getItem("dark-mode") ?? (!window.matchMedia("(prefers-color-scheme: dark)").matches).toString()))
+  toggleDarkMode();
 
 export function DarkMode() {
   return (
-    <dark-mode onClick={toggleDarkMode}>
-      <button type="button" style={{ border: 0 }} aria-label="toggle dark mode" title="toggle dark mode" onClick={toggleDarkMode}>
+    <dark-mode>
+      <button type="button" aria-label="toggle dark mode" title="toggle dark mode" onClick={toggleDarkMode}>
         <svg width="24px" height="24px" viewBox="0 0 72 72">
           <g>
             <path fill="#FFFFFF" d="M36,45 v-36 a28,28 0 0 1 0 56 z" />

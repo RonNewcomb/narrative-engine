@@ -16,11 +16,10 @@ export function PublishButton({ onError }: { onError: (msg?: string) => void }) 
       <button
         type="button"
         onClick={publish}
-        style={{ border: 0 }}
         aria-label="Compile the work so its ready for distribution"
         title="Compile the work so its ready for distribution"
       >
-        <svg fill="#000000" version="1.1" xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 335.08 335.079">
+        <svg fill="#000000" xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 335.08 335.079">
           <path
             d="M311.175,115.775c-1.355-10.186-1.546-27.73,7.915-33.621c0.169-0.108,0.295-0.264,0.443-0.398
         c7.735-2.474,13.088-5.946,8.886-10.618l-114.102-34.38L29.56,62.445c0,0-21.157,3.024-19.267,35.894

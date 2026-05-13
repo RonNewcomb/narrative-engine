@@ -6,7 +6,7 @@ export function PlayButton({ onClick }: { onClick: (source: string) => void }) {
 
   return (
     <play-button>
-      <button type="button" style={{ border: 0 }} aria-label="Play" title="Play" onClick={playBtn}>
+      <button type="button" aria-label="Play" title="Play" onClick={playBtn}>
         <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path
             fillRule="evenodd"

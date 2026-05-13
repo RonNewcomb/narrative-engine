@@ -23,6 +23,9 @@ mirrorway-logo {
   display: flex;
   justify-content: flex-end;
 }
+.action-row button {
+  border: 0;
+}
 .action-row button:active {
   filter: invert(1);
 }
@@ -34,7 +37,8 @@ main {
   max-height: calc(100vh - 44px);
 }
 
-main > div {
+main > * {
+  display: block;
   border: 1px solid gray;
   height: 100%;
   overflow-y: auto;

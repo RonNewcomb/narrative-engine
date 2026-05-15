@@ -2,27 +2,31 @@ import type { Scene } from "../modals/SceneDialog";
 
 export function SceneType({ scene, onClick }: { scene: Scene; onClick?: (scene: Scene) => void }) {
   const next = () => {
-    console.log(scene.type);
-    const i = stypes.findIndex(x => x[0] == scene.type);
-    scene.type = stypes[i + 1]?.[0] || "";
-    console.log({ i, type: scene.type });
-    onClick?.({ ...scene });
+    if (!onClick) return;
+    const i = stypes.findIndex(x => x[0] == scene.icon);
+    scene.icon = stypes[(i + 1) % stypes.length][0];
+    onClick({ ...scene });
   };
 
   return (
-    <span className="notbutton" onClick={next}>
-      {getSceneIcon(scene.type)}
-    </span>
+    <button type="button" style={{ fontSize: "x-large", backgroundColor: "transparent" }} className="notbutton" onClick={next}>
+      {getSceneIcon(scene.icon)}
+    </button>
   );
 }
 
 const stypes = [
-  ["", "⛖"],
   ["+", "📈"],
   ["-", "📉"],
+  ["?", "💭"],
+  ["!", "⚔️"],
+  ["_", "🔀"],
+  ["i", "🔎"],
+  ["", "💬"],
 ];
+const otherwise = stypes[stypes.length - 1];
 
 export function getSceneIcon(type?: string): string {
-  const x = stypes.find(x => x[0] == type) || stypes[0];
+  const x = stypes.find(x => x[0] == type) || otherwise;
   return x[1];
 }

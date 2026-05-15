@@ -23,6 +23,7 @@ declare module "react" {
       "settings-list": DetailedHTMLProps<HTMLAttributes<HTMLElement>, HTMLElement>;
       "player-frame": DetailedHTMLProps<HTMLAttributes<HTMLElement>, HTMLElement>;
       "distraction-button": DetailedHTMLProps<HTMLAttributes<HTMLElement>, HTMLElement>;
+      "scene-dialog": DetailedHTMLProps<HTMLAttributes<HTMLElement>, HTMLElement>;
     }
   }
 }

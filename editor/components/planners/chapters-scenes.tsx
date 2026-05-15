@@ -47,7 +47,7 @@ export function ChaptersScenes() {
         {scenes.map((scene, i) => (
           <details key={i} className="indent">
             <summary>
-              <SceneType scene={scene} /> {scene.title}
+              <SceneType scene={scene} /> {scene.characterAttemptingSomething}
             </summary>
             <div onClick={() => editScene(scene)}>{JSON.stringify(scene, undefined, 2)}</div>
           </details>

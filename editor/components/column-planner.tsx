@@ -1,4 +1,4 @@
-import { Bibliographic } from "../publisher/iFictionRecord";
+import { useMemo, useState } from "react";
 import { ChaptersScenes } from "./planners/chapters-scenes";
 import { CharacterList } from "./planners/character-list";
 import { IntficRecord } from "./planners/intfic-record";
@@ -9,7 +9,10 @@ import { useProject } from "./services/useProject";
 
 export function Planner() {
   const { project } = useProject();
-  const biblio: Bibliographic | undefined = project?.record.story.bibliographic;
+  const [biblio, setBiblio] = useState(project?.record?.story?.bibliographic);
+  useMemo(() => {
+    if (biblio != project?.record.story.bibliographic) setBiblio(project?.record.story.bibliographic);
+  }, [project]);
 
   return (
     <scene-planner>
@@ -17,11 +20,11 @@ export function Planner() {
         scene-planner > * {
           padding-bottom: 1.5em;
         }
-        scene-planner  summary {
+        scene-planner > *:not(intfic-record) > details > summary {
           font-size: xx-large;
         }
       `}</style>
-      <IntficRecord bib={biblio} open={false} />
+      <IntficRecord bib={biblio} open={false} onChange={setBiblio} />
       <ChaptersScenes />
       <CharacterList />
       <SettingsList />

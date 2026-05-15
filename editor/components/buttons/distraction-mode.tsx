@@ -5,6 +5,7 @@ play-button    { visibility: hidden; }
 publish-button { visibility: hidden; }
 scene-planner  { visibility: hidden; }
 player-frame   { visibility: hidden; }
+file-opensave .close { visibility: hidden; }
 `;
 
 const hushStyle = document.createElement("style");

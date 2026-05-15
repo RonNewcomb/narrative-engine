@@ -19,6 +19,13 @@ mirrorway-logo {
   padding: 0.3em 0.7em;
 }
 
+button {
+  cursor: pointer;
+}
+button:hover {
+  box-shadow: inset 0 0 0 5px rgba(255, 255, 255, 0.2);
+}
+
 .action-row {
   display: flex;
   justify-content: flex-end;
@@ -85,6 +92,10 @@ main > player-frame {
   iframe {
     border: none;
   }
+}
+
+textarea {
+  font-family: inherit; /* Matches the surrounding text */
 }
 
 footer {

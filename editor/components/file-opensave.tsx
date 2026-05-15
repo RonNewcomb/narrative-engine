@@ -72,7 +72,7 @@ export function FileOpenSave({
             Save
           </button>
         </div>
-        <button className="actionbutton" onClick={handleClose} aria-label="close file">
+        <button className="actionbutton close" onClick={handleClose} aria-label="close file">
           Close
         </button>
       </div>

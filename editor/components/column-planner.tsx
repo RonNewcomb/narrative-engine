@@ -21,12 +21,12 @@ export function Planner() {
           font-size: xx-large;
         }
       `}</style>
-      <IntficRecord bib={biblio} />
+      <IntficRecord bib={biblio} open={false} />
       <ChaptersScenes />
       <CharacterList />
       <SettingsList />
       <TrashBin />
-      <OtherFiles folder={project?.topFolder} />
+      <OtherFiles />
     </scene-planner>
   );
 }

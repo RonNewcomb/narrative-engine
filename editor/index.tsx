@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { createRoot } from "react-dom/client";
 import { DarkMode } from "./components/buttons/dark-mode";
+import { DistractionButton } from "./components/buttons/distraction-mode";
 import { SpeechToText } from "./components/buttons/microphone-button";
 import { MobileEditor } from "./components/buttons/mobile-editor-button";
 import { PlayButton } from "./components/buttons/play-button";
@@ -51,6 +52,7 @@ function Editor() {
           <PublishButton onError={setError} />
           <SpeechToText />
           <DarkMode />
+          <DistractionButton />
         </div>
       </header>
       <main>

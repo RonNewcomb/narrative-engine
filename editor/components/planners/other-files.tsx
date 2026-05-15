@@ -1,14 +1,11 @@
 import { useMemo, useState } from "react";
+import { useProject } from "../services/useProject";
 
-let folder: FileSystemDirectoryHandle | undefined;
-
-export function clear() {
-  folder = undefined;
-}
-
-export function OtherFiles({ folder: folderHandle }: { folder?: FileSystemDirectoryHandle }) {
-  folder = folderHandle || folder;
+export function OtherFiles() {
+  const { project } = useProject();
   const [nodes, setNodes] = useState<FileTree[]>([]);
+
+  const folder = project?.topFolder;
   useMemo(() => folder && walkFolders(folder).then(setNodes), [folder]);
 
   if (!folder || !nodes || nodes.length == 0) return <other-files></other-files>;

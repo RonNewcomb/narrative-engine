@@ -23,11 +23,19 @@ mirrorway-logo {
   display: flex;
   justify-content: flex-end;
 }
-.action-row button {
+button.notbutton {
   border: 0;
 }
-.action-row button:active {
+button.notbutton:active {
   filter: invert(1);
+}
+
+.actionbutton {
+  background-color: #497d7e;
+  color: white;
+  padding: 0.5em 1em;
+  border: none;
+  border-radius: 1em;
 }
 
 main {
@@ -118,6 +126,5 @@ dialog.new-project {
 }
 
 the-modal {
-  width: 80%;
   padding: 2em;
 }

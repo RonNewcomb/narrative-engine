@@ -1,27 +1,39 @@
 import { useState } from "react";
-import { iFictionRecord } from "../../publisher/iFictionRecord";
+import { Bibliographic, iFictionRecord } from "../../publisher/iFictionRecord";
 import { getFreshIntficRecord, IntficRecord } from "../planners/intfic-record";
 import { modal } from "../services/modal";
 
-export async function showNewProjectDialog() {
-  const biblio = await modal<iFictionRecord | undefined>(X => <NewProjectDialog onDone={X} />);
+export async function showNewProjectDialog(suggestedTitle?: string) {
+  const biblio = await modal<iFictionRecord | undefined>(X => <NewProjectDialog title={suggestedTitle} onDone={X} />);
   return biblio;
 }
 
-function NewProjectDialog({ onDone }: { onDone: (x?: iFictionRecord) => void }) {
-  const [newBib, setBib] = useState(() => getFreshIntficRecord().story.bibliographic);
+function NewProjectDialog({ title, onDone }: { title?: string; onDone: (x?: iFictionRecord) => void }) {
+  const [ific, setIfic] = useState(() => {
+    const x = getFreshIntficRecord();
+    if (title) x.story.bibliographic.title = title;
+    console.log({ title });
+    return x;
+  });
+
+  const updateBib = (bib: Bibliographic) => {
+    setIfic(fic => {
+      fic.story.bibliographic = bib;
+      return { ...fic };
+    });
+  };
 
   return (
     <>
       <p>Only the title is really necessary. A working title is fine too, you can change these values later.</p>
       <div>
-        <IntficRecord bib={newBib} onChange={setBib} />
+        <IntficRecord bib={ific.story.bibliographic} onChange={updateBib} />
       </div>
       <div style={{ display: "flex", justifyContent: "spaceAround", padding: "1em" }}>
-        <button className="savebutton" type="button" onClick={() => onDone(undefined)}>
+        <button className="actionButton" type="button" onClick={() => onDone(undefined)}>
           Nevermind
         </button>
-        <button className="savebutton" type="button" onClick={() => onDone()}>
+        <button className="actionButton" type="button" onClick={() => onDone(ific)}>
           Create
         </button>
       </div>

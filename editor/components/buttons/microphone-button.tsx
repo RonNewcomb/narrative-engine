@@ -41,7 +41,7 @@ export function SpeechToText() {
       <button
         onClick={toggle}
         type="button"
-        className={live ? "pulse" : ""}
+        className={`notbutton ${live ? "pulse" : ""}`}
         aria-label="toggle speech-to-writing mode"
         title="toggle speech-to-writing mode"
       >

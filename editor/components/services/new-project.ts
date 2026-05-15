@@ -2,7 +2,7 @@ import { showNewProjectDialog } from "../modals/NewProjectModal";
 import { Project } from "./useProject";
 
 export async function createProject(): Promise<Project | string> {
-  const topFolder = await (window as any).showDirectoryPicker();
+  const topFolder: FileSystemDirectoryHandle = await window.showDirectoryPicker();
   const shouldntExist = await topFolder.getFileHandle("about.json", { create: false }).catch(() => undefined);
   if (shouldntExist) return "Sorry, but this folder already has a project in it. Please choose a different, or new, folder.";
 
@@ -14,7 +14,7 @@ export async function createProject(): Promise<Project | string> {
     return fileHandle;
   }
 
-  const record = await showNewProjectDialog();
+  const record = await showNewProjectDialog(topFolder?.name);
   if (!record) return "Cancelled.";
   const filename = makeFilesystemSafeName(record.story.bibliographic.title || "intfic");
   record.filename = filename + ".txt";

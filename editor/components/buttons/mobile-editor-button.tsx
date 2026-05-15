@@ -3,7 +3,13 @@ import { serveMobile } from "../modals/MobileEditorQR";
 export function MobileEditor() {
   return (
     <mobile-editor>
-      <button type="button" onClick={() => serveMobile()} aria-label="Edit on your mobile" title="Edit on your mobile">
+      <button
+        type="button"
+        className="notbutton"
+        onClick={() => serveMobile()}
+        aria-label="Edit on your mobile"
+        title="Edit on your mobile"
+      >
         <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path
             d="M13 19C13 19.5523 12.5523 20 12 20C11.4477 20 11 19.5523 11 19C11 18.4477 11.4477 18 12 18C12.5523 18 13 18.4477 13 19Z"

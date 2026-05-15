@@ -15,6 +15,7 @@ export function PublishButton({ onError }: { onError: (msg?: string) => void }) 
     <publish-button>
       <button
         type="button"
+        className="notbutton"
         onClick={publish}
         aria-label="Compile the work so its ready for distribution"
         title="Compile the work so its ready for distribution"

@@ -1,7 +1,5 @@
 import bjson from "../../publisher/about.json";
-import type { iFictionRecord } from "../../publisher/iFictionRecord";
-
-export type Bibliographic = iFictionRecord["story"]["bibliographic"];
+import type { Bibliographic, iFictionRecord } from "../../publisher/iFictionRecord";
 
 export function getFreshIntficRecord(): iFictionRecord {
   return { ...bjson } as iFictionRecord;

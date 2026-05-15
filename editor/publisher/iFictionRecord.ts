@@ -10,35 +10,7 @@ export interface iFictionRecord {
       ifid: string[];
       format: "html";
     };
-    bibliographic: {
-      title: string;
-      author: string;
-      language: string;
-      headline: string;
-      firstpublished: string | number;
-      genre?: string;
-      group?: typeof AuthoringTool;
-      forgiveness?: string;
-      description: string;
-      series?: string;
-      seriesnumber?: string | number;
-      resources?: {
-        auxiliary?: {
-          leafname?: string;
-          description?: string;
-        }[];
-      };
-      contacts?: {
-        url?: string;
-        authoremail?: string;
-      };
-      cover?: {
-        format?: string;
-        height?: string | number;
-        width?: string | number;
-        description?: string;
-      };
-    };
+    bibliographic: Bibliographic;
     colophon?: {
       generator: typeof AuthoringTool;
       generatorversion: string;
@@ -49,4 +21,34 @@ export interface iFictionRecord {
   characters?: Character[];
   places?: Place[];
   scenes?: Scene[];
+}
+
+export interface Bibliographic {
+  title: string;
+  author: string;
+  language: string;
+  headline: string;
+  firstpublished: string | number;
+  genre?: string;
+  group?: typeof AuthoringTool;
+  forgiveness?: string;
+  description: string;
+  series?: string;
+  seriesnumber?: string | number;
+  resources?: {
+    auxiliary?: {
+      leafname?: string;
+      description?: string;
+    }[];
+  };
+  contacts?: {
+    url?: string;
+    authoremail?: string;
+  };
+  cover?: {
+    format?: string;
+    height?: string | number;
+    width?: string | number;
+    description?: string;
+  };
 }

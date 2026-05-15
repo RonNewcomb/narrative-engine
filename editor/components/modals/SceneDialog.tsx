@@ -1,7 +1,10 @@
+import { useState } from "react";
+import { SceneType } from "../buttons/SceneType";
 import { modal } from "../services/modal";
 
 export interface Scene {
   title?: string;
+  type?: string;
   character?: string;
   motivatingBelief?: string;
   actionBeingAttempted?: string;
@@ -34,35 +37,58 @@ export async function showSceneDialog(original?: Scene) {
   return scene;
 }
 
-function SceneDialog({ scene, onDone }: { scene: Scene; onDone: (x?: Scene) => void }) {
+function SceneDialog({ scene: s, onDone }: { scene: Scene; onDone: (x?: Scene) => void }) {
+  const [scene, setScene] = useState(s);
+
+  const save = () => {
+    scene.title = `${scene.character || "someone"} ${scene.actionBeingAttempted || "tries something"}`;
+    onDone(scene);
+  };
+
   return (
     <>
+      <style>{`
+      the-modal input { min-width: 40em; }
+      `}</style>
       <h3>
-        Basics - {scene.character || ""} {scene.actionBeingAttempted || ""}
+        Basics - <SceneType scene={scene} onClick={setScene} />
+        {scene.character || ""} {scene.actionBeingAttempted || ""}
       </h3>
       <div>
         <span>Character </span>
-        <input name="character" defaultValue={scene["character"]} onChange={e => (scene["character"] = e.target.value)} />
+        <input
+          name="character"
+          placeholder='Who is the "star" of this scene?'
+          required
+          defaultValue={scene["character"]}
+          onChange={e => (scene["character"] = e.target.value)}
+        />
         <span> will be attempting to </span>
         <input
           name="actionBeingAttempted"
+          placeholder="What are they trying to accomplish throughout this whole scene?"
+          required
           defaultValue={scene["actionBeingAttempted"]}
           onChange={e => (scene["actionBeingAttempted"] = e.target.value)}
         />
         <span> because they believe </span>
         <input
           name="motivatingBelief"
+          placeholder="What belief of theirs was violated by a previous scene?"
+          required
           defaultValue={scene["motivatingBelief"]}
           onChange={e => (scene["motivatingBelief"] = e.target.value)}
         />
-      </div>
-      <div>
-        <span>Beliefs Leading To This Method</span>
-        <input
-          name="beliefsLeadingToThisMethod"
-          defaultValue={scene["beliefsLeadingToThisMethod"]}
-          onChange={e => (scene["beliefsLeadingToThisMethod"] = e.target.value)}
-        />
+        .
+        <div>
+          <span>Beliefs Leading To This Method</span>
+          <input
+            name="beliefsLeadingToThisMethod"
+            placeholder="Maybe the violated belief rests atop deeper beliefs, which may not be completely true?"
+            defaultValue={scene["beliefsLeadingToThisMethod"]}
+            onChange={e => (scene["beliefsLeadingToThisMethod"] = e.target.value)}
+          />
+        </div>
       </div>
 
       <h3>First Paragraphs</h3>
@@ -148,11 +174,11 @@ function SceneDialog({ scene, onDone }: { scene: Scene; onDone: (x?: Scene) => v
           onChange={e => (scene["futureReflections"] = e.target.value)}
         />
       </div>
-      <div style={{ display: "flex", justifyContent: "spaceAround", padding: "1em" }}>
-        <button className="savebutton" type="button" onClick={() => onDone(undefined)}>
+      <div style={{ display: "flex", justifyContent: "space-evenly", padding: "1em", width: "100%" }}>
+        <button className="actionButton" type="button" onClick={() => onDone(undefined)}>
           Nevermind
         </button>
-        <button className="savebutton" type="button" onClick={() => onDone(scene)}>
+        <button className="actionButton" type="button" onClick={save}>
           Save
         </button>
       </div>

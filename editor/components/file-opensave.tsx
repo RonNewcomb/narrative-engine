@@ -56,30 +56,23 @@ export function FileOpenSave({
           border-radius: 1em;
           padding-left: 1em;
         }
-        file-opensave .save {
-          background-color: #497d7e;
-          color: white;
-          padding: 0.5em 1em;
-          border: none;
-          border-radius: 1em;
-        }
       `}</style>
       <div style={{ display: filename ? "none" : "block" }}>
-        <button className="save" onClick={handleNew} aria-label="new story">
+        <button className="actionbutton" onClick={handleNew} aria-label="new story">
           New
         </button>
-        <button className="save" onClick={handleLoad} aria-label="open story">
+        <button className="actionbutton" onClick={handleLoad} aria-label="open story">
           Open
         </button>
       </div>
       <div style={{ display: filename ? "flex" : "none", gap: "2em" }}>
         <div className="save-header" onClick={handleSave}>
           {filename}{" "}
-          <button className="save" aria-label="save file">
+          <button className="actionbutton" aria-label="save file">
             Save
           </button>
         </div>
-        <button className="save" onClick={handleClose} aria-label="close file">
+        <button className="actionbutton" onClick={handleClose} aria-label="close file">
           Close
         </button>
       </div>

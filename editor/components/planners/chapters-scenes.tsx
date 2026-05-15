@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { SceneType } from "../buttons/SceneType";
 import { Scene, showSceneDialog } from "../modals/SceneDialog";
 import { useProject } from "../services/useProject";
 
@@ -37,15 +38,17 @@ export function ChaptersScenes() {
     chapters-scenes .indent .indent { margin-left: 1em; }
 `}</style>
       <details>
-        <summary style={{}}>
+        <summary>
           <span>📕 Scenes</span>{" "}
-          <button style={{ float: "right" }} onClick={() => addScene()}>
+          <button style={{ padding: "1em 2em", float: "right" }} type="button" className="actionButton" onClick={addScene}>
             Add Scene
           </button>
         </summary>
         {scenes.map((scene, i) => (
           <details key={i} className="indent">
-            <summary>📈 {scene.title}</summary>
+            <summary>
+              <SceneType scene={scene} /> {scene.title}
+            </summary>
             <div onClick={() => editScene(scene)}>{JSON.stringify(scene, undefined, 2)}</div>
           </details>
         ))}

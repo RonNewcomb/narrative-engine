@@ -28,7 +28,7 @@ if ("false" == (localStorage.getItem("dark-mode") ?? (!window.matchMedia("(prefe
 export function DarkMode() {
   return (
     <dark-mode>
-      <button type="button" aria-label="toggle dark mode" title="toggle dark mode" onClick={toggleDarkMode}>
+      <button type="button" className="notbutton" aria-label="toggle dark mode" title="toggle dark mode" onClick={toggleDarkMode}>
         <svg width="24px" height="24px" viewBox="0 0 72 72">
           <g>
             <path fill="#FFFFFF" d="M36,45 v-36 a28,28 0 0 1 0 56 z" />

@@ -14,7 +14,10 @@ export function OtherFiles({ folder: folderHandle }: { folder?: FileSystemDirect
   if (!folder || !nodes || nodes.length == 0) return <other-files></other-files>;
   return (
     <other-files>
-      <OtherFilesRecurse nodes={nodes} />
+      <details>
+        <summary>Other Files</summary>
+        <OtherFilesRecurse nodes={nodes} />
+      </details>
     </other-files>
   );
 }

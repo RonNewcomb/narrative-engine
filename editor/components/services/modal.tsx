@@ -33,6 +33,9 @@ const defaultModalStyle: CSSProperties = {
   top: "50%",
   left: "50%",
   translate: "-50% -50%",
+  overflow: "auto",
+  maxHeight: "95vh",
+  maxWidth: "100vw",
 };
 
 const focusable = "input,select,textarea,button,a[href],[tabindex]:not([tabindex='-1'])";

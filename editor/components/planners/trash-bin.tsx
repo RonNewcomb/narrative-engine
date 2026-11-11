@@ -5,7 +5,9 @@ export function TrashBin() {
     trash-bin { display: block }
 `}</style>
       <details>
-        <summary>🗑️ Scraps</summary>
+        <summary>
+          <span className="noinvert">🗑️</span> Scraps
+        </summary>
       </details>
     </trash-bin>
   );

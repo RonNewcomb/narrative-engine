@@ -37,7 +37,9 @@ export function SettingsList() {
     settings-list .indent { margin-left: 1em }
 `}</style>
       <details>
-        <summary>🗺️ Places</summary>
+        <summary>
+          <span className="noinvert">🗺️</span> Places
+        </summary>
         {places.map(c => (
           <details className="indent">
             <summary>${c.name}</summary>

@@ -39,7 +39,9 @@ export function ChaptersScenes() {
 `}</style>
       <details>
         <summary>
-          <span>📕 Scenes</span>{" "}
+          <span>
+            <span className="noinvert">📕</span> Scenes
+          </span>{" "}
           <button style={{ padding: "1em 2em", float: "right" }} type="button" className="actionButton" onClick={addScene}>
             Add Scene
           </button>

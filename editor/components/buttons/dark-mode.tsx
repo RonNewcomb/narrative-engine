@@ -8,7 +8,7 @@ body {
 }
 
 /* Re-invert media so they look normal */
-img, video, iframe, canvas {
+img, video, iframe, canvas, .qrcode, .noinvert {
   filter: invert(1) hue-rotate(180deg);
 }`;
 

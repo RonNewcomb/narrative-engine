@@ -91,7 +91,9 @@ export function CharacterList() {
     character-list .indent { margin-left: 1em }
     `}</style>
       <details>
-        <summary>🎭 Characters</summary>
+        <summary>
+          <span className="noinvert">🎭</span> Characters
+        </summary>
         {characters.map(c => (
           <details className="indent">
             <summary>{c.name}</summary>
